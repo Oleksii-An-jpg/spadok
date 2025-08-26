@@ -64,7 +64,7 @@ env:
         - BUILD
         - RUNTIME
   - variable: FIREBASE_PRIVATE_KEY
-    secret: FirebaseApiKeySecret@1
+    secret: FirebaseApiKeySecret
     availability:
       - BUILD
       - RUNTIME
