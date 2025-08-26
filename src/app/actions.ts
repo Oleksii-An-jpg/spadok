@@ -7,7 +7,6 @@ export async function createSession(token: string) {
     const cookieStore = await cookies()
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days in ms
     const sessionCookie = await adminAuth.createSessionCookie(token, { expiresIn });
-    console.log(sessionCookie);
     cookieStore.set({
         name: 'session',
         value: sessionCookie,
