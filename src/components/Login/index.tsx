@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { auth } from "@/lib/client";
-import { GoogleAuthProvider, signInWithPopup, signOut, getAuth, onAuthStateChanged } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signOut, getAuth, onAuthStateChanged, User } from "firebase/auth";
 import {createSession} from "@/app/actions";
 
 export default function LoginButton() {
-    const [user, setUser] = useState<any>(null);
-    const [adminData, setAdminData] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [adminData, setAdminData] = useState<null>(null);
 
     useEffect(() => {
         const auth = getAuth();
