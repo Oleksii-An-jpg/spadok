@@ -4,6 +4,8 @@ import {adminAuth} from "@/lib/admin";
 import {cookies} from "next/headers";
 import {redirect} from "next/navigation";
 import {ReactNode} from "react";
+import {Card, Grid, GridItem} from "@chakra-ui/react";
+import Sidebar from "@/components/sidebar";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
     const cookieStore = await cookies();
@@ -18,5 +20,14 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         redirect("/auth");
     }
 
-    return children;
+    return <Grid gridTemplateColumns="200px 1fr" p={4} gap={4}>
+        <GridItem>
+            <Sidebar />
+        </GridItem>
+        <GridItem>
+            <Card.Root>
+                {children}
+            </Card.Root>
+        </GridItem>
+    </Grid>
 }
