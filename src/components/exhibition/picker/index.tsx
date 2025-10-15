@@ -1,10 +1,10 @@
 import {createListCollection, Field, Portal, Select} from "@chakra-ui/react";
-import {Control, Controller} from "react-hook-form";
+import {Control, Controller, FieldPath} from "react-hook-form";
 import {useMemo} from "react";
 import {Item} from "@/models/item";
 
 type BaseItem = {
-    id: string;
+    id: string | number;
     name: string;
 }
 
@@ -12,13 +12,13 @@ type PickerProps<T> = {
     items: T[];
     label: string;
     placeholder?: string;
-    name: string;
+    name: FieldPath<Item>;
     control: Control<Item>;
     required?: boolean;
     multiple?: boolean;
 }
 
-function Picker<T extends BaseItem>({ items, control, name, label, required, placeholder, multiple }: PickerProps) {
+function Picker<T extends BaseItem>({ items, control, name, label, required, placeholder, multiple }: PickerProps<T>) {
     const collection = useMemo(() => {
         return createListCollection({
             items: items.map(item => ({
@@ -50,6 +50,7 @@ function Picker<T extends BaseItem>({ items, control, name, label, required, pla
                             onValueChange: ({ value }) => field.onChange(...value),
                         }}
                         onInteractOutside={() => field.onBlur()}
+                        /* @ts-expect-error something is wrong with the typings */
                         collection={collection}
                     >
                         <Select.HiddenSelect />

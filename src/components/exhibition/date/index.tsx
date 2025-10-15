@@ -50,7 +50,7 @@ const Date: FC<DateProps> = ({ control }) => {
                         <Select.Root
                             size="xs"
                             name={field.name}
-                            value={[field.value]}
+                            value={field.value ? [field.value] : []}
                             onValueChange={({ value }) => field.onChange(...value)}
                             onInteractOutside={() => field.onBlur()}
                             collection={dateTypeCollection}

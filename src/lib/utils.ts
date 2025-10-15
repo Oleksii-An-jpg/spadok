@@ -240,6 +240,7 @@ export interface ExtractedDateInfo {
     century?: Century;
     part?: Part;
     fraction?: Fraction;
+    decade?: number; // 0-9 for decades within a century
 }
 
 // Extract all date components from date range

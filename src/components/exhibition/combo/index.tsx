@@ -10,7 +10,7 @@ import {
     useListCollection,
     Wrap
 } from "@chakra-ui/react";
-import {Control, Controller} from "react-hook-form";
+import {Control, Controller, FieldPath} from "react-hook-form";
 import {Item} from "@/models/item";
 
 type BaseItem = {
@@ -22,23 +22,24 @@ type ComboProps<T> = {
     items: T[];
     label: string;
     placeholder?: string;
-    name: string;
+    name: FieldPath<Item>;
     control: Control<Item>;
     required?: boolean;
 }
 
 function Combo<T extends BaseItem>({ items, label, control, name, placeholder, required }: ComboProps<T>){
     const { contains } = useFilter({ sensitivity: "base" });
+    const formatted = useMemo(() => items.map(item => ({
+        label: item.name,
+        value: item.id,
+    })), [items]);
     const collection = useMemo(() => {
         return createListCollection({
-            items: items.map(item => ({
-                label: item.name,
-                value: item.id,
-            }))
+            items: formatted
         });
     }, [items]);
     const { collection: collectionOfItems, filter } = useListCollection({
-        initialItems: collection,
+        initialItems: formatted,
         filter: contains,
     });
     const handleInputChange = (details: Combobox.InputValueChangeDetails) => {
@@ -56,6 +57,7 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
                 multiple
                 size="xs"
                 collection={collectionOfItems}
+                /* @ts-expect-error something is wrong with the typings */
                 value={field.value ? field.value : []}
                 onValueChange={({ value }) => field.onChange(value)}
                 onInputValueChange={handleInputChange}
@@ -70,6 +72,7 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
                 </Combobox.Control>
 
                 <Wrap gap="2">
+                    {/* @ts-expect-error something is wrong with the typings */}
                     {field.value?.map((item) => (
                         <Badge key={item}>{collection.find(item)?.label}</Badge>
                     ))}
@@ -79,7 +82,7 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
                     <Combobox.Positioner>
                         <Combobox.Content>
                             <Combobox.Empty>Не знайдено</Combobox.Empty>
-                            {collection.items.map((item) => (
+                            {collectionOfItems.items.map((item) => (
                                 <Combobox.Item key={item.value} item={item}>
                                     {item.label}
                                     <Combobox.ItemIndicator />
