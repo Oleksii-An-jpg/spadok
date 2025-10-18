@@ -43,8 +43,13 @@ export type Item = ItemBaseModel & {
     sex: Sex[];
 }
 
+export type ItemUIModel = Omit<Item, 'images'> & {
+    images: File[]
+};
+
 export type ItemDBModel = ItemBaseModel & {
     region: string[];
     date: string[];
     sex: Sex[] | null;
+    images: string[]
 }

@@ -10,8 +10,20 @@ const nextConfig: NextConfig = {
             },
         ]
     },
+    async redirects() {
+        return [
+            {
+                source: '/admin',
+                destination: '/admin/founds',
+                permanent: true,
+            },
+        ]
+    },
     experimental: {
         optimizePackageImports: ["@chakra-ui/react"],
+        serverActions: {
+            bodySizeLimit: '100mb',
+        },
     },
 };
 

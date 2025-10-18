@@ -1,16 +1,12 @@
-import {getRegions} from "@/api/regions";
-
 'server only';
+import {getRegions} from "@/api/regions";
 import {Item, ItemDBModel} from "@/models/item";
 import {admin} from "@/lib/admin";
-import {
-    FirestoreDataConverter,
-    QueryDocumentSnapshot,
-} from "firebase-admin/firestore";
+import {FirestoreDataConverter, QueryDocumentSnapshot,} from "firebase-admin/firestore";
 import {Region} from "@/models/region";
 import {UniqueIdentifier} from "@dnd-kit/core";
 import {getTextFromAddress} from "@/components/places/utils";
-import {extractCenturyPartAndFraction} from "@/lib/utils";
+import {extractCenturyPartAndFraction, getDateTupleFromExtractedInfo} from "@/lib/utils";
 
 function isDefined<T>(value: T | undefined): value is T {
     return value !== undefined;
@@ -22,8 +18,13 @@ export class ItemConverter implements FirestoreDataConverter<Item> {
         this.regions = regions;
     }
 
-    toFirestore(item: Item): Item {
-        return item;
+    toFirestore(item: Item): ItemDBModel {
+        const { date, ...rest } = item;
+        const tuple = getDateTupleFromExtractedInfo(date);
+        return {
+            ...rest,
+            date: tuple ? tuple.map(d => d.toISOString()) : [],
+        };
     }
 
     fromFirestore(snapshot: QueryDocumentSnapshot<ItemDBModel>): Item {
@@ -55,29 +56,34 @@ export async function getItem(id: string) {
     return doc.data();
 }
 
-export async function getItems() {
-    const regions = await getRegions();
+async function getOrderAndPosition() {
     const orderSnapshot = await admin.collection('order').withConverter({
-        fromFirestore(snapshot: QueryDocumentSnapshot<{
-            items: string[]
-        }>): UniqueIdentifier[] {
+        fromFirestore(snapshot): UniqueIdentifier[] {
             return snapshot.data().items;
         },
-        toFirestore(items: string[]): string[] {
+        toFirestore(items: string[]) {
             return items;
         }
     }).doc('default').get();
+
     const order = (orderSnapshot.data() || []);
     const position = new Map(order.map((id, index) => [id, index]));
+
+    return { order, position };
+}
+
+export async function getItems() {
+    const regions = await getRegions();
+    const { order, position } = await getOrderAndPosition();
+
     const collection = admin.collection('items').withConverter(new ItemConverter(regions));
     const snapshot = await collection.get();
+
     const items = snapshot.docs.map((doc) => doc.data()).sort((a, b) => {
         const posA = position.get(a.id) ?? Number.MAX_SAFE_INTEGER;
         const posB = position.get(b.id) ?? Number.MAX_SAFE_INTEGER;
         return posA - posB;
     });
-    return {
-        items,
-        order
-    };
+
+    return { items, order };
 }

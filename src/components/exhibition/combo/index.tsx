@@ -5,13 +5,12 @@ import {
     Combobox,
     createListCollection,
     Field,
-    Portal,
     useFilter,
     useListCollection,
     Wrap
 } from "@chakra-ui/react";
 import {Control, Controller, FieldPath} from "react-hook-form";
-import {Item} from "@/models/item";
+import {ItemUIModel} from "@/models/item";
 
 type BaseItem = {
     id: string;
@@ -22,8 +21,8 @@ type ComboProps<T> = {
     items: T[];
     label: string;
     placeholder?: string;
-    name: FieldPath<Item>;
-    control: Control<Item>;
+    name: FieldPath<ItemUIModel>;
+    control: Control<ItemUIModel>;
     required?: boolean;
 }
 
@@ -78,19 +77,17 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
                     ))}
                 </Wrap>
 
-                <Portal>
-                    <Combobox.Positioner>
-                        <Combobox.Content>
-                            <Combobox.Empty>Не знайдено</Combobox.Empty>
-                            {collectionOfItems.items.map((item) => (
-                                <Combobox.Item key={item.value} item={item}>
-                                    {item.label}
-                                    <Combobox.ItemIndicator />
-                                </Combobox.Item>
-                            ))}
-                        </Combobox.Content>
-                    </Combobox.Positioner>
-                </Portal>
+                <Combobox.Positioner>
+                    <Combobox.Content>
+                        <Combobox.Empty>Не знайдено</Combobox.Empty>
+                        {collectionOfItems.items.map((item) => (
+                            <Combobox.Item key={item.value} item={item}>
+                                {item.label}
+                                <Combobox.ItemIndicator />
+                            </Combobox.Item>
+                        ))}
+                    </Combobox.Content>
+                </Combobox.Positioner>
             </Combobox.Root>}
         />
         <Field.HelperText />

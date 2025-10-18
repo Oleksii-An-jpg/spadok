@@ -243,6 +243,27 @@ export interface ExtractedDateInfo {
     decade?: number; // 0-9 for decades within a century
 }
 
+export const getDateTupleFromExtractedInfo = (info: ExtractedDateInfo): [Date, Date] | undefined => {
+    const { dateType, century, part, fraction } = info;
+
+    if (dateType === DateType.CENTURIES && century) {
+        return getCenturyDatesRange(century);
+    }
+    if (dateType === DateType.PARTS && century && part) {
+        return createDateTuple(century, part, fraction);
+    }
+    if (dateType === DateType.DECADES && century && info.decade !== undefined) {
+        const centuryNumber = getCenturyNumber(century);
+        const startYear = (centuryNumber - 1) * 100 + info.decade * 10;
+        return [new Date(startYear, 0, 1), new Date(startYear + 9, 11, 31)];
+    }
+    if (dateType === DateType.YEARS && century && info.decade !== undefined) {
+        const centuryNumber = getCenturyNumber(century);
+        const year = (centuryNumber - 1) * 100 + info.decade;
+        return [new Date(year, 0, 1), new Date(year, 11, 31)];
+    }
+}
+
 // Extract all date components from date range
 export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo => {
     if (!dates || dates.length === 0) {

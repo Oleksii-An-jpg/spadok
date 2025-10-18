@@ -1,7 +1,7 @@
-import {createListCollection, Field, Portal, Select} from "@chakra-ui/react";
+import {createListCollection, Field, Select} from "@chakra-ui/react";
 import {Control, Controller, FieldPath} from "react-hook-form";
 import {useMemo} from "react";
-import {Item} from "@/models/item";
+import {ItemUIModel} from "@/models/item";
 
 type BaseItem = {
     id: string | number;
@@ -12,8 +12,8 @@ type PickerProps<T> = {
     items: T[];
     label: string;
     placeholder?: string;
-    name: FieldPath<Item>;
-    control: Control<Item>;
+    name: FieldPath<ItemUIModel>;
+    control: Control<ItemUIModel>;
     required?: boolean;
     multiple?: boolean;
 }
@@ -33,6 +33,7 @@ function Picker<T extends BaseItem>({ items, control, name, label, required, pla
             {required && <Field.RequiredIndicator />}
         </Field.Label>
         <Controller
+            rules={{ required: required }}
             control={control}
             name={name}
             render={({ field }) => {
@@ -62,18 +63,16 @@ function Picker<T extends BaseItem>({ items, control, name, label, required, pla
                                 <Select.Indicator />
                             </Select.IndicatorGroup>
                         </Select.Control>
-                        <Portal>
-                            <Select.Positioner>
-                                <Select.Content>
-                                    {collection.items.map((item) => (
-                                        <Select.Item item={item} key={item.value}>
-                                            {item.label}
-                                            <Select.ItemIndicator />
-                                        </Select.Item>
-                                    ))}
-                                </Select.Content>
-                            </Select.Positioner>
-                        </Portal>
+                        <Select.Positioner>
+                            <Select.Content>
+                                {collection.items.map((item) => (
+                                    <Select.Item item={item} key={item.value}>
+                                        {item.label}
+                                        <Select.ItemIndicator />
+                                    </Select.Item>
+                                ))}
+                            </Select.Content>
+                        </Select.Positioner>
                     </Select.Root>
                 )
             }}

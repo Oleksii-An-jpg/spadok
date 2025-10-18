@@ -1,20 +1,22 @@
 'use client';
 import {FC, useEffect, useRef, useState} from "react";
-import {Item, Matureness} from "@/models/item";
+import {Item, ItemUIModel, Matureness} from "@/models/item";
 import {
+    Box,
     Button,
     Card,
+    Checkbox,
+    CheckboxGroup,
+    Container,
     Field,
+    FileUpload,
+    HStack,
     Input,
+    InputGroup,
+    Link as ChakraLink,
     Text,
     Textarea,
-    InputGroup,
     VStack,
-    Link as ChakraLink,
-    Container,
-    CheckboxGroup,
-    Checkbox,
-    HStack,
 } from "@chakra-ui/react";
 import {Controller, useController, useForm} from "react-hook-form";
 import {PlacesAutocompleteInput} from "@/components/places";
@@ -28,9 +30,36 @@ import {Cut} from "@/models/cut";
 import Combo from "@/components/exhibition/combo";
 import Picker from "@/components/exhibition/picker";
 import Date from "@/components/exhibition/date";
+import Gallery from "@/components/exhibition/gallery";
+
+function itemToFormData(item: ItemUIModel): FormData {
+    const formData = new FormData();
+    const { images, ...rest } = item;
+
+    // Append images
+    images.forEach((file) => {
+        formData.append('images', file);
+    });
+
+    // Append all other fields
+    Object.entries(rest).forEach(([key, value]) => {
+        if (value === null || value === undefined) {
+            return; // Skip null/undefined
+        }
+
+        // Arrays and objects -> JSON
+        if (Array.isArray(value) || typeof value === 'object') {
+            formData.append(key, JSON.stringify(value));
+        } else {
+            formData.append(key, String(value));
+        }
+    });
+
+    return formData;
+}
 
 type ExhibitionProps = {
-    item: Item
+    item?: Item
     authors: Author[]
     regions: Region[]
     materials: Material[]
@@ -40,8 +69,9 @@ type ExhibitionProps = {
 }
 
 const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, techniques, categories, cuts }) => {
-    const { register, formState: { errors }, reset, control, handleSubmit } = useForm<Item>({
-        defaultValues: item
+    const { images = [], ...rest } = item || {};
+    const { register, watch, formState: { errors, isValid }, setValue, control, handleSubmit } = useForm<ItemUIModel>({
+        defaultValues: rest
     });
 
     const sex = useController({
@@ -53,21 +83,33 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
         name: 'matureness'
     });
     const [map, setMap] = useState<[google.maps.Map, google.maps.marker.AdvancedMarkerElement]>()
+    const [files] = watch(['images']);
 
-    const mapRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        if (map && item.address) {
-            const [mapInstance, markerInstance] = map
-            mapInstance.setCenter(item.address.latLng);
-            mapInstance.setZoom(10);
-            markerInstance.position = item.address.latLng;
+        async function parseImages() {
+            if (images && images.length > 0) {
+                const files = await Promise.all(images.map(async (image) => {
+                    const imageUrl = `https://storage.googleapis.com/spadok-images/${image}`
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    return new File([blob], image, {type: blob.type});
+                }));
+                setValue('images', files);
+            }
         }
-    }, [item.address, map]);
+
+        parseImages();
+    }, [images]);
+    const mapRef = useRef<HTMLDivElement>(null);
 
     return <Card.Body css={{ "--field-label-width": '15em'}}>
         <Container maxW="5xl">
-            <VStack as="form" align="start" onSubmit={handleSubmit(data => {
-                console.log(data);
+            <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
+                const formData = itemToFormData(data);
+                await fetch('/api/items', {
+                    method: 'POST',
+                    body: formData,
+                })
             })} gap={4}>
                 <Field.Root orientation="horizontal" required>
                     <Field.Label>
@@ -75,16 +117,18 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                         <Field.RequiredIndicator />
                     </Field.Label>
                     <InputGroup>
-                        <Input size="xs" {...register('name')} />
+                        <Input size="xs" autoComplete="off" {...register('name', {
+                            required: true
+                        })} />
                     </InputGroup>
                     <Field.HelperText />
                     <Field.ErrorText />
                 </Field.Root>
-                <Field.Root orientation="horizontal" required>
+                <Field.Root orientation="horizontal" required className="z-10">
                     <Field.Label htmlFor="addressLine">Географічна адреса</Field.Label>
                     <InputGroup>
                         <Controller
-                            rules={{ required: "Field is required" }}
+                            rules={{ required: true }}
                             render={({ field }) => {
                                 return (
                                     <PlacesAutocompleteInput
@@ -108,6 +152,10 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                                                 });
                                                 setMap([mapInstance, new library.AdvancedMarkerElement({
                                                     map: mapInstance,
+                                                    position: {
+                                                        lat: 50.450001,
+                                                        lng: 30.523333
+                                                    }
                                                 })]);
                                             }
                                         }}
@@ -117,12 +165,17 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                                                 const line = getTextFromAddress(address);
                                                 field.onChange(line);
 
-                                                reset({
-                                                    address: {
-                                                        ...address,
-                                                        line,
-                                                    }
-                                                })
+                                                setValue('address', {
+                                                    ...address,
+                                                    line,
+                                                });
+
+                                                if (map) {
+                                                    const [mapInstance, markerInstance] = map
+                                                    mapInstance.setCenter(address.latLng);
+                                                    mapInstance.setZoom(10);
+                                                    markerInstance.position = address.latLng;
+                                                }
                                             }
                                         }}
                                     />
@@ -154,7 +207,6 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                 }))} name="author" control={control} label="Автор" placeholder="Оберіть автора" />
                 <Field.Root orientation="horizontal">
                     <Field.Label>
-                        <Field.RequiredIndicator />
                         Інформація про купівлю
                     </Field.Label>
                     <InputGroup>
@@ -165,7 +217,6 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                 </Field.Root>
                 <Field.Root orientation="horizontal">
                     <Field.Label>
-                        <Field.RequiredIndicator />
                         Ціна
                     </Field.Label>
                     <InputGroup startAddon="₴" endAddon="UAH">
@@ -235,7 +286,9 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                         <Field.RequiredIndicator />
                     </Field.Label>
                     <InputGroup>
-                        <Input size="xs" {...register('sourceURL')} />
+                        <Input autoComplete="off" size="xs" {...register('sourceURL', {
+                            required: true
+                        })} />
                     </InputGroup>
                     <Field.HelperText />
                     <Field.ErrorText />
@@ -256,7 +309,20 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                         </Field.Root>
                     )}
                 />
-                <Button type="submit">Зберегти</Button>
+                <HStack align="start" w="full">
+                    <Text css={{ 'width': 'var(--field-label-width)' }} fontSize="sm">Фотографії</Text>
+                    <Box flex={1}>
+                        <Controller render={({ field }) => {
+                            return <FileUpload.Root onFileChange={({ acceptedFiles }) => {
+                                field.onChange(acceptedFiles);
+                            }} acceptedFiles={files} maxFiles={Infinity} accept="image/*">
+                                <FileUpload.HiddenInput />
+                                <Gallery />
+                            </FileUpload.Root>
+                        }} name="images" control={control} />
+                    </Box>
+                </HStack>
+                <Button disabled={!isValid} type="submit">Зберегти</Button>
             </VStack>
         </Container>
     </Card.Body>

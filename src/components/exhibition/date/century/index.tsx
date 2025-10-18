@@ -1,11 +1,11 @@
 import {FC} from "react";
 import {Control} from "react-hook-form";
-import {Item} from "@/models/item";
+import {ItemUIModel} from "@/models/item";
 import {Century} from "@/lib/utils";
 import Picker from "@/components/exhibition/picker";
 
 type CenturyPickerProps = {
-    control: Control<Item>
+    control: Control<ItemUIModel>
 }
 
 const CenturyPicker: FC<CenturyPickerProps> = ({ control }) => {

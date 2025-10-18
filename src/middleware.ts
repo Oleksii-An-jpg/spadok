@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     } catch {
         await auth.signOut();
-        return NextResponse.redirect(new URL("/login", request.url));
+        return NextResponse.redirect(new URL("/auth", request.url));
     }
 }
 

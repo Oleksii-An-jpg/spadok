@@ -1,7 +1,7 @@
 import {FC, useMemo} from "react";
-import {createListCollection, Field, Portal, Select} from "@chakra-ui/react";
+import {createListCollection, Field, Select} from "@chakra-ui/react";
 import {Control, Controller, useWatch} from "react-hook-form";
-import {Item} from "@/models/item";
+import {ItemUIModel} from "@/models/item";
 import {DateType, Part} from "@/lib/utils";
 import CenturyPicker from "@/components/exhibition/date/century";
 import PartPicker from "@/components/exhibition/date/part";
@@ -9,7 +9,7 @@ import FractionPicker from "@/components/exhibition/date/fraction";
 import DecadePicker from "@/components/exhibition/date/decade";
 
 type DateProps = {
-    control: Control<Item>;
+    control: Control<ItemUIModel>;
 }
 
 const Date: FC<DateProps> = ({ control }) => {
@@ -45,6 +45,7 @@ const Date: FC<DateProps> = ({ control }) => {
             <Controller
                 control={control}
                 name="date.dateType"
+                rules={{ required: true }}
                 render={({ field }) => {
                     return (
                         <Select.Root
@@ -64,18 +65,16 @@ const Date: FC<DateProps> = ({ control }) => {
                                     <Select.Indicator />
                                 </Select.IndicatorGroup>
                             </Select.Control>
-                            <Portal>
-                                <Select.Positioner>
-                                    <Select.Content>
-                                        {dateTypeCollection.items.map((dateType) => (
-                                            <Select.Item item={dateType} key={dateType.value}>
-                                                {dateType.label}
-                                                <Select.ItemIndicator />
-                                            </Select.Item>
-                                        ))}
-                                    </Select.Content>
-                                </Select.Positioner>
-                            </Portal>
+                            <Select.Positioner>
+                                <Select.Content>
+                                    {dateTypeCollection.items.map((dateType) => (
+                                        <Select.Item item={dateType} key={dateType.value}>
+                                            {dateType.label}
+                                            <Select.ItemIndicator />
+                                        </Select.Item>
+                                    ))}
+                                </Select.Content>
+                            </Select.Positioner>
                         </Select.Root>
                     )
                 }}
