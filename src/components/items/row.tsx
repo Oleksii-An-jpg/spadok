@@ -37,9 +37,12 @@ const Row: FC<PropsWithChildren<RowProps>> = ({ row, children }) => {
     }
 
     return <tr ref={setNodeRef} style={style}>
-        <Table.Cell>
-            <RowDragHandleCell row={row} />
-        </Table.Cell>
+        {/*<Table.Cell>*/}
+        {/*    {row}*/}
+        {/*</Table.Cell>*/}
+        {/*<Table.Cell>*/}
+        {/*    <RowDragHandleCell row={row} />*/}
+        {/*</Table.Cell>*/}
         {children}
     </tr>
 }

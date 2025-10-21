@@ -1,7 +1,8 @@
 // scripts/sync-to-algolia.ts
 import { algoliasearch } from 'algoliasearch';
 import { getFirestore } from 'firebase-admin/firestore';
-import { configureAlgoliaIndex } from '@/lib/algolia';
+import { configureAlgoliaIndex, denormalizeItemForAlgolia } from '@/lib/algolia';
+import {Item} from "@/models/item";
 
 const algoliaClient = algoliasearch(
     process.env.ALGOLIA_APP_ID!,
@@ -16,20 +17,12 @@ async function syncFirestoreToAlgolia() {
     const db = getFirestore();
     const snapshot = await db.collection('items').get();
 
-    const records = snapshot.docs.map(doc => {
+    const recordPromises = snapshot.docs.map(async (doc) => {
         const data = doc.data();
-        return {
-            objectID: doc.id,
-            ...data,
-            _tags: [
-                ...(data.techniques || []),
-                ...(data.subRegions || []),
-                ...(data.region || []),
-                data.mainCategory,
-                ...(data.subCategories || []),
-            ].filter(Boolean),
-        };
+        return denormalizeItemForAlgolia(doc.id, data as Item);
     });
+
+    const records = await Promise.all(recordPromises);
 
     console.log(`Syncing ${records.length} items to Algolia...`);
 

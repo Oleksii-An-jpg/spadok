@@ -44,7 +44,8 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
         <Table.Root variant="outline">
             <Table.Header>
                 <Table.Row>
-                    <Table.ColumnHeader colSpan={2}>Назва</Table.ColumnHeader>
+                    {/*<Table.ColumnHeader>Ідентифікатор</Table.ColumnHeader>*/}
+                    <Table.ColumnHeader>Назва</Table.ColumnHeader>
                     <Table.ColumnHeader>Регіон</Table.ColumnHeader>
                     <Table.ColumnHeader>Дії</Table.ColumnHeader>
                 </Table.Row>

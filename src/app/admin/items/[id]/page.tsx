@@ -14,13 +14,7 @@ type Params = Promise<{ id: string }>
 
 export default async function Page({params}: { params: Params }) {
     const {id} = await params;
-    const item = await getItem(id)
-    const authors = await getAuthors();
-    const regions = await getRegions();
-    const materials = await getMaterials();
-    const techniques = await getTechniques();
-    const categories = await getCategories();
-    const cuts = await getCuts();
+    const [item, authors, regions, materials, techniques, categories, cuts] = await Promise.all([getItem(id), getAuthors(), getRegions(), getMaterials(), getTechniques(), getCategories(), getCuts()]);
     if (!item) {
         return notFound();
     }

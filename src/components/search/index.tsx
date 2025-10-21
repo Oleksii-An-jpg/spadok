@@ -1,7 +1,7 @@
 'use client';
 import {FC} from "react";
 import {useForm} from "react-hook-form";
-import {Field, Input, InputGroup} from "@chakra-ui/react";
+import {Field, Group, Input, Button} from "@chakra-ui/react";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
 type SearchProps = {
@@ -24,15 +24,14 @@ const Search: FC<SearchProps> = (props) => {
         }
     })}>
         <Field.Root>
-            <Field.Label>
-                Пошук
-                <Field.RequiredIndicator />
-            </Field.Label>
-            <InputGroup>
-                <Input size="xs" autoComplete="off" {...register('query', {
+            <Group attached w="full">
+                <Input placeholder="Назва, опис, основна категорія, додаткова категорія і так далі..." autoComplete="off" {...register('query', {
                     required: true
                 })} />
-            </InputGroup>
+                <Button type="submit" variant="outline">
+                    Пошук
+                </Button>
+            </Group>
             <Field.HelperText />
             <Field.ErrorText />
         </Field.Root>

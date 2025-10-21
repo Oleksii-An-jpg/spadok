@@ -2,7 +2,7 @@
 
 import {getItems} from "@/api/items";
 import Items from "@/components/items";
-import {Card, Heading, VStack} from "@chakra-ui/react";
+import {Box, Card, Heading, VStack} from "@chakra-ui/react";
 import Create from "@/components/exhibition/create";
 import {getRegions} from "@/api/regions";
 import {getAuthors} from "@/api/authors";
@@ -41,12 +41,7 @@ export default async function Page({
         }
     }
 
-    const authors = await getAuthors();
-    const regions = await getRegions();
-    const materials = await getMaterials();
-    const techniques = await getTechniques();
-    const categories = await getCategories();
-    const cuts = await getCuts();
+    const [authors, regions, materials, techniques, categories, cuts] = await Promise.all([getAuthors(), getRegions(), getMaterials(), getTechniques(), getCategories(), getCuts()]);
 
     return (
         <>
@@ -54,7 +49,9 @@ export default async function Page({
                 <VStack align="start">
                     <Heading>Предмети</Heading>
                     <Create authors={authors} regions={regions} materials={materials} techniques={techniques} categories={categories} cuts={cuts} />
-                    <Search query={q} />
+                    <Box flex={1} w="full">
+                        <Search query={q} />
+                    </Box>
                 </VStack>
             </Card.Header>
             <Card.Body>
