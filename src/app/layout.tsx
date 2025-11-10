@@ -19,6 +19,7 @@ const eUkraine = localFont({
 })
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://staging.spadok.foundation'),
   title: "Краудфандинг «Спільний спадок». Спільно купуємо речі для музеїв.",
     description: "Шукаємо старовинні українські речі у вільному продажу й спільно викуповуємо найцінніші з них для музеїв. Оформлюйте передплату й ставайте меценатами «Спільного спадку».",
     openGraph: {
