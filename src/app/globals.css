@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+    --color-salmon: rgb(255, 123, 123);
+    --color-azure: rgb(47, 109, 173);
+    --color-khaki: rgb(242, 226, 148);
+    --color-travertine: rgb(255, 253, 234);
+    --color-concrete: rgb(243, 243, 243);
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,5 +30,4 @@ body {
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-e-ukraine), sans-serif;
-    @apply text-sm xl:text-2xl font-extralight;
 }

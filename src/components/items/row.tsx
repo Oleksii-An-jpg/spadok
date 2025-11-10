@@ -6,7 +6,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 import { useSortable } from '@dnd-kit/sortable'
-import {IconButton, Table} from "@chakra-ui/react";
+import {IconButton} from "@chakra-ui/react";
 import {BiMenu} from "react-icons/bi";
 
 type RowProps = {

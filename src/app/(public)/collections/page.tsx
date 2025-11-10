@@ -3,7 +3,7 @@
 export default async function Page() {
     return (
         <>
-            <h1>Catalog Page</h1>
+            <h1>Collections Page</h1>
         </>
     )
 }

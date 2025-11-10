@@ -13,7 +13,7 @@ export default async function Page({params}: { params: Params }) {
     const category = await getCategory(id);
     const {items} = await getItems({
         category: id
-    })
+    });
 
     return (
         <Grid templateColumns="repeat(4, 1fr)">

@@ -5,7 +5,7 @@ import {redirect} from "next/navigation";
 
 export async function createSession(token: string) {
     const cookieStore = await cookies()
-    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days in ms
+    const expiresIn = 60 * 60 * 24 * 14 * 1000; // 14 days in ms
     const sessionCookie = await adminAuth.createSessionCookie(token, { expiresIn });
     cookieStore.set({
         name: 'session',

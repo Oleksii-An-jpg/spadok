@@ -100,9 +100,17 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
 
         parseImages();
     }, [images]);
+    useEffect(() => {
+        if (map && item?.address) {
+            const [mapInstance, markerInstance] = map
+            mapInstance.setCenter(item.address.latLng);
+            mapInstance.setZoom(10);
+            markerInstance.position = item.address.latLng;
+        }
+    }, [map, item?.address]);
     const mapRef = useRef<HTMLDivElement>(null);
 
-    return <Card.Body css={{ "--field-label-width": '15em'}}>
+    return <Card.Body css={{ "--field-label-width": '18em'}}>
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
                 const formData = itemToFormData(data);
@@ -196,7 +204,9 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                 </Field.Root>
                 <Field.Root orientation="horizontal">
                     <Field.Label>
-                        Опис (<ChakraLink variant="underline" colorPalette="blue" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown base syntax</ChakraLink>)
+                        <span>
+                            Опис (<ChakraLink variant="underline" colorPalette="blue" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown base syntax</ChakraLink>)
+                        </span>
                     </Field.Label>
                     <Textarea size="xs" autoresize {...register('description')} />
                     <Field.HelperText />

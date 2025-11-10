@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local'
 import "./globals.css";
-import {Provider} from "@/components/ui/provider";
 
 const eUkraine = localFont({
     variable: '--font-e-ukraine',
@@ -43,9 +42,7 @@ export default function RootLayout({
       <body
         className={`${eUkraine.variable} subpixel-antialiased`}
       >
-      <Provider>
-          {children}
-      </Provider>
+      {children}
       </body>
     </html>
   );
