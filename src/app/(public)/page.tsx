@@ -3,12 +3,14 @@ import Section from "@/components/section";
 import Link from "next/link";
 import BrandButton from "@/components/brand/button";
 import {Logo} from "@/components/logo";
-import {VStack} from "@chakra-ui/react";
+import {Heading, VStack} from "@chakra-ui/react";
 import {getFounds} from "@/api/founds";
 import {getDisplayPrice} from "@/lib/price";
 import Avatar from "@/components/avatar";
 import Members from "@/components/members";
 import QNA from "@/components/q&a";
+import {getItems} from "@/api/items";
+import Display from "@/components/display";
 
 const MEMBERS = [
     {
@@ -71,6 +73,9 @@ const MEMBERS = [
 
 export default async function Home() {
     const founds = await getFounds();
+    const {items} = await getItems({
+        limit: 6
+    });
   return (
       <main className="text-sm xl:text-2xl font-extralight">
           <Section className="py-24 xl:py-48 text-center" variant="secondary">
@@ -260,30 +265,18 @@ export default async function Home() {
                   </Link>
               </p>
               <h3 className="text-xl xl:text-4xl leading-10 mb-6 font-light mt-12 whitespace-nowrap">
-                  Передані речі
-                  <br /> до музею:
+                  Передані речі до музею:
               </h3>
-              <div>
-                  {/*{toShow.map((exhibit, index) => {*/}
-                  {/*    return <ExhibitUI key={index} {...exhibit} />;*/}
-                  {/*})}*/}
-                  <div className="mt-8 text-center">
-                      {/*<Button*/}
-                      {/*    onClick={() => {*/}
-                      {/*        if (count === exhibits.length - 1) {*/}
-                      {/*            setCount(limit);*/}
-                      {/*            return;*/}
-                      {/*        }*/}
-                      {/*        setCount(count + limit);*/}
-                      {/*    }}*/}
-                      {/*    decorated={false}*/}
-                      {/*    size="medium"*/}
-                      {/*    variant="primary"*/}
-                      {/*>*/}
-                      {/*    {count === exhibits.length - 1 ? 'Приховати' : `Більше`}*/}
-                      {/*</Button>*/}
-                  </div>
-              </div>
+              <VStack align="stretch" gap={16} mb={6}>
+                  {items.map((item) => (
+                      <Display key={item.id} item={item} />
+                  ))}
+              </VStack>
+              <VStack gap={16}>
+                  <Heading fontSize={{ smToXl: 'xl', xl: '4xl' }} fontWeight="light">
+                      Тут будуть підбірки...
+                  </Heading>
+              </VStack>
           </Section>
           <Section className="py-24 xl:py-48" variant="quaternary">
               <div className="xl:flex xl:justify-between xl:gap-x-40">

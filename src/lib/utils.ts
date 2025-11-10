@@ -201,21 +201,25 @@ const inferPart = (
     const duration = endYear - startYear + 1;
     const offset = startYear - centuryStartYear;
 
-    // Check for special parts
-    if (duration === 5 && offset === 1) return Part.BEGINNING;
-    if (duration === 5 && offset === 96) return Part.END;
-    if (duration === 50 && offset === 26) return Part.MIDDLE;
+    // Check for special parts with tolerance
+    if (duration >= 5 && duration <= 6 && offset >= 1 && offset <= 2) return Part.BEGINNING;
+    if (duration >= 5 && duration <= 6 && offset >= 94 && offset <= 96) return Part.END;
+    if (duration >= 49 && duration <= 51 && offset >= 25 && offset <= 26) return Part.MIDDLE;
 
     if (!fraction) return undefined;
 
     const partLength = getFractionLength(fraction);
 
-    // Check for LAST
-    if (offset === 100 - partLength + 1) return Part.LAST;
+    // Check for LAST with tolerance
+    const expectedLastOffset = 100 - partLength + 1;
+    if (offset >= expectedLastOffset - 1 && offset <= expectedLastOffset + 1) return Part.LAST;
 
-    // Check for regular parts
-    if ((offset - 1) % partLength === 0) {
-        const index = (offset - 1) / partLength;
+    // Check for regular parts with tolerance
+    const index = Math.round((offset - 1) / partLength);
+    const expectedOffset = partLength * index + 1;
+
+    // Allow ±1 year tolerance
+    if (Math.abs(offset - expectedOffset) <= 1) {
         switch (index) {
             case 0: return Part.FIRST;
             case 1: return Part.SECOND;

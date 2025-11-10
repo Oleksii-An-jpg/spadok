@@ -7,6 +7,7 @@ import {Region} from "@/models/region";
 import {UniqueIdentifier} from "@dnd-kit/core";
 import {getTextFromAddress} from "@/components/places/utils";
 import {extractCenturyPartAndFraction, getDateTupleFromExtractedInfo} from "@/lib/utils";
+import { FieldPath } from 'firebase-admin/firestore';
 
 function isDefined<T>(value: T | undefined): value is T {
     return value !== undefined;
@@ -74,6 +75,7 @@ async function getOrderAndPosition() {
 
 type Options = {
     category?: string;
+    limit?: number;
 };
 
 export async function getItems(options?: Options) {
@@ -106,16 +108,38 @@ export async function getItems(options?: Options) {
         return { items, order };
     }
 
-    // default: no filter
-    const snapshot = await collection.get();
+    // default: no filter - use order array to determine which items to fetch
+    const itemIdsToFetch = options?.limit
+        ? order.slice(0, options.limit)
+        : order;
 
-    const items = snapshot.docs
-        .map((doc) => doc.data())
-        .sort((a, b) => {
-            const posA = position.get(a.id) ?? Number.MAX_SAFE_INTEGER;
-            const posB = position.get(b.id) ?? Number.MAX_SAFE_INTEGER;
-            return posA - posB;
-        });
+    // Firestore 'in' queries have a limit of 30 items, so we need to batch if necessary
+    const batchSize = 30;
+    const batches: UniqueIdentifier[][] = [];
+
+    for (let i = 0; i < itemIdsToFetch.length; i += batchSize) {
+        batches.push(itemIdsToFetch.slice(i, i + batchSize));
+    }
+
+    // Fetch all batches in parallel
+    const snapshots = await Promise.all(
+        batches.map(batch =>
+            collection.where(FieldPath.documentId(), 'in', batch).get()
+        )
+    );
+
+    // Merge all documents
+    const allDocs = snapshots.flatMap(snap => snap.docs);
+
+    // Create a map for quick lookup
+    const docsMap = new Map<UniqueIdentifier, Item>(allDocs.map(doc => {
+        return [doc.id, doc.data()];
+    }));
+
+    // Sort items according to the order array
+    const items = itemIdsToFetch
+        .map(id => docsMap.get(id))
+        .filter((item): item is Item => item !== undefined);
 
     return { items, order };
 }
