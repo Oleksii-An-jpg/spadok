@@ -21,8 +21,8 @@ export default async function CatalogLayout({
     //     })),
     // })).filter(category => category.items.length > 3);
     return <Container py={8}>
-        <Grid templateColumns="repeat(5, 1fr)" gap={4}>
-            {children}
-        </Grid>
+        {/*<Grid templateColumns="repeat(5, 1fr)" templateRows="masonry" gap={4}>*/}
+        {/*</Grid>*/}
+        {children}
     </Container>
 }
