@@ -14,11 +14,11 @@ type DisplayProps = {
 }
 
 const Display: FC<DisplayProps> = ({ item }) => {
-    return <Stack direction={{ smToXl: 'column', xl: 'row' }} gap={16}>
+    return <Stack direction={{ base: 'column', xl: 'row' }} gap={{ base: 4, xl: 16 }}>
         <Carousel.Root slideCount={items.length}>
             <Carousel.Control justifyContent="center" xl={{ width: 'xl' }}>
                 <Carousel.PrevTrigger asChild>
-                    <IconButton size="xs" variant="outline">
+                    <IconButton colorPalette="red">
                         <BiLeftArrowAlt />
                     </IconButton>
                 </Carousel.PrevTrigger>
@@ -34,36 +34,38 @@ const Display: FC<DisplayProps> = ({ item }) => {
                 </Carousel.ItemGroup>
 
                 <Carousel.NextTrigger asChild>
-                    <IconButton size="xs" variant="outline">
+                    <IconButton colorPalette="red">
                         <BiRightArrowAlt />
                     </IconButton>
                 </Carousel.NextTrigger>
             </Carousel.Control>
         </Carousel.Root>
-        <VStack align="stretch" fontSize={{ smToXl: 'xs', xl: 'md' }} gap={3}>
-            <VStack align="stretch">
-                <Text>Вартість:</Text>
-                <Text fontSize="2xl">{item.price ? getDisplayPrice(item.price) : 'Дарунок'}</Text>
+        <Stack direction={{ base: 'row', xl: 'column' }} columnGap={8} rowGap={3}>
+            <VStack align="stretch" gap={0}>
+                <Text fontSize={{ base: 'sm', xl: 'md' }}>Вартість:</Text>
+                <Text fontSize={{ base: 'sm', xl: '2xl' }}>{item.price ? getDisplayPrice(item.price) : 'Дарунок'}</Text>
             </VStack>
-            <Box>
-                <Text>{item.name}</Text>
-                <Text>{[item.address?.state, item.address?.region, item.address?.city]
-                    .filter(Boolean)
-                    .join(', ')} {item.region?.length && `(${item.regions.find(({ id }) => id === item.region[0])?.name})`}.</Text>
-                <Text>{[item.date.part, item.date.fraction, item.date.century && `${item.date.century} ст.`].filter(Boolean).join(' ')}</Text>
-            </Box>
-            <Collapsible.Root>
-                <Collapsible.Trigger className="cursor-pointer underline decoration-dashed">Повний опис</Collapsible.Trigger>
-                <Collapsible.Content mt={4}>
-                    {item.purchase}
-                </Collapsible.Content>
-            </Collapsible.Root>
-            <ChakraLink asChild variant="underline">
-                <Link target="_blank" href={item.sourceURL}>
-                    Завантажити світлини у високій якості
-                </Link>
-            </ChakraLink>
-        </VStack>
+            <VStack align="stretch" fontSize={{ base: 'xs', xl: 'md' }} gap={3}>
+                <Box>
+                    <Text>{item.name}</Text>
+                    <Text>{[item.address?.state, item.address?.region, item.address?.city]
+                        .filter(Boolean)
+                        .join(', ')} {item.region?.length && `(${item.regions.find(({ id }) => id === item.region[0])?.name})`}.</Text>
+                    <Text>{[item.date.part, item.date.fraction, item.date.century && `${item.date.century} ст.`].filter(Boolean).join(' ')}</Text>
+                </Box>
+                <Collapsible.Root>
+                    <Collapsible.Trigger className="cursor-pointer underline decoration-dashed">Повний опис</Collapsible.Trigger>
+                    <Collapsible.Content mt={4}>
+                        {item.purchase}
+                    </Collapsible.Content>
+                </Collapsible.Root>
+                <ChakraLink asChild variant="underline">
+                    <Link target="_blank" href={item.sourceURL}>
+                        Завантажити світлини у високій якості
+                    </Link>
+                </ChakraLink>
+            </VStack>
+        </Stack>
     </Stack>
 }
 

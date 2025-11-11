@@ -10,9 +10,6 @@ const config = defineConfig({
                 base: {
                     borderRadius: 0,
                     fontSize: 'xs',
-                    xl: {
-                        fontSize: 'xl'
-                    }
                 },
                 variants: {
                     variant: {

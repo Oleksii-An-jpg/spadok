@@ -15,19 +15,12 @@ export default async function Page({params}: { params: Params }) {
         category: id
     });
 
-    return (
-        <Grid templateColumns="repeat(4, 1fr)">
-            <GridItem colSpan={4}>
-                {category?.name}
+    return items.map((item) => (
+            <GridItem key={item.id}>
+                <Box className="relative h-96">
+                    <Image src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`} className="object-scale-down" alt={item.name} fill />
+                </Box>
+                {item.name}
             </GridItem>
-            {items.map((item) => (
-                <GridItem key={item.id}>
-                    <Box className="relative h-96">
-                        <Image src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`} className="object-scale-down" alt={item.name} fill />
-                    </Box>
-                    {item.name}
-                </GridItem>
-            ))}
-        </Grid>
-    )
+        ))
 }

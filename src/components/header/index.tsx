@@ -24,7 +24,7 @@ const Header: FC<HTMLAttributes<HTMLHeadingElement>> = ({
                     <Logo />
                 </Link>
                 <Link href="https://www.patreon.com/spilnyi_spadok" target="_blank">
-                    <BrandButton variant="brand-primary" size="xl">
+                    <BrandButton variant="brand-primary" size={{ base: 'sm', md: 'xl' }}>
                         Доєднатися
                     </BrandButton>
                 </Link>
