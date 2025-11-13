@@ -10,11 +10,35 @@ import {
     Textarea,
     Link as ChakraLink,
     Text,
-    Box, FileUpload, HStack
+    Box, FileUpload, HStack, Button
 } from "@chakra-ui/react";
 import {Category as CategoryModel, CategoryUIModel} from "@/models/category";
 import {Controller, useForm} from "react-hook-form";
 import Gallery from "@/components/exhibition/gallery";
+
+function categoryToFormData(category: CategoryUIModel) {
+    const formData = new FormData();
+    const { highlight, ...rest } = category;
+
+    if (highlight instanceof File) {
+        formData.append('highlight', highlight);
+    }
+
+    Object.entries(rest).forEach(([key, value]) => {
+        if (value === null || value === undefined) {
+            return; // Skip null/undefined
+        }
+
+        // Arrays and objects -> JSON
+        if (Array.isArray(value) || typeof value === 'object') {
+            formData.append(key, JSON.stringify(value));
+        } else {
+            formData.append(key, String(value));
+        }
+    });
+
+    return formData;
+}
 
 type CategoryProps = {
     category: CategoryModel
@@ -22,7 +46,7 @@ type CategoryProps = {
 
 const Category: FC<CategoryProps> = ({ category }) => {
     const { highlight, ...rest } = category
-    const { register, handleSubmit, setValue, watch, control } = useForm<CategoryUIModel>({
+    const { register, handleSubmit, setValue, watch, control, formState: { isValid, isSubmitting } } = useForm<CategoryUIModel>({
         defaultValues: rest
     });
     const file = watch('highlight');
@@ -42,7 +66,10 @@ const Category: FC<CategoryProps> = ({ category }) => {
     return <Card.Body css={{ "--field-label-width": '18em'}}>
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
-                console.log(data)
+                return await fetch('/api/categories', {
+                    method: 'POST',
+                    body: categoryToFormData(data),
+                })
             })} gap={4}>
                 <Field.Root orientation="horizontal" required>
                     <Field.Label>
@@ -67,12 +94,11 @@ const Category: FC<CategoryProps> = ({ category }) => {
                     <Field.HelperText />
                 </Field.Root>
                 <HStack align="start" w="full">
-                    <Text css={{ 'width': 'var(--field-label-width)' }} fontSize="sm">Колаж</Text>
+                    <Text css={{ 'width': 'var(--field-label-width)' }} fontSize="sm">Ілюстрація</Text>
                     <Box flex={1}>
                         <Controller render={({ field }) => {
                             return <FileUpload.Root onFileChange={({ acceptedFiles }) => {
-                                console.log(acceptedFiles);
-                                // field.onChange(acceptedFiles);
+                                field.onChange(...acceptedFiles);
                             }} acceptedFiles={file ? [file] : []} maxFiles={1} accept="image/*">
                                 <FileUpload.HiddenInput />
                                 <Gallery />
@@ -80,6 +106,7 @@ const Category: FC<CategoryProps> = ({ category }) => {
                         }} name="highlight" control={control} />
                     </Box>
                 </HStack>
+                <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
             </VStack>
         </Container>
     </Card.Body>

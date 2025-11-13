@@ -1,5 +1,5 @@
 import {useFileUploadContext} from "@ark-ui/react";
-import {FileUpload, Float, HStack, Icon, VStack} from "@chakra-ui/react";
+import {Box, FileUpload, Float, HStack, Icon, VStack} from "@chakra-ui/react";
 import {BiUpload, BiX} from "react-icons/bi";
 import {FC} from "react";
 import Link from "next/link";
@@ -34,10 +34,34 @@ const FileUploadList: FC = () => {
     )
 }
 
-const Gallery: FC = () => {
+const FileUploadPreview: FC = () => {
+    const fileUpload = useFileUploadContext()
+    const files = fileUpload.acceptedFiles
+    if (!files.length) return null
+    const [file] = files
+    return <FileUpload.ItemGroup>
+        <FileUpload.Item
+            w="auto"
+            h={200}
+            p="2"
+            file={file}
+            key={file.name}
+        >
+            <Box className="flex w-full h-full justify-center">
+                <FileUpload.ItemPreviewImage h="100%" />
+            </Box>
+        </FileUpload.Item>
+    </FileUpload.ItemGroup>
+}
+
+type GalleryProps = {
+    multiple?: boolean
+}
+
+const Gallery: FC<GalleryProps> = ({ multiple }) => {
     return (
         <VStack alignItems="stretch" w="full">
-            <FileUploadList />
+            {multiple ? <FileUploadList /> : <FileUploadPreview />}
             <FileUpload.Dropzone minH={20} borderStyle="dashed" justifyContent="center" alignItems="center">
                 <Icon size="md" color="fg.muted">
                     <BiUpload />

@@ -59,7 +59,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                         <Row key={item.id} row={item.id}>
                             <Table.Cell>
                                 <ChakraLink asChild variant="underline">
-                                    <Link prefetch={false} href={`/src/app/(private)/admin/items/${item.id}`}>
+                                    <Link prefetch={false} href={`/admin/items/${item.id}`}>
                                         {item.name}
                                     </Link>
                                 </ChakraLink>

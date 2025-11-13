@@ -89,5 +89,5 @@ export async function POST(request: NextRequest) {
         await saveItemToAlgolia(ref.id, rest as Item);
     }
 
-    return NextResponse.json({ success: true, item });
+    return NextResponse.json({ success: true, data: item });
 }

@@ -70,7 +70,7 @@ type ExhibitionProps = {
 
 const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, techniques, categories, cuts }) => {
     const { images = [], ...rest } = item || {};
-    const { register, watch, formState: { errors, isValid }, setValue, control, handleSubmit } = useForm<ItemUIModel>({
+    const { register, watch, formState: { errors, isValid, isSubmitting }, setValue, control, handleSubmit } = useForm<ItemUIModel>({
         defaultValues: rest
     });
 
@@ -114,7 +114,7 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
                 const formData = itemToFormData(data);
-                await fetch('/api/items', {
+                return await fetch('/api/items', {
                     method: 'POST',
                     body: formData,
                 })
@@ -327,12 +327,12 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                                 field.onChange(acceptedFiles);
                             }} acceptedFiles={files} maxFiles={Infinity} accept="image/*">
                                 <FileUpload.HiddenInput />
-                                <Gallery />
+                                <Gallery multiple />
                             </FileUpload.Root>
                         }} name="images" control={control} />
                     </Box>
                 </HStack>
-                <Button disabled={!isValid} type="submit">Зберегти</Button>
+                <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
             </VStack>
         </Container>
     </Card.Body>

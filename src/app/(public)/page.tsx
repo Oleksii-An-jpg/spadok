@@ -3,7 +3,7 @@ import Section from "@/components/section";
 import Link from "next/link";
 import BrandButton from "@/components/brand/button";
 import {Logo} from "@/components/logo";
-import {Link as ChakraLink,
+import {
     LinkBox,
     LinkOverlay, Text, Heading, SimpleGrid, VStack} from "@chakra-ui/react";
 import {getFounds} from "@/api/founds";
