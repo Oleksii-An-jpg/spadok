@@ -41,11 +41,11 @@ function categoryToFormData(category: CategoryUIModel) {
 }
 
 type CategoryProps = {
-    category: CategoryModel
+    category?: CategoryModel
 }
 
 const Category: FC<CategoryProps> = ({ category }) => {
-    const { highlight, ...rest } = category
+    const { highlight, ...rest } = category || {};
     const { register, handleSubmit, setValue, watch, control, formState: { isValid, isSubmitting } } = useForm<CategoryUIModel>({
         defaultValues: rest
     });

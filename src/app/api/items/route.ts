@@ -1,30 +1,11 @@
 // app/api/items/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getStorage } from 'firebase-admin/storage';
 import {admin} from "@/lib/admin";
 import {ItemConverter} from "@/api/items";
 import {getRegions} from "@/api/regions";
 import {Item} from "@/models/item";
 import {saveItemToAlgolia} from "@/lib/algolia";
-
-async function uploadImageToBucket(file: File) {
-    const bucket = getStorage().bucket('spadok-images');
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    const fileRef = bucket.file(file.name);
-
-    await fileRef.save(buffer, {
-        contentType: file.type,
-        metadata: {
-            cacheControl: 'public, max-age=31536000',
-        },
-    });
-
-    // Make public
-    await fileRef.makePublic();
-
-    return fileRef.name;
-}
+import {uploadImageToBucket} from "@/lib/upload";
 
 function removeUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
     return Object.fromEntries(

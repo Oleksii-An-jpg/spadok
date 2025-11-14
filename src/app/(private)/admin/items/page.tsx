@@ -49,9 +49,9 @@ export default async function Page({
                 <VStack align="start">
                     <Heading>Предмети</Heading>
                     <Create authors={authors} regions={regions} materials={materials} techniques={techniques} categories={categories} cuts={cuts} />
-                    <Box flex={1} w="full">
-                        <Search query={q} />
-                    </Box>
+                    {/*<Box flex={1} w="full">*/}
+                    {/*    <Search query={q} />*/}
+                    {/*</Box>*/}
                 </VStack>
             </Card.Header>
             <Card.Body>

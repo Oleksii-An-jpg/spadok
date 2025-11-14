@@ -1,28 +1,18 @@
 'use client';
 import {FC} from "react";
 import {Button, Dialog, Portal, CloseButton} from "@chakra-ui/react";
-import Exhibition from "@/components/exhibition";
-import {Author} from "@/models/author";
-import {Region} from "@/models/region";
-import {Material} from "@/models/material";
-import {Technique} from "@/models/technique";
-import {Category} from "@/models/category";
-import {Cut} from "@/models/cut";
+import Category from "@/components/category";
+import {Category as CategoryModel} from "@/models/category";
 
 type CreateProps = {
-    authors: Author[]
-    regions: Region[]
-    materials: Material[]
-    techniques: Technique[]
-    categories: Category[]
-    cuts: Cut[]
+    category?: CategoryModel
 }
 
 const Create: FC<CreateProps> = (props) => {
     return <Dialog.Root size="cover" scrollBehavior="inside">
         <Dialog.Trigger asChild>
             <Button>
-                Додати предмет
+                Додати категорію
             </Button>
         </Dialog.Trigger>
         <Portal>
@@ -30,10 +20,10 @@ const Create: FC<CreateProps> = (props) => {
             <Dialog.Positioner>
                 <Dialog.Content>
                     <Dialog.Header>
-                        <Dialog.Title>Додати предмет</Dialog.Title>
+                        <Dialog.Title>Додати категорію</Dialog.Title>
                     </Dialog.Header>
                     <Dialog.Body>
-                        <Exhibition {...props} />
+                        <Category {...props} />
                     </Dialog.Body>
                     <Dialog.Footer>
                         <Dialog.ActionTrigger asChild>

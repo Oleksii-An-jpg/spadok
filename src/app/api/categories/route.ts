@@ -1,27 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getStorage } from 'firebase-admin/storage';
 import {admin} from "@/lib/admin";
 import {CategoriesConverter} from "@/api/categories";
 import {Category} from "@/models/category";
-
-async function uploadImageToBucket(file: File) {
-    const bucket = getStorage().bucket('spadok-images');
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    const fileRef = bucket.file(file.name);
-
-    await fileRef.save(buffer, {
-        contentType: file.type,
-        metadata: {
-            cacheControl: 'public, max-age=31536000',
-        },
-    });
-
-    // Make public
-    await fileRef.makePublic();
-
-    return fileRef.name;
-}
+import {deleteImageFromBucket, uploadImageToBucket} from "@/lib/upload";
 
 export async function POST(request: NextRequest) {
     const formData = await request.formData();
@@ -50,4 +31,26 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data });
+}
+
+export async function DELETE(request: NextRequest) {
+    const body: Category = await request.json();
+    if (!body.id) {
+        return NextResponse.json({ success: false, message: 'ID is required' }, { status: 400 });
+    }
+
+    const collection = admin.collection('categories').withConverter(new CategoriesConverter());
+    const doc = await collection.doc(body.id).get();
+
+    if (!doc.exists) {
+        return NextResponse.json({ success: false, message: 'Category not found' }, { status: 404 });
+    }
+
+    await collection.doc(body.id).delete();
+
+    if (body.highlight) {
+        await deleteImageFromBucket(body.highlight)
+    }
+
+    return NextResponse.json({ success: true });
 }

@@ -6,7 +6,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 import { useSortable } from '@dnd-kit/sortable'
-import {IconButton} from "@chakra-ui/react";
+import {IconButton, Table} from "@chakra-ui/react";
 import {BiMenu} from "react-icons/bi";
 
 type RowProps = {
@@ -36,7 +36,7 @@ const Row: FC<PropsWithChildren<RowProps>> = ({ row, children }) => {
         position: 'relative',
     }
 
-    return <tr ref={setNodeRef} style={style}>
+    return <Table.Row ref={setNodeRef} style={style}>
         {/*<Table.Cell>*/}
         {/*    {row}*/}
         {/*</Table.Cell>*/}
@@ -44,7 +44,7 @@ const Row: FC<PropsWithChildren<RowProps>> = ({ row, children }) => {
         {/*    <RowDragHandleCell row={row} />*/}
         {/*</Table.Cell>*/}
         {children}
-    </tr>
+    </Table.Row>
 }
 
 export default Row
