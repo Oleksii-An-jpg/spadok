@@ -5,7 +5,8 @@ import BrandButton from "@/components/brand/button";
 import {Logo} from "@/components/logo";
 import {
     LinkBox,
-    LinkOverlay, Text, Heading, SimpleGrid, VStack} from "@chakra-ui/react";
+    LinkOverlay, Text, Heading, Link as ChakraLink, VStack, Box
+} from "@chakra-ui/react";
 import {getFounds} from "@/api/founds";
 import {getDisplayPrice} from "@/lib/price";
 import Avatar from "@/components/avatar";
@@ -287,20 +288,22 @@ export default async function Home() {
                   <Heading fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">
                       Наші підбірки:
                   </Heading>
-                  <SimpleGrid columns={{ base: 2, xl: 4 }} gap={4}>
+                  <Box columnCount={{ base: 2, md: 3, xl: 4 }} gap={4}>
                       {withItems.map((item) => (
-                          <LinkBox className="group" key={item.id}>
+                          <LinkBox className="group break-inside-avoid mb-4" key={item.id}>
                               <LinkOverlay asChild>
-                                  <Link href={`/collections/${item.id}`}>
-                                      <VStack className="transition-all ease-in-out duration-300 border-azure group-hover:border-salmon border-4 p-2">
-                                          <Image src={`https://storage.googleapis.com/spadok-images/${item.highlight}`} alt={item.name} width={200} height={200} />
-                                          <Text lineClamp={1} fontSize={{ base: 'xs', xl: 'md' }} className="text-center">{item.name}</Text>
-                                      </VStack>
-                                  </Link>
+                                  <ChakraLink asChild>
+                                      <Link href={`/collections/${item.id}`}>
+                                          <VStack className="transition-all ease-in-out duration-300 border-azure group-hover:border-salmon border-4 p-2">
+                                              <img src={`https://storage.googleapis.com/spadok-images/${item.highlight || item.items[0].highlight}`} alt={item.name} />
+                                              <Text lineClamp={1} fontSize={{ base: 'xs', xl: 'md' }} className="text-center">{item.name}</Text>
+                                          </VStack>
+                                      </Link>
+                                  </ChakraLink>
                               </LinkOverlay>
                           </LinkBox>
                       ))}
-                  </SimpleGrid>
+                  </Box>
               </VStack>
           </Section>
           <Section className="py-24 xl:py-48" variant="quaternary">

@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
         id: formData.get('id'),
         name: formData.get('name'),
         description: formData.get('description'),
+        isCollection: formData.get('isCollection') === 'true',
         ...(highlight && {
             highlight: await uploadImageToBucket(highlight),
         })

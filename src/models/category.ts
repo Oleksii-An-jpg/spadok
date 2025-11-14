@@ -3,6 +3,7 @@ export type Category = {
     name: string
     description: string
     highlight?: string
+    isCollection?: boolean
 }
 
 export type CategoryUIModel = Omit<Category, 'highlight'> & {

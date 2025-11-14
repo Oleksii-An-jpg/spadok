@@ -10,7 +10,7 @@ import {
     Textarea,
     Link as ChakraLink,
     Text,
-    Box, FileUpload, HStack, Button
+    Box, FileUpload, HStack, Button, Checkbox
 } from "@chakra-ui/react";
 import {Category as CategoryModel, CategoryUIModel} from "@/models/category";
 import {Controller, useForm} from "react-hook-form";
@@ -66,6 +66,7 @@ const Category: FC<CategoryProps> = ({ category }) => {
     return <Card.Body css={{ "--field-label-width": '18em'}}>
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
+                console.log(data);
                 return await fetch('/api/categories', {
                     method: 'POST',
                     body: categoryToFormData(data),
@@ -106,6 +107,22 @@ const Category: FC<CategoryProps> = ({ category }) => {
                         }} name="highlight" control={control} />
                     </Box>
                 </HStack>
+                <Controller
+                    control={control}
+                    name="isCollection"
+                    render={({ field }) => (
+                        <Field.Root>
+                            <Checkbox.Root
+                                checked={field.value}
+                                onCheckedChange={({ checked }) => field.onChange(checked)}
+                            >
+                                <Checkbox.HiddenInput />
+                                <Checkbox.Label css={{ 'width': 'var(--field-label-width)' }}>Підбірка</Checkbox.Label>
+                                <Checkbox.Control />
+                            </Checkbox.Root>
+                        </Field.Root>
+                    )}
+                />
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
             </VStack>
         </Container>
