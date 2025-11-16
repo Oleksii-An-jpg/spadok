@@ -15,7 +15,6 @@ import QNA from "@/components/q&a";
 import {getItems} from "@/api/items";
 import Display from "@/components/display";
 import {getCategories} from "@/api/categories";
-import Image from "next/image";
 
 const MEMBERS = [
     {

@@ -111,6 +111,18 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                 },
             },
             {
+                accessorFn: item => item.images[0],
+                header: 'Фото',
+                cell: info => {
+                    const image = info.getValue();
+                    return image ? <Box overflow="hidden" w="12" h="12" display="flex" alignItems="center" justifyContent="center">
+                        <img src={`https://storage.googleapis.com/spadok-images/${image}`} alt="Item image" />
+                    </Box> : null;
+                },
+                enableColumnFilter: false,
+                enableSorting: false,
+            },
+            {
                 accessorKey: 'id',
                 header: 'Дії',
                 enableSorting: false,
