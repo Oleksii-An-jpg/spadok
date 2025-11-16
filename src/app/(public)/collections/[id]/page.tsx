@@ -18,15 +18,15 @@ import {getCategory} from "@/api/categories";
 
 const ChakraMarkdownComponents: Components = {
     // Headings
-    h1: (props) => <Heading as="h1" size="2xl" my={4} {...props} />,
-    h2: (props) => <Heading as="h2" size="xl" my={4} {...props} />,
-    h3: (props) => <Heading as="h3" size="lg" my={3} {...props} />,
-    h4: (props) => <Heading as="h4" size="md" my={3} {...props} />,
-    h5: (props) => <Heading as="h5" size="sm" my={2} {...props} />,
-    h6: (props) => <Heading as="h6" size="xs" my={2} {...props} />,
+    h1: (props) => <Heading as="h1" size="4xl" my={4} {...props} />,
+    h2: (props) => <Heading as="h2" size="3xl" my={4} {...props} />,
+    h3: (props) => <Heading as="h3" size="2xl" my={3} {...props} />,
+    h4: (props) => <Heading as="h4" size="xl" my={3} {...props} />,
+    h5: (props) => <Heading as="h5" size="lg" my={2} {...props} />,
+    h6: (props) => <Heading as="h6" size="md" my={2} {...props} />,
 
     // Paragraph
-    p: (props) => <Text mb={4} {...props} />,
+    p: (props) => <Text mb={4} fontSize="sm" {...props} />,
 
     // Links
     a: (props) => <Link color="blue.500" {...props} target="_blank" />,
@@ -57,7 +57,7 @@ const ChakraMarkdownComponents: Components = {
     // Lists
     ul: (props) => <List.Root as="ul" my={4} pl={4} {...props} />,
     ol: (props) => <List.Root as="ol" my={4} pl={4} {...props} />,
-    li: (props) => <List.Item mb={1} {...props} />,
+    li: (props) => <List.Item fontSize="sm" mb={1} {...props} />,
 
     // Blockquote
     blockquote: ({ children, ...props }) => (
