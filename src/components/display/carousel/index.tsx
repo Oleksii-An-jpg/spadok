@@ -15,17 +15,24 @@ const CarouselThumbnails = ({ items }: { items: string[] }) => {
                     <BiLeftArrowAlt />
                 </ActionButton>
             </ChakraCarousel.PrevTrigger>
-            {items.map((src, index) => (
-                <AspectRatio
-                    key={index}
-                    ratio={1}
-                    w="16"
-                    cursor="button"
-                    onClick={() => carousel.scrollTo(index)}
-                >
-                    <Image src={`https://storage.googleapis.com/spadok-images/${src}`} className="object-scale-down" alt="asd" fill />
-                </AspectRatio>
-            ))}
+            <ChakraCarousel.IndicatorGroup>
+                {items.map((src, index) => (
+                    <ChakraCarousel.Indicator index={index} key={index} unstyled
+                                              _current={{
+                                                  outline: "2px solid salmon",
+                                                  outlineOffset: "2px",
+                                              }}>
+                        <AspectRatio
+                            ratio={1}
+                            w="16"
+                            cursor="button"
+                            onClick={() => carousel.scrollTo(index)}
+                        >
+                            <Image src={`https://storage.googleapis.com/spadok-images/${src}`} className="object-scale-down" alt="asd" fill />
+                        </AspectRatio>
+                    </ChakraCarousel.Indicator>
+                ))}
+            </ChakraCarousel.IndicatorGroup>
             <ChakraCarousel.NextTrigger asChild>
                 <ActionButton>
                     <BiRightArrowAlt />
@@ -58,6 +65,7 @@ const Carousel: FC<CarouselProps> = ({ item }) => {
         slideCount={item.images.length}
         className="bg-gray-800 p-4"
         flex={1}
+        gap={4}
     >
         <ChakraCarousel.Control gap="4">
             <ChakraCarousel.ItemGroup width="full">
@@ -69,12 +77,6 @@ const Carousel: FC<CarouselProps> = ({ item }) => {
                     </ChakraCarousel.Item>
                 ))}
             </ChakraCarousel.ItemGroup>
-
-            {/*<ChakraCarousel.NextTrigger asChild>*/}
-            {/*    <ActionButton insetEnd="4">*/}
-            {/*        <BiRightArrowAlt />*/}
-            {/*    </ActionButton>*/}
-            {/*</ChakraCarousel.NextTrigger>*/}
         </ChakraCarousel.Control>
         <CarouselThumbnails items={item.images} />
     </ChakraCarousel.Root>
