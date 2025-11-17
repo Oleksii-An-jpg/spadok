@@ -44,7 +44,7 @@ function categoryToFormData(category: CategoryUIModel) {
 
 type CategoryProps = {
     category?: CategoryModel;
-    items: Item[];
+    items?: Item[];
 }
 
 const Category: FC<CategoryProps> = ({ category, items }) => {
@@ -126,7 +126,7 @@ const Category: FC<CategoryProps> = ({ category, items }) => {
                     )}
                 />
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
-                <Tags items={items} />
+                {items && <Tags items={items} />}
             </VStack>
         </Container>
     </Card.Body>

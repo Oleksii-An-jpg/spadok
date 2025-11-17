@@ -3,18 +3,19 @@
 import {getItemsByCategory} from "@/api/items";
 import {Box, Card, Text, VStack,
     Heading,
-    Link,
     Code,
     List,
     Separator,
     Image,
     Table,
-    Blockquote,
+    Blockquote, LinkOverlay,
+    Link as ChakraLink,
     Checkbox,} from "@chakra-ui/react";
 import Markdown, {Components} from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from 'rehype-raw'
 import {getCategory} from "@/api/categories";
+import Link from "next/link";
 
 const ChakraMarkdownComponents: Components = {
     // Headings
@@ -29,29 +30,22 @@ const ChakraMarkdownComponents: Components = {
     p: (props) => <Text mb={4} fontSize="sm" {...props} />,
 
     // Links
-    a: (props) => <Link color="blue.500" {...props} target="_blank" />,
+    a: (props) => <ChakraLink color="blue.500" {...props} target="_blank" />,
 
-    // Inline code
     code: (props) => {
-        const { node, inline, className, children, ...rest } = props as any;
+        const { node, className, children, ...rest } = props;
 
-        return inline ? (
-            <Code colorScheme="gray" fontSize="0.875em" {...rest}>
-                {children}
-            </Code>
-        ) : (
-            <Code
-                display="block"
-                whiteSpace="pre"
-                p={4}
-                my={4}
-                borderRadius="md"
-                overflowX="auto"
-                {...rest}
-            >
-                {children}
-            </Code>
-        );
+        return <Code
+            display="block"
+            whiteSpace="pre"
+            p={4}
+            my={4}
+            borderRadius="md"
+            overflowX="auto"
+            {...rest}
+        >
+            {children}
+        </Code>;
     },
 
     // Lists
@@ -93,7 +87,7 @@ const ChakraMarkdownComponents: Components = {
 
     // Checkbox (for task lists)
     input: (props) => {
-        const { node, ...rest } = props as any;
+        const { node, ...rest } = props;
         if (rest.type === 'checkbox') {
             return <Checkbox.Root readOnly checked={rest.checked} />;
         }
@@ -116,10 +110,16 @@ export default async function Page({params}: { params: Params }) {
                 {items.map((item) => (
                     <Card.Root variant="elevated" size="sm" key={item.id} className="break-inside-avoid mb-4">
                         <Card.Body>
-                            <VStack>
-                                <img src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`} alt={item.name} />
-                                <Text fontSize="sm" className="text-center">{item.name}</Text>
-                            </VStack>
+                            <LinkOverlay asChild>
+                                <ChakraLink asChild variant="plain">
+                                    <Link prefetch={false} href={`/items/${item.id}`}>
+                                        <VStack>
+                                            <img src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`} alt={item.name} />
+                                            <Text fontSize="sm" className="text-center">{item.name}</Text>
+                                        </VStack>
+                                    </Link>
+                                </ChakraLink>
+                            </LinkOverlay>
                         </Card.Body>
                     </Card.Root>
                 ))}

@@ -76,7 +76,7 @@ async function getOrderAndPosition() {
 type WhereFilter = {
     field: string | FirebaseFirestore.FieldPath;
     operator: FirebaseFirestore.WhereFilterOp;
-    value: any;
+    value: unknown;
 };
 
 type Options = {

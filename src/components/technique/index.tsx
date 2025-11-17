@@ -16,7 +16,7 @@ import Tags from "@/components/tags";
 
 type TechniqueProps = {
     technique?: TechniqueModel
-    items: Item[];
+    items?: Item[];
 }
 
 const Technique: FC<TechniqueProps> = ({ technique, items }) => {
@@ -45,7 +45,7 @@ const Technique: FC<TechniqueProps> = ({ technique, items }) => {
                     <Field.ErrorText />
                 </Field.Root>
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
-                <Tags items={items} />
+                {items && <Tags items={items} />}
             </VStack>
         </Container>
     </Card.Body>

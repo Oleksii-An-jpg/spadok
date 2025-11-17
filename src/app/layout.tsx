@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${eUkraine.variable} subpixel-antialiased`}
+        className={`${eUkraine.variable} bg-white subpixel-antialiased`}
       >
       {children}
       </body>

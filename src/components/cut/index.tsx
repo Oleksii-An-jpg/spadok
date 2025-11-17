@@ -16,7 +16,7 @@ import Tags from "@/components/tags";
 
 type CutProps = {
     cut?: CutModel
-    items: Item[];
+    items?: Item[];
 }
 
 const Cut: FC<CutProps> = ({ cut, items }) => {
@@ -45,7 +45,7 @@ const Cut: FC<CutProps> = ({ cut, items }) => {
                     <Field.ErrorText />
                 </Field.Root>
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
-                <Tags items={items} />
+                {items && <Tags items={items} />}
             </VStack>
         </Container>
     </Card.Body>

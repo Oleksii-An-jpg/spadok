@@ -16,7 +16,7 @@ import Tags from "@/components/tags";
 
 type RegionProps = {
     region?: RegionModel;
-    items: Item[]
+    items?: Item[]
 }
 
 const Region: FC<RegionProps> = ({ region, items }) => {
@@ -55,7 +55,7 @@ const Region: FC<RegionProps> = ({ region, items }) => {
                     <Field.ErrorText />
                 </Field.Root>
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
-                <Tags items={items} />
+                {items && <Tags items={items} />}
             </VStack>
         </Container>
     </Card.Body>

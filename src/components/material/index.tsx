@@ -16,7 +16,7 @@ import {Item} from "@/models/item";
 
 type MaterialProps = {
     material?: MaterialModel;
-    items: Item[]
+    items?: Item[]
 }
 
 const Material: FC<MaterialProps> = ({ material, items }) => {
@@ -55,7 +55,7 @@ const Material: FC<MaterialProps> = ({ material, items }) => {
                     <Field.ErrorText />
                 </Field.Root>
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
-                <Tags items={items} />
+                {items && <Tags items={items} />}
             </VStack>
         </Container>
     </Card.Body>

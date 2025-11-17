@@ -46,7 +46,7 @@ const Author: FC<AuthorProps> = ({ author, items }) => {
                 </Field.Root>
                 <Field.Root orientation="horizontal">
                     <Field.Label>
-                        Ім'я
+                        Ім&apos;я
                         <Field.RequiredIndicator />
                     </Field.Label>
                     <InputGroup>
