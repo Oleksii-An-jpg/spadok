@@ -1,8 +1,19 @@
 'use client';
 
-import {FC, useMemo, useState} from "react";
+import {FC, useCallback, useMemo, useState} from "react";
 import {Item} from "@/models/item";
-import {Group, IconButton, Table, Link as ChakraLink, HStack, NativeSelect, Text, Box, VStack} from "@chakra-ui/react";
+import {
+    Group,
+    IconButton,
+    Table,
+    Link as ChakraLink,
+    HStack,
+    NativeSelect,
+    Text,
+    Box,
+    VStack,
+    Dialog, Portal, Button, CloseButton
+} from "@chakra-ui/react";
 import {BiFirstPage, BiHide, BiLastPage, BiLeftArrowAlt, BiRightArrowAlt, BiTrash} from "react-icons/bi";
 import Link from "next/link";
 import Row from "./row";
@@ -28,6 +39,7 @@ import {
     useReactTable,
 } from '@tanstack/react-table'
 import Filter from "@/components/filter";
+import {useForm} from "react-hook-form";
 
 type ItemsProps = {
     items: Item[]
@@ -38,6 +50,13 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
     const sensor = useSensor(PointerSensor, {
         activationConstraint: { distance: 10 },
     });
+    const { handleSubmit, formState: { isSubmitting } } = useForm();
+    const handleDelete = useCallback((item: Item) => {
+        return fetch(`/api/items`, {
+            method: 'DELETE',
+            body: JSON.stringify(item),
+        })
+    }, []);
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event
         if (active && over && active.id !== over.id) {
@@ -92,9 +111,37 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                         <IconButton size="sm" variant="outline">
                             <BiHide />
                         </IconButton>
-                        <IconButton size="sm" colorPalette="red" variant="outline">
-                            <BiTrash />
-                        </IconButton>
+                        <Dialog.Root role="alertdialog">
+                            <Dialog.Trigger asChild>
+                                <IconButton size="sm" colorPalette="red" variant="outline">
+                                    <BiTrash />
+                                </IconButton>
+                            </Dialog.Trigger>
+                            <Portal>
+                                <Dialog.Backdrop />
+                                <Dialog.Positioner>
+                                    <Dialog.Content>
+                                        <Dialog.Header>
+                                            <Dialog.Title>Ви впевнені?</Dialog.Title>
+                                        </Dialog.Header>
+                                        <Dialog.Body>
+                                            Видалення цього елемента є незворотнім. Ви дійсно хочете видалити <Text as="b">«{item.name}»</Text>?
+                                        </Dialog.Body>
+                                        <Dialog.Footer>
+                                            <Dialog.ActionTrigger asChild>
+                                                <Button variant="outline">Скасувати</Button>
+                                            </Dialog.ActionTrigger>
+                                            <Button onClick={handleSubmit(() => {
+                                                return handleDelete(info.row.original);
+                                            })} loading={isSubmitting} colorPalette="red">Видалити</Button>
+                                        </Dialog.Footer>
+                                        <Dialog.CloseTrigger asChild>
+                                            <CloseButton size="sm" />
+                                        </Dialog.CloseTrigger>
+                                    </Dialog.Content>
+                                </Dialog.Positioner>
+                            </Portal>
+                        </Dialog.Root>
                     </Group>
                 }
             },

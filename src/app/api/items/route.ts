@@ -5,7 +5,7 @@ import {ItemConverter} from "@/api/items";
 import {getRegions} from "@/api/regions";
 import {Item} from "@/models/item";
 import {saveItemToAlgolia} from "@/lib/algolia";
-import {uploadImageToBucket} from "@/lib/upload";
+import {deleteImageFromBucket, uploadImageToBucket} from "@/lib/upload";
 
 function removeUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
     return Object.fromEntries(
@@ -71,4 +71,30 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: item });
+}
+
+export async function DELETE(request: NextRequest) {
+    const body: Item = await request.json();
+    const id = body.id ? String(body.id as string) : null;
+    const regions = await getRegions();
+    if (!id) {
+        return NextResponse.json({ success: false, message: 'ID is required' }, { status: 400 });
+    }
+
+    const collection = admin.collection('items').withConverter(new ItemConverter(regions));
+    const doc = await collection.doc(id).get();
+
+    if (!doc.exists) {
+        return NextResponse.json({ success: false, message: 'Category not found' }, { status: 404 });
+    }
+
+    await collection.doc(id).delete();
+
+    if (body.images?.length) {
+        await Promise.all(body.images.map(async image => {
+            await deleteImageFromBucket(image)
+        }))
+    }
+
+    return NextResponse.json({ success: true });
 }

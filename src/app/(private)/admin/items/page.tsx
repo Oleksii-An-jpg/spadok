@@ -2,7 +2,7 @@
 
 import {getItems} from "@/api/items";
 import Items from "@/components/items";
-import {Box, Card, Heading, VStack} from "@chakra-ui/react";
+import {Card, Heading, VStack} from "@chakra-ui/react";
 import Create from "@/components/exhibition/create";
 import {getRegions} from "@/api/regions";
 import {getAuthors} from "@/api/authors";
@@ -12,7 +12,6 @@ import {getCategories} from "@/api/categories";
 import {getCuts} from "@/api/cuts";
 import {searchItems} from "@/lib/algolia";
 import {UniqueIdentifier} from "@dnd-kit/core";
-import Search from "@/components/search";
 
 export default async function Page({
                                        searchParams,
@@ -49,9 +48,6 @@ export default async function Page({
                 <VStack align="start">
                     <Heading>Предмети</Heading>
                     <Create authors={authors} regions={regions} materials={materials} techniques={techniques} categories={categories} cuts={cuts} />
-                    {/*<Box flex={1} w="full">*/}
-                    {/*    <Search query={q} />*/}
-                    {/*</Box>*/}
                 </VStack>
             </Card.Header>
             <Card.Body>
