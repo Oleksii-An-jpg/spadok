@@ -1,8 +1,8 @@
 'use client';
 
-import {FC, useMemo, useState, useEffect, InputHTMLAttributes} from "react";
+import {FC, useMemo, useState} from "react";
 import {Item} from "@/models/item";
-import {Group, IconButton, Table, Link as ChakraLink, HStack, NativeSelect, Text, Box, VStack, Field, Input} from "@chakra-ui/react";
+import {Group, IconButton, Table, Link as ChakraLink, HStack, NativeSelect, Text, Box, VStack} from "@chakra-ui/react";
 import {BiFirstPage, BiHide, BiLastPage, BiLeftArrowAlt, BiRightArrowAlt, BiTrash} from "react-icons/bi";
 import Link from "next/link";
 import Row from "./row";
@@ -18,7 +18,6 @@ import {
 } from '@dnd-kit/sortable'
 
 import {
-    Column,
     ColumnDef,
     PaginationState,
     flexRender,
@@ -28,47 +27,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table'
-
-// A typical debounced input react component
-function DebouncedInput({
-                            value: initialValue,
-                            onChange,
-                            debounce = 500,
-                            ...props
-                        }: {
-    value: string | number
-    onChange: (value: string | number) => void
-    debounce?: number
-} & Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
-    const [value, setValue] = useState(initialValue)
-
-    useEffect(() => {
-        setValue(initialValue)
-    }, [initialValue])
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            onChange(value)
-        }, debounce)
-
-        return () => clearTimeout(timeout)
-    }, [value])
-
-    return <Field.Root>
-        <Input placeholder="me@example.com" {...props} size="xs" value={value} onChange={e => setValue(e.target.value)} />
-    </Field.Root>
-}
-
-function Filter({ column }: { column: Column<Item> }) {
-    const columnFilterValue = column.getFilterValue()
-
-    return <DebouncedInput
-        onChange={value => column.setFilterValue(value)}
-        placeholder={`Пошук...`}
-        type="text"
-        value={(columnFilterValue ?? '') as string}
-    />
-}
+import Filter from "@/components/filter";
 
 type ItemsProps = {
     items: Item[]
@@ -204,12 +163,6 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                         })}
                     </Table.Row>
                 ))}
-                <Table.Row>
-                    {/*<Table.ColumnHeader>Ідентифікатор</Table.ColumnHeader>*/}
-                    {/*<Table.ColumnHeader>Назва</Table.ColumnHeader>*/}
-                    {/*<Table.ColumnHeader>Регіон</Table.ColumnHeader>*/}
-                    {/*<Table.ColumnHeader>Дії</Table.ColumnHeader>*/}
-                </Table.Row>
             </Table.Header>
             <Table.Body>
                 <SortableContext
@@ -232,28 +185,6 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                             </Row>
                         )
                     })}
-                    {/*{items.map(item => (*/}
-                    {/*    <Row key={item.id} row={item.id}>*/}
-                    {/*        <Table.Cell>*/}
-                    {/*            <ChakraLink asChild variant="underline">*/}
-                    {/*                <Link prefetch={false} href={`/admin/items/${item.id}`}>*/}
-                    {/*                    {item.name}*/}
-                    {/*                </Link>*/}
-                    {/*            </ChakraLink>*/}
-                    {/*        </Table.Cell>*/}
-                    {/*        <Table.Cell>{item.regions.map(region => region.name).join(', ')}</Table.Cell>*/}
-                    {/*        <Table.Cell>*/}
-                    {/*            <Group>*/}
-                    {/*                <IconButton size="sm" variant="outline">*/}
-                    {/*                    <BiHide />*/}
-                    {/*                </IconButton>*/}
-                    {/*                <IconButton size="sm" colorPalette="red" variant="outline">*/}
-                    {/*                    <BiTrash />*/}
-                    {/*                </IconButton>*/}
-                    {/*            </Group>*/}
-                    {/*        </Table.Cell>*/}
-                    {/*    </Row>*/}
-                    {/*))}*/}
                 </SortableContext>
             </Table.Body>
             <Table.Footer>

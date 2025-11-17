@@ -1,6 +1,7 @@
 'use server';
 import {notFound} from "next/navigation";
 import {getAuthor} from "@/api/authors";
+import Author from "@/components/author";
 
 type Params = Promise<{ id: string }>
 
@@ -11,5 +12,5 @@ export default async function Page({params}: { params: Params }) {
         return notFound();
     }
 
-    return <div>Category: {author.firstName}</div>
+    return <Author author={author} />
 }

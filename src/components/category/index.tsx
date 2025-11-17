@@ -66,7 +66,6 @@ const Category: FC<CategoryProps> = ({ category }) => {
     return <Card.Body css={{ "--field-label-width": '18em'}}>
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
-                console.log(data);
                 return await fetch('/api/categories', {
                     method: 'POST',
                     body: categoryToFormData(data),

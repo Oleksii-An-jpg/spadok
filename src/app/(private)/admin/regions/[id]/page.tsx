@@ -1,6 +1,7 @@
 'use server';
 import {notFound} from "next/navigation";
 import {getRegion} from "@/api/regions";
+import Region from "@/components/region";
 
 type Params = Promise<{ id: string }>
 
@@ -11,5 +12,5 @@ export default async function Page({params}: { params: Params }) {
         return notFound();
     }
 
-    return <div>Category: {region.name}</div>
+    return <Region region={region} />;
 }
