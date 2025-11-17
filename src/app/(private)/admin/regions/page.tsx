@@ -1,8 +1,9 @@
 'use server';
 
-import {Button, Card, Heading, VStack} from "@chakra-ui/react";
+import {Card, Heading, VStack} from "@chakra-ui/react";
 import {getRegions} from "@/api/regions";
 import Entities from "@/components/entities";
+import Create from "@/components/region/create";
 
 export default async function Page() {
     const regions = await getRegions();
@@ -12,7 +13,7 @@ export default async function Page() {
             <Card.Header>
                 <VStack align="start">
                     <Heading>Регіони</Heading>
-                    <Button>Додати регіон</Button>
+                    <Create />
                 </VStack>
             </Card.Header>
             <Card.Body>

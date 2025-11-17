@@ -124,7 +124,7 @@ function Entities<T extends BaseItem>({items}: EntitiesProps<T>) {
         // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
     })
     const { handleSubmit, formState: { isSubmitting } } = useForm();
-    return <Table.Root variant="outline">
+    return <Table.Root size="sm">
         <Table.Header>
             {table.getHeaderGroups().map(headerGroup => (
                 <Table.Row key={headerGroup.id}>

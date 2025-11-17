@@ -1,8 +1,9 @@
 'use server';
 
-import {Button, Card, Heading, VStack} from "@chakra-ui/react";
+import {Card, Heading, VStack} from "@chakra-ui/react";
 import Entities from "@/components/entities";
 import {getCuts} from "@/api/cuts";
+import Create from "@/components/cut/create";
 
 export default async function Page() {
     const cuts = await getCuts();
@@ -12,7 +13,7 @@ export default async function Page() {
             <Card.Header>
                 <VStack align="start">
                     <Heading>Крої</Heading>
-                    <Button>Додати крій</Button>
+                    <Create />
                 </VStack>
             </Card.Header>
             <Card.Body>

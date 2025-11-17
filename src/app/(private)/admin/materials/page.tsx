@@ -1,8 +1,9 @@
 'use server';
 
-import {Button, Card, Heading, VStack} from "@chakra-ui/react";
+import {Card, Heading, VStack} from "@chakra-ui/react";
 import Entities from "@/components/entities";
 import {getMaterials} from "@/api/materials";
+import Create from "@/components/material/create";
 
 export default async function Page() {
     const materials = await getMaterials();
@@ -12,7 +13,7 @@ export default async function Page() {
             <Card.Header>
                 <VStack align="start">
                     <Heading>Матеріали</Heading>
-                    <Button>Додати матеріал</Button>
+                    <Create />
                 </VStack>
             </Card.Header>
             <Card.Body>
