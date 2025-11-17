@@ -11,12 +11,15 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import {useForm} from "react-hook-form";
+import Tags from "@/components/tags";
+import {Item} from "@/models/item";
 
 type MaterialProps = {
-    material?: MaterialModel
+    material?: MaterialModel;
+    items: Item[]
 }
 
-const Material: FC<MaterialProps> = ({ material }) => {
+const Material: FC<MaterialProps> = ({ material, items }) => {
     const { register, handleSubmit, formState: { isValid, isSubmitting } } = useForm<MaterialModel>({
         defaultValues: material
     });
@@ -52,6 +55,7 @@ const Material: FC<MaterialProps> = ({ material }) => {
                     <Field.ErrorText />
                 </Field.Root>
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
+                <Tags items={items} />
             </VStack>
         </Container>
     </Card.Body>

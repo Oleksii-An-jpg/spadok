@@ -11,12 +11,15 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import {useForm} from "react-hook-form";
+import {Item} from "@/models/item";
+import Tags from "@/components/tags";
 
 type TechniqueProps = {
     technique?: TechniqueModel
+    items: Item[];
 }
 
-const Technique: FC<TechniqueProps> = ({ technique }) => {
+const Technique: FC<TechniqueProps> = ({ technique, items }) => {
     const { register, handleSubmit, formState: { isValid, isSubmitting } } = useForm<TechniqueModel>({
         defaultValues: technique
     });
@@ -42,6 +45,7 @@ const Technique: FC<TechniqueProps> = ({ technique }) => {
                     <Field.ErrorText />
                 </Field.Root>
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
+                <Tags items={items} />
             </VStack>
         </Container>
     </Card.Body>

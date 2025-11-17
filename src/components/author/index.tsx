@@ -11,12 +11,15 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import {useForm, Controller} from "react-hook-form";
+import {Item} from "@/models/item";
+import Tags from "@/components/tags";
 
 type AuthorProps = {
-    author?: AuthorModel
+    author?: AuthorModel;
+    items: Item[]
 }
 
-const Author: FC<AuthorProps> = ({ author }) => {
+const Author: FC<AuthorProps> = ({ author, items }) => {
     const { register, handleSubmit, control, formState: { isValid, isSubmitting } } = useForm<AuthorModel>({
         defaultValues: author
     });
@@ -97,6 +100,7 @@ const Author: FC<AuthorProps> = ({ author }) => {
                     <Field.ErrorText />
                 </Field.Root>
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
+                <Tags items={items} />
             </VStack>
         </Container>
     </Card.Body>

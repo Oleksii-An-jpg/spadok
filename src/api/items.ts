@@ -73,9 +73,15 @@ async function getOrderAndPosition() {
     return { order, position };
 }
 
+type WhereFilter = {
+    field: string | FirebaseFirestore.FieldPath;
+    operator: FirebaseFirestore.WhereFilterOp;
+    value: any;
+};
+
 type Options = {
-    category?: string;
     limit?: number;
+    where?: WhereFilter | WhereFilter[];
 };
 
 export async function getItems(options?: Options) {
@@ -84,20 +90,24 @@ export async function getItems(options?: Options) {
 
     const collection = admin.collection('items').withConverter(new ItemConverter(regions));
 
-    if (options?.category) {
-        // Firestore doesn't support OR directly, so we have to do two queries
-        const [mainSnap, subSnap] = await Promise.all([
-            collection.where('mainCategory', '==', options.category).get(),
-            collection.where('subCategories', 'array-contains', options.category).get(),
-        ]);
+    // Handle custom where filters
+    if (options?.where) {
+        const filters = Array.isArray(options.where) ? options.where : [options.where];
 
-        // Merge and deduplicate by id
-        const allDocs = new Map<string, FirebaseFirestore.QueryDocumentSnapshot<Item>>();
-        for (const doc of [...mainSnap.docs, ...subSnap.docs]) {
-            allDocs.set(doc.id, doc);
+        let query: FirebaseFirestore.Query<Item> = collection;
+
+        // Apply all where filters
+        for (const filter of filters) {
+            query = query.where(filter.field, filter.operator, filter.value);
         }
 
-        const items = Array.from(allDocs.values())
+        // Apply limit if specified
+        if (options?.limit) {
+            query = query.limit(options.limit);
+        }
+
+        const snapshot = await query.get();
+        const items = snapshot.docs
             .map((doc) => doc.data())
             .sort((a, b) => {
                 const posA = position.get(a.id) ?? Number.MAX_SAFE_INTEGER;
@@ -108,12 +118,11 @@ export async function getItems(options?: Options) {
         return { items, order };
     }
 
-    // default: no filter - use order array to determine which items to fetch
+    // Default: no filter - use order array
     const itemIdsToFetch = options?.limit
         ? order.slice(0, options.limit)
         : order;
 
-    // Firestore 'in' queries have a limit of 30 items, so we need to batch if necessary
     const batchSize = 30;
     const batches: UniqueIdentifier[][] = [];
 
@@ -121,25 +130,53 @@ export async function getItems(options?: Options) {
         batches.push(itemIdsToFetch.slice(i, i + batchSize));
     }
 
-    // Fetch all batches in parallel
     const snapshots = await Promise.all(
         batches.map(batch =>
             collection.where(FieldPath.documentId(), 'in', batch).get()
         )
     );
 
-    // Merge all documents
     const allDocs = snapshots.flatMap(snap => snap.docs);
-
-    // Create a map for quick lookup
     const docsMap = new Map<UniqueIdentifier, Item>(allDocs.map(doc => {
         return [doc.id, doc.data()];
     }));
 
-    // Sort items according to the order array
     const items = itemIdsToFetch
         .map(id => docsMap.get(id))
         .filter((item): item is Item => item !== undefined);
+
+    return { items, order };
+}
+
+export async function getItemsByCategory(category: string, options?: { limit?: number }) {
+    const regions = await getRegions();
+    const { order, position } = await getOrderAndPosition();
+
+    const collection = admin.collection('items').withConverter(new ItemConverter(regions));
+
+    // Firestore doesn't support OR directly, so we do two queries
+    const [mainSnap, subSnap] = await Promise.all([
+        collection.where('mainCategory', '==', category).get(),
+        collection.where('subCategories', 'array-contains', category).get(),
+    ]);
+
+    // Merge and deduplicate by id
+    const allDocs = new Map<string, FirebaseFirestore.QueryDocumentSnapshot<Item>>();
+    for (const doc of [...mainSnap.docs, ...subSnap.docs]) {
+        allDocs.set(doc.id, doc);
+    }
+
+    let items = Array.from(allDocs.values())
+        .map((doc) => doc.data())
+        .sort((a, b) => {
+            const posA = position.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+            const posB = position.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+            return posA - posB;
+        });
+
+    if (options?.limit) {
+        items = items.slice(0, options.limit);
+    }
 
     return { items, order };
 }

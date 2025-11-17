@@ -15,6 +15,8 @@ import {
 import {Category as CategoryModel, CategoryUIModel} from "@/models/category";
 import {Controller, useForm} from "react-hook-form";
 import Gallery from "@/components/exhibition/gallery";
+import {Item} from "@/models/item";
+import Tags from "@/components/tags";
 
 function categoryToFormData(category: CategoryUIModel) {
     const formData = new FormData();
@@ -41,10 +43,11 @@ function categoryToFormData(category: CategoryUIModel) {
 }
 
 type CategoryProps = {
-    category?: CategoryModel
+    category?: CategoryModel;
+    items: Item[];
 }
 
-const Category: FC<CategoryProps> = ({ category }) => {
+const Category: FC<CategoryProps> = ({ category, items }) => {
     const { highlight, ...rest } = category || {};
     const { register, handleSubmit, setValue, watch, control, formState: { isValid, isSubmitting } } = useForm<CategoryUIModel>({
         defaultValues: rest
@@ -123,6 +126,7 @@ const Category: FC<CategoryProps> = ({ category }) => {
                     )}
                 />
                 <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
+                <Tags items={items} />
             </VStack>
         </Container>
     </Card.Body>

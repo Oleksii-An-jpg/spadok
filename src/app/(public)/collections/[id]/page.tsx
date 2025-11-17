@@ -1,6 +1,6 @@
 'use server';
 
-import {getItems} from "@/api/items";
+import {getItemsByCategory} from "@/api/items";
 import {Box, Card, Text, VStack,
     Heading,
     Link,
@@ -107,9 +107,7 @@ export default async function Page({params}: { params: Params }) {
     const {id} = await params;
 
     const category = await getCategory(id);
-    const {items} = await getItems({
-        category: id
-    });
+    const {items} = await getItemsByCategory(id);
 
     return (
         <VStack align="stretch">
