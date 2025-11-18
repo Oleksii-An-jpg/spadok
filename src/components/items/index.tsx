@@ -14,7 +14,7 @@ import {
     VStack,
     Dialog, Portal, Button, CloseButton
 } from "@chakra-ui/react";
-import {BiFirstPage, BiHide, BiLastPage, BiLeftArrowAlt, BiRightArrowAlt, BiTrash} from "react-icons/bi";
+import {BiFirstPage, BiHide, BiLastPage, BiLeftArrowAlt, BiRightArrowAlt, BiShow, BiTrash} from "react-icons/bi";
 import Link from "next/link";
 import Row from "./row";
 import {
@@ -40,6 +40,7 @@ import {
 } from '@tanstack/react-table'
 import Filter from "@/components/filter";
 import {useForm} from "react-hook-form";
+import {useRouter} from "next/navigation";
 
 type ItemsProps = {
     items: Item[]
@@ -47,15 +48,30 @@ type ItemsProps = {
 }
 
 const Items: FC<ItemsProps> = ({ items, order }) => {
+    const router = useRouter();
     const sensor = useSensor(PointerSensor, {
         activationConstraint: { distance: 10 },
     });
     const { handleSubmit, formState: { isSubmitting } } = useForm();
-    const handleDelete = useCallback((item: Item) => {
-        return fetch(`/api/items`, {
+    const handleDelete = useCallback(async (item: Item) => {
+        await fetch(`/api/items`, {
             method: 'DELETE',
             body: JSON.stringify(item),
-        })
+        });
+
+        router.refresh();
+    }, []);
+    const toggleVisible = useCallback(async (item: Item) => {
+        const { published } = item;
+        await fetch(`/api/items`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                published: !published,
+                id: item.id,
+            }),
+        });
+
+        router.refresh();
     }, []);
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event
@@ -108,8 +124,10 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                 cell: info => {
                     const item = info.row.original;
                     return <Group>
-                        <IconButton size="sm" variant="outline">
-                            <BiHide />
+                        <IconButton disabled={isSubmitting} size="sm" variant="outline" onClick={handleSubmit(() => {
+                            return toggleVisible(info.row.original);
+                        })}>
+                            {item.published ? <BiHide /> : <BiShow />}
                         </IconButton>
                         <Dialog.Root role="alertdialog">
                             <Dialog.Trigger asChild>
@@ -133,7 +151,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                                             </Dialog.ActionTrigger>
                                             <Button onClick={handleSubmit(() => {
                                                 return handleDelete(info.row.original);
-                                            })} loading={isSubmitting} colorPalette="red">Видалити</Button>
+                                            })} disabled={isSubmitting} colorPalette="red">Видалити</Button>
                                         </Dialog.Footer>
                                         <Dialog.CloseTrigger asChild>
                                             <CloseButton size="sm" />
@@ -146,7 +164,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                 }
             },
         ],
-        []
+        [isSubmitting]
     )
 
     const [pagination, setPagination] = useState<PaginationState>({

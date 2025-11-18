@@ -49,7 +49,7 @@ type CategoryProps = {
 
 const Category: FC<CategoryProps> = ({ category, items }) => {
     const { highlight, ...rest } = category || {};
-    const { register, handleSubmit, setValue, watch, control, formState: { isValid, isSubmitting } } = useForm<CategoryUIModel>({
+    const { register, handleSubmit, setValue, watch, control, formState: { isValid, isSubmitting }, reset } = useForm<CategoryUIModel>({
         defaultValues: rest
     });
     const file = watch('highlight');
@@ -69,10 +69,12 @@ const Category: FC<CategoryProps> = ({ category, items }) => {
     return <Card.Body css={{ "--field-label-width": '18em'}}>
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
-                return await fetch('/api/categories', {
+                await fetch('/api/categories', {
                     method: 'POST',
                     body: categoryToFormData(data),
-                })
+                });
+
+                reset(data)
             })} gap={4}>
                 <Field.Root orientation="horizontal" required>
                     <Field.Label>

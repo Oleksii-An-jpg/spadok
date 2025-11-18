@@ -20,16 +20,18 @@ type CutProps = {
 }
 
 const Cut: FC<CutProps> = ({ cut, items }) => {
-    const { register, handleSubmit, formState: { isValid, isSubmitting } } = useForm<CutModel>({
+    const { register, handleSubmit, formState: { isValid, isSubmitting }, reset } = useForm<CutModel>({
         defaultValues: cut
     });
     return <Card.Body css={{ "--field-label-width": '18em'}}>
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
-                return await fetch('/api/cuts', {
+                await fetch('/api/cuts', {
                     method: 'POST',
                     body: JSON.stringify(data),
-                })
+                });
+
+                reset(data)
             })} gap={4}>
                 <Field.Root orientation="horizontal" required>
                     <Field.Label>

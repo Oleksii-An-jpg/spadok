@@ -98,3 +98,23 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
 }
+
+export async function PATCH(request: NextRequest) {
+    const body: Item = await request.json();
+    const id = body.id ? String(body.id as string) : null;
+    const regions = await getRegions();
+    if (!id) {
+        return NextResponse.json({ success: false, message: 'ID is required' }, { status: 400 });
+    }
+
+    const collection = admin.collection('items').withConverter(new ItemConverter(regions));
+    const doc = await collection.doc(id).get();
+
+    if (!doc.exists) {
+        return NextResponse.json({ success: false, message: 'Item not found' }, { status: 404 });
+    }
+
+    await collection.doc(id).update(body);
+
+    return NextResponse.json({ success: true });
+}

@@ -70,7 +70,7 @@ type ExhibitionProps = {
 
 const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, techniques, categories, cuts }) => {
     const { images = [], ...rest } = item || {};
-    const { register, watch, formState: { errors, isValid, isSubmitting }, setValue, control, handleSubmit } = useForm<ItemUIModel>({
+    const { register, watch, reset, formState: { errors, isValid, isSubmitting }, setValue, control, handleSubmit } = useForm<ItemUIModel>({
         defaultValues: rest
     });
 
@@ -114,10 +114,12 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
                 const formData = itemToFormData(data);
-                return await fetch('/api/items', {
+                await fetch('/api/items', {
                     method: 'POST',
                     body: formData,
-                })
+                });
+
+                reset(data)
             })} gap={4}>
                 <Field.Root orientation="horizontal" required>
                     <Field.Label>

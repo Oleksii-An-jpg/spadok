@@ -20,16 +20,18 @@ type AuthorProps = {
 }
 
 const Author: FC<AuthorProps> = ({ author, items }) => {
-    const { register, handleSubmit, control, formState: { isValid, isSubmitting } } = useForm<AuthorModel>({
+    const { register, handleSubmit, control, formState: { isValid, isSubmitting }, reset } = useForm<AuthorModel>({
         defaultValues: author
     });
     return <Card.Body css={{ "--field-label-width": '18em'}}>
         <Container maxW="5xl">
             <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
-                return await fetch('/api/authors', {
+                await fetch('/api/authors', {
                     method: 'POST',
                     body: JSON.stringify(data),
-                })
+                });
+
+                reset(data)
             })} gap={4}>
                 <Field.Root orientation="horizontal" required>
                     <Field.Label>

@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import {BiFirstPage, BiLastPage, BiLeftArrowAlt, BiRightArrowAlt, BiTrash} from "react-icons/bi";
-import {usePathname} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {useCallback, useMemo, useState} from "react";
 import {useForm} from "react-hook-form";
 import {
@@ -37,11 +37,14 @@ type EntitiesProps<T> = {
 
 function Entities<T extends BaseItem>({items}: EntitiesProps<T>) {
     const pathname = usePathname();
-    const handleDelete = useCallback((item: T) => {
-        return fetch(`/api/${pathname.replace('/admin', '')}`, {
+    const router = useRouter();
+    const handleDelete = useCallback(async (item: T) => {
+        await fetch(`/api/${pathname.replace('/admin', '')}`, {
             method: 'DELETE',
             body: JSON.stringify(item),
-        })
+        });
+
+        router.refresh();
     }, []);
     const columns = useMemo<ColumnDef<T>[]>(
         () => [
