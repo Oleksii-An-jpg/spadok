@@ -44,7 +44,7 @@ const Display: FC<DisplayProps> = ({ item, simple = true }) => {
         </ChakraCarousel.Root> : <Carousel item={item} />}
         <Stack flex={1} direction={{ base: 'row', xl: 'column' }} columnGap={8} rowGap={3}>
             <VStack align="stretch" gap={0}>
-                <Text fontSize={{ base: 'sm', xl: 'md' }}>Вартість:</Text>
+                <Text fontSize={{ base: 'sm', xl: 'md' }}>Врятовано за:</Text>
                 <Text fontSize={{ base: 'sm', xl: '2xl' }}>{item.price ? getDisplayPrice(item.price) : 'Дарунок'}</Text>
             </VStack>
             <VStack align="stretch" fontSize={{ base: 'xs', xl: 'md' }} gap={3}>

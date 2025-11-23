@@ -1,6 +1,6 @@
 'use client';
 import {FC, useMemo, useState, Fragment } from "react";
-import {Box, Card, LinkOverlay, Text, VStack, HStack, IconButton, Link as ChakraLink} from "@chakra-ui/react";
+import {Box, Card, LinkOverlay, Text, VStack, HStack, IconButton, Link as ChakraLink, Heading} from "@chakra-ui/react";
 import {
     ColumnDef,
     flexRender,
@@ -64,36 +64,39 @@ const List: FC<ListProps> = ({ items }) => {
     });
     return <VStack align="stretch">
         <VStack align="stretch">
-            <HStack justify="end">
-                <Text fontSize="xs">Сторінка {table.getState().pagination.pageIndex + 1} із {table.getPageCount()}</Text>
-                <IconButton
-                    size="2xs"
-                    onClick={() => table.firstPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <BiFirstPage />
-                </IconButton>
-                <IconButton
-                    size="2xs"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <BiLeftArrowAlt />
-                </IconButton>
-                <IconButton
-                    size="2xs"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <BiRightArrowAlt />
-                </IconButton>
-                <IconButton
-                    size="2xs"
-                    onClick={() => table.lastPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <BiLastPage />
-                </IconButton>
+            <HStack justify="space-between">
+                <Heading>Врятовані речі</Heading>
+                <HStack>
+                    <Text fontSize="xs">Сторінка {table.getState().pagination.pageIndex + 1} із {table.getPageCount()}</Text>
+                    <IconButton
+                        size="2xs"
+                        onClick={() => table.firstPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        <BiFirstPage />
+                    </IconButton>
+                    <IconButton
+                        size="2xs"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        <BiLeftArrowAlt />
+                    </IconButton>
+                    <IconButton
+                        size="2xs"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        <BiRightArrowAlt />
+                    </IconButton>
+                    <IconButton
+                        size="2xs"
+                        onClick={() => table.lastPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        <BiLastPage />
+                    </IconButton>
+                </HStack>
             </HStack>
         </VStack>
         <Box columnCount={{ base: 2, md: 3, lg: 5, xl: 6 }} gap={2}>

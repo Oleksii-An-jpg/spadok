@@ -2,7 +2,7 @@
 import {FC, useMemo, useEffect} from "react";
 import {Controller, useForm, FieldPath} from "react-hook-form";
 import {Accordion, createListCollection, Checkmark,
-    Listbox,
+    Listbox, Text,
     useListboxItemContext} from "@chakra-ui/react";
 import {Category} from "@/models/category";
 import {Cut} from "@/models/cut";
@@ -158,10 +158,10 @@ const Facets: FC<FacetsProps> = (props) => {
                     <Listbox.Root variant="plain" collection={entity.collection} value={field.value}
                                   onValueChange={({ value }) => field.onChange(value)}
                                   selectionMode="multiple">
-                        <Accordion.Root defaultValue={['categories']} variant="plain" collapsible>
+                        <Accordion.Root size="sm" defaultValue={['categories']} variant="plain" collapsible>
                             <Accordion.Item value={entity.name}>
                                 <Accordion.ItemTrigger justifyContent="space-between">
-                                    <Listbox.Label>{entity.label}</Listbox.Label>
+                                    <Listbox.Label><Text fontSize="sm">{entity.label}</Text></Listbox.Label>
                                     <Accordion.ItemIndicator />
                                 </Accordion.ItemTrigger>
                                 <Accordion.ItemContent>
@@ -170,7 +170,11 @@ const Facets: FC<FacetsProps> = (props) => {
                                             {entity.collection.items.map((item) => (
                                                 <Listbox.Item highlightOnHover item={item} key={item.value}>
                                                     <ListboxItemCheckmark />
-                                                    <Listbox.ItemText>{item.label}</Listbox.ItemText>
+                                                    <Listbox.ItemText>
+                                                        <Text fontSize="xs">
+                                                            {item.label}
+                                                        </Text>
+                                                    </Listbox.ItemText>
                                                 </Listbox.Item>
                                             ))}
                                         </Listbox.Content>
