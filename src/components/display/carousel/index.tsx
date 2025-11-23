@@ -71,7 +71,7 @@ const Carousel: FC<CarouselProps> = ({ item }) => {
             <ChakraCarousel.ItemGroup width="full">
                 {item.images.map((image, index) => (
                     <ChakraCarousel.Item key={index} index={index}>
-                        <Box w="100%" rounded="lg" fontSize="2.5rem" className="relative h-[calc(100dvh-16rem)]">
+                        <Box w="100%" rounded="lg" fontSize="2.5rem" className="relative h-[calc(100dvh-20rem)]">
                             <Image src={`https://storage.googleapis.com/spadok-images/${image}`} className="object-scale-down" alt={item.name} fill />
                         </Box>
                     </ChakraCarousel.Item>

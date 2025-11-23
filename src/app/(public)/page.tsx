@@ -303,6 +303,13 @@ export default async function Home() {
                           </LinkBox>
                       ))}
                   </Box>
+                  <VStack>
+                      <BrandButton asChild size="xl" variant="brand-primary">
+                          <ChakraLink asChild>
+                              <Link href="/collections">Перейти до каталогу</Link>
+                          </ChakraLink>
+                      </BrandButton>
+                  </VStack>
               </VStack>
           </Section>
           <Section className="py-24 xl:py-48" variant="quaternary">
