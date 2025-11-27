@@ -37,7 +37,7 @@ export default async function Page(_: Props) {
                 <Breadcrumb.List>
                     <Breadcrumb.Item>
                         <Breadcrumb.Link asChild>
-                            <Link href="/public">
+                            <Link href="/">
                                 <BiHome /> Головна
                             </Link>
                         </Breadcrumb.Link>
