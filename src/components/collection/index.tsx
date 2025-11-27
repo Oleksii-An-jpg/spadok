@@ -13,7 +13,7 @@ const Collection: FC<CollectionProps> = ({ collection }) => {
         <LinkOverlay asChild>
             <ChakraLink asChild>
                 <Link href={`/collections/${collection.id}`}>
-                    <VStack className="[clip-path:polygon(0_34px,34px_34px,34px_0,calc(100%-34px)_0,calc(100%-34px)_34px,100%_34px,100%_calc(100%-34px),calc(100%-34px)_calc(100%-34px),calc(100%-34px)_100%,34px_100%,34px_calc(100%-34px),0_calc(100%-34px))]
+                    <VStack className="[clip-path:polygon(0_30px,30px_30px,30px_0,calc(100%-30px)_0,calc(100%-30px)_30px,100%_30px,100%_calc(100%-30px),calc(100%-30px)_calc(100%-30px),calc(100%-30px)_100%,30px_100%,30px_calc(100%-30px),0_calc(100%-30px))]
 ">
                         <img src={`https://storage.googleapis.com/spadok-images/${collection.highlight}`} alt={collection.name} />
                     </VStack>
