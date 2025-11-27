@@ -6,12 +6,14 @@ import Display from "@/components/display";
 import {Breadcrumb, VStack} from "@chakra-ui/react";
 import Link from "next/link";
 import {BiCategory, BiHome} from "react-icons/bi";
+import Attributes from "@/components/attributes";
+import {getCategories} from "@/api/categories";
 
 type Params = Promise<{ id: string }>
 
 export default async function Page({params}: { params: Params }) {
     const {id} = await params;
-    const item = await getItem(id);
+    const [item, categories] = await Promise.all([getItem(id), getCategories()]);
 
     if (!item) {
         return notFound();
@@ -30,7 +32,7 @@ export default async function Page({params}: { params: Params }) {
                 <Breadcrumb.Separator />
                 <Breadcrumb.Item>
                     <Breadcrumb.Link asChild>
-                        <Link href="/collections">
+                        <Link href="/catalog">
                             <BiCategory /> Каталог
                         </Link>
                     </Breadcrumb.Link>
@@ -42,5 +44,21 @@ export default async function Page({params}: { params: Params }) {
             </Breadcrumb.List>
         </Breadcrumb.Root>
         <Display simple={false} item={item} />
+        <Attributes attributes={[
+            {
+                name: 'Категорії',
+                collection: [item.mainCategory, ...(item.subCategories || [])].map(category => ({
+                    name: categories.find(({ id }) => id === category)?.name,
+                    link: `/catalog`
+                }))
+            },
+            {
+                name: 'Регіони',
+                collection: item.regions.map(region => ({
+                    name: region.name,
+                    link: `/catalog`
+                }))
+            },
+        ]} />
     </VStack>
 }

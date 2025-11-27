@@ -4,8 +4,7 @@ import Link from "next/link";
 import BrandButton from "@/components/brand/button";
 import {Logo} from "@/components/logo";
 import {
-    LinkBox,
-    LinkOverlay, Text, Heading, Link as ChakraLink, VStack, Box
+    Heading, Link as ChakraLink, VStack, Box
 } from "@chakra-ui/react";
 import {getFounds} from "@/api/founds";
 import {getDisplayPrice} from "@/lib/price";
@@ -15,6 +14,7 @@ import QNA from "@/components/q&a";
 import {getItems} from "@/api/items";
 import Display from "@/components/display";
 import {getCategories} from "@/api/categories";
+import Collection from "@/components/collection";
 
 const MEMBERS = [
     {
@@ -79,14 +79,6 @@ export default async function Home() {
     const founds = await getFounds();
     const categories = await getCategories();
     const {items} = await getItems();
-    const withItems = categories.map(category => ({
-        ...category,
-        items: items.filter(item => item.mainCategory === category.id || item.subCategories?.includes(category.id)).map(item => ({
-            id: item.id,
-            highlight: item.images[0],
-            name: item.name
-        })),
-    })).filter(category => category.items.length > 3);
   return (
       <main className="text-sm xl:text-2xl font-extralight">
           <Section className="py-24 xl:py-48 text-center" variant="secondary">
@@ -285,28 +277,17 @@ export default async function Home() {
               </VStack>
               <VStack gap={16} align="stretch">
                   <Heading fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">
-                      Наші підбірки:
+                      Дослідіть наші колекції:
                   </Heading>
                   <Box columnCount={{ base: 2, md: 3, xl: 4 }} gap={4}>
-                      {withItems.map((item) => (
-                          <LinkBox className="group break-inside-avoid mb-4" key={item.id}>
-                              <LinkOverlay asChild>
-                                  <ChakraLink asChild>
-                                      <Link href={`/collections/${item.id}`}>
-                                          <VStack className="transition-all ease-in-out duration-300 border-azure group-hover:border-salmon border-4 p-2">
-                                              <img src={`https://storage.googleapis.com/spadok-images/${item.highlight || item.items[0].highlight}`} alt={item.name} />
-                                              <Text lineClamp={1} fontSize={{ base: 'xs', xl: 'md' }} className="text-center">{item.name}</Text>
-                                          </VStack>
-                                      </Link>
-                                  </ChakraLink>
-                              </LinkOverlay>
-                          </LinkBox>
+                      {categories.filter(category => category.isCollection).map((item) => (
+                          <Collection collection={item} key={item.id} />
                       ))}
                   </Box>
                   <VStack>
                       <BrandButton asChild size="xl" variant="brand-primary">
                           <ChakraLink asChild>
-                              <Link href="/collections">Перейти до каталогу</Link>
+                              <Link href="/catalog">Перейти до каталогу</Link>
                           </ChakraLink>
                       </BrandButton>
                   </VStack>
@@ -350,114 +331,6 @@ export default async function Home() {
                       <QNA />
                   </div>
               </div>
-          </Section>
-          <Section className="py-6 xl:py-16" variant="quinary" inset={false}>
-              <footer className="flex flex-wrap justify-between gap-y-10 gap-x-10 text-xs">
-                  <div>
-                      <h4 className="text-sm xl:text-2xl mb-3.5 xl:mb-5">
-                          Спільний спадок
-                      </h4>
-                      <ul className="text-gray-600">
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="mailto:welcome@spadok.foundation"
-                                  className="underline"
-                              >
-                                  welcome@spadok.foundation
-                              </Link>
-                          </li>
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://www.facebook.com/spilnyi.spadok"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  facebook
-                              </Link>
-                          </li>
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://instagram.com/spilnyi.spadok"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  instagram
-                              </Link>
-                          </li>
-                      </ul>
-                  </div>
-                  <div>
-                      <h4 className="text-sm xl:text-2xl mb-3.5 xl:mb-5">
-                          Музей Івана Гончара
-                      </h4>
-                      <ul className="text-gray-600">
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://honchar.org.ua"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  honchar.org.ua
-                              </Link>
-                          </li>
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://facebook.com/honcharmuseum"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  facebook
-                              </Link>
-                          </li>
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://instagram.com/honchar.museum"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  instagram
-                              </Link>
-                          </li>
-                      </ul>
-                  </div>
-                  <div>
-                      <h4 className="text-sm xl:text-2xl mb-3.5 xl:mb-5">
-                          Благодійний фонд «КОЛО»
-                      </h4>
-                      <ul className="text-gray-600">
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://www.kolo.fund"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  kolo.fund
-                              </Link>
-                          </li>
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://www.facebook.com/kolofund"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  facebook
-                              </Link>
-                          </li>
-                          <li className="mb-1 xl:mb-2.5">
-                              <Link
-                                  href="https://www.instagram.com/kolo_fund"
-                                  className="underline"
-                                  target="_blank"
-                              >
-                                  instagram
-                              </Link>
-                          </li>
-                      </ul>
-                  </div>
-                  <p className="min-w-full">
-                      Спільний спадок © {new Date().getFullYear()}
-                  </p>
-              </footer>
           </Section>
       </main>
   );

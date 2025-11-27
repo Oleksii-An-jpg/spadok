@@ -2,16 +2,16 @@
 
 import {getItemsByCategory} from "@/api/items";
 import {
-    Box, Card, Text, VStack,
+    Box, Text, VStack,
     Heading,
     Code,
     List,
     Separator,
     Image,
     Table,
-    Blockquote, LinkOverlay,
+    Blockquote,
     Link as ChakraLink,
-    Checkbox, Breadcrumb,
+    Checkbox, Breadcrumb, Bleed,
 } from "@chakra-ui/react";
 import Markdown, {Components} from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -20,6 +20,8 @@ import {getCategory} from "@/api/categories";
 import Link from "next/link";
 import {BiHome, BiCategory} from "react-icons/bi";
 import {notFound} from "next/navigation";
+import Item from "@/components/items/item";
+import Banner from "@/components/banner";
 
 const ChakraMarkdownComponents: Components = {
     // Headings
@@ -125,7 +127,7 @@ export default async function Page({params}: { params: Params }) {
                     <Breadcrumb.Item>
                         <Breadcrumb.Link asChild>
                             <Link href="/collections">
-                                <BiCategory /> Каталог
+                                <BiCategory /> Колекції
                             </Link>
                         </Breadcrumb.Link>
                     </Breadcrumb.Item>
@@ -137,28 +139,11 @@ export default async function Page({params}: { params: Params }) {
             </Breadcrumb.Root>
             <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{category?.description}</Markdown>
             <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
-                {items.map((item) => {
-                    return (
-                        <Card.Root variant="elevated" size="sm" key={item.id} className="break-inside-avoid mb-4">
-                            <Card.Body>
-                                <LinkOverlay asChild>
-                                    <ChakraLink asChild variant="plain">
-                                        <Link prefetch={false} href={`/items/${item.id}`}>
-                                            <VStack>
-                                                <img src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`} alt={item.name} />
-                                                <VStack gap={0.5}>
-                                                    <Text fontSize="sm" className="text-center">{item.name}</Text>
-                                                    <Text fontSize="xs" color="gray.500">{item.regions[0].name}</Text>
-                                                </VStack>
-                                            </VStack>
-                                        </Link>
-                                    </ChakraLink>
-                                </LinkOverlay>
-                            </Card.Body>
-                        </Card.Root>
-                    )
-                })}
+                {items.map((item) => <Item item={item} key={item.id} />)}
             </Box>
+            <Bleed inline="8">
+                <Banner />
+            </Bleed>
         </VStack>
     )
 }
