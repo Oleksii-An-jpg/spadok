@@ -2,7 +2,6 @@
 
 import {getCategories} from "@/api/categories";
 import {
-    Box,
     VStack,
     Breadcrumb,
     HStack,
@@ -61,11 +60,13 @@ export default async function Page(_: Props) {
                         </Suspense>
                     </Grid>
                     <GridItem colStart={2}>
-                        <VStack align="stretch">
-                            <Heading>Наші колекції</Heading>
-                            <Box columnCount={{ base: 3, md: 4 }} gap={4}>
+                        <VStack align="stretch" gap={8}>
+                            <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
+                                Дослідіть наші колекції:
+                            </Heading>
+                            <Grid templateColumns={{ base: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' }} gap={4}>
                                 {collections.map((item) => <Collection collection={item} key={item.id} />)}
-                            </Box>
+                            </Grid>
                         </VStack>
                     </GridItem>
                 </Grid>

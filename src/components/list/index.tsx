@@ -229,9 +229,11 @@ const List: FC<ListProps> = ({ items, categories, regions }) => {
             </VStack>
         </GridItem>
         <GridItem>
-            <VStack align="stretch">
+            <VStack align="stretch" gap={8}>
                 <HStack justify="space-between">
-                    <Heading>Врятовані речі</Heading>
+                    <Heading fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">
+                        Врятовані речі
+                    </Heading>
                     <HStack>
                         <Text fontSize="xs">Сторінка {table.getState().pagination.pageIndex + 1} із {table.getPageCount()}</Text>
                         <IconButton

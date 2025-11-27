@@ -4,7 +4,7 @@ import Link from "next/link";
 import BrandButton from "@/components/brand/button";
 import {Logo} from "@/components/logo";
 import {
-    Heading, Link as ChakraLink, VStack, Box
+    Heading, Link as ChakraLink, VStack, Grid
 } from "@chakra-ui/react";
 import {getFounds} from "@/api/founds";
 import {getDisplayPrice} from "@/lib/price";
@@ -279,11 +279,11 @@ export default async function Home() {
                   <Heading fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">
                       Дослідіть наші колекції:
                   </Heading>
-                  <Box columnCount={{ base: 2, md: 3, xl: 4 }} gap={4}>
+                  <Grid templateColumns={{ base: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' }} gap={4}>
                       {categories.filter(category => category.isCollection).map((item) => (
                           <Collection collection={item} key={item.id} />
                       ))}
-                  </Box>
+                  </Grid>
                   <VStack>
                       <BrandButton asChild size="xl" variant="brand-primary">
                           <ChakraLink asChild>
