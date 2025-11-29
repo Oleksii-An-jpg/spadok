@@ -3,9 +3,10 @@
 import {Button, Card, Heading, VStack} from "@chakra-ui/react";
 import Entities from "@/components/entities";
 import {getAuthors} from "@/api/authors";
+import {getItems} from "@/api/items";
 
 export default async function Page() {
-    const authors = await getAuthors();
+    const [authors, {items}] = await Promise.all([getAuthors(), getItems()]);
 
     return (
         <>
@@ -19,6 +20,7 @@ export default async function Page() {
                 <Entities items={authors.map(author => ({
                     id: author.id,
                     name: `${author.firstName} ${author.lastName}`,
+                    count: items.filter(item => item.author === author.id).length
                 }))} />
             </Card.Body>
         </>

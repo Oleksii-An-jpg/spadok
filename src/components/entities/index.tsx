@@ -29,13 +29,15 @@ import Row from "@/components/items/row";
 type BaseItem = {
     id: string;
     name: string;
+    count: number;
 }
 
 type EntitiesProps<T> = {
     items: T[];
+    columns?: ColumnDef<T>[];
 }
 
-function Entities<T extends BaseItem>({items}: EntitiesProps<T>) {
+function Entities<T extends BaseItem>({items, columns = []}: EntitiesProps<T>) {
     const pathname = usePathname();
     const router = useRouter();
     const handleDelete = useCallback(async (item: T) => {
@@ -46,7 +48,7 @@ function Entities<T extends BaseItem>({items}: EntitiesProps<T>) {
 
         router.refresh();
     }, []);
-    const columns = useMemo<ColumnDef<T>[]>(
+    const cols = useMemo<ColumnDef<T>[]>(
         () => [
             {
                 accessorKey: 'name',
@@ -60,6 +62,16 @@ function Entities<T extends BaseItem>({items}: EntitiesProps<T>) {
                     </ChakraLink>
                 },
             },
+            {
+                accessorKey: 'count',
+                header: 'Предметів',
+                enableSorting: false,
+                enableColumnFilter: false,
+                cell: info => {
+                    return info.getValue()
+                },
+            },
+            ...columns,
             {
                 accessorKey: 'id',
                 header: 'Дії',
@@ -112,7 +124,7 @@ function Entities<T extends BaseItem>({items}: EntitiesProps<T>) {
     });
 
     const table = useReactTable({
-        columns,
+        columns: cols,
         data: items,
         debugTable: true,
         getCoreRowModel: getCoreRowModel(),

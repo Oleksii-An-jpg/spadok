@@ -4,9 +4,10 @@ import {Card, Heading, VStack} from "@chakra-ui/react";
 import Entities from "@/components/entities";
 import {getTechniques} from "@/api/techniques";
 import Create from "@/components/technique/create";
+import {getItems} from "@/api/items";
 
 export default async function Page() {
-    const techniques = await getTechniques();
+    const [techniques, {items}] = await Promise.all([getTechniques(), getItems()]);
 
     return (
         <>
@@ -17,7 +18,10 @@ export default async function Page() {
                 </VStack>
             </Card.Header>
             <Card.Body>
-                <Entities items={techniques} />
+                <Entities items={techniques.map(technique => ({
+                    ...technique,
+                    count: items.filter(item => item.techniques?.includes(technique.id)).length
+                }))} />
             </Card.Body>
         </>
     )
