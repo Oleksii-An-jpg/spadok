@@ -3,7 +3,7 @@
 import {getItem} from "@/api/items";
 import {notFound} from "next/navigation";
 import Display from "@/components/display";
-import {Breadcrumb, VStack} from "@chakra-ui/react";
+import {Box, Breadcrumb, VStack} from "@chakra-ui/react";
 import Link from "next/link";
 import {BiCategory, BiHome} from "react-icons/bi";
 import Attributes from "@/components/attributes";
@@ -25,7 +25,7 @@ export default async function Page({params}: { params: Params }) {
                 <Breadcrumb.Item>
                     <Breadcrumb.Link asChild>
                         <Link href="/">
-                            <BiHome /> Головна
+                            <BiHome /> <Box hideBelow="lg">Головна</Box>
                         </Link>
                     </Breadcrumb.Link>
                 </Breadcrumb.Item>
@@ -33,7 +33,7 @@ export default async function Page({params}: { params: Params }) {
                 <Breadcrumb.Item>
                     <Breadcrumb.Link asChild>
                         <Link href="/catalog">
-                            <BiCategory /> Каталог
+                            <BiCategory /> <Box hideBelow="lg">Каталог</Box>
                         </Link>
                     </Breadcrumb.Link>
                 </Breadcrumb.Item>

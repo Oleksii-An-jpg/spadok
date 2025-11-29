@@ -56,7 +56,7 @@ export const Section: FC<SectionProps> = ({
         <section
             className={clsx('section relative px-5 xl:px-32', className, container, {
                 inset,
-                ['before:content-[""] before:absolute before:z-10 before:left-0 before:bottom-full before:w-5 before:h-5 after:content-[""] after:absolute after:z-10 after:right-0 after:bottom-full after:w-5 after:h-5']:
+                ['[clip-path:polygon(0_30px,30px_30px,30px_0,calc(100%-30px)_0,calc(100%-30px)_30px,100%_30px,100%_calc(100%-30px),calc(100%-30px)_calc(100%-30px),calc(100%-30px)_100%,30px_100%,30px_calc(100%-30px),0_calc(100%-30px))]']:
                     !inset,
             })}
             {...rest}

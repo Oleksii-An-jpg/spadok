@@ -2,7 +2,7 @@
 import {getRegions} from "@/api/regions";
 import {Item, ItemDBModel} from "@/models/item";
 import {admin} from "@/lib/admin";
-import {FirestoreDataConverter, QueryDocumentSnapshot,} from "firebase-admin/firestore";
+import {FirestoreDataConverter, QueryDocumentSnapshot,FieldValue} from "firebase-admin/firestore";
 import {Region} from "@/models/region";
 import {UniqueIdentifier} from "@dnd-kit/core";
 import {getTextFromAddress} from "@/components/places/utils";
@@ -179,4 +179,69 @@ export async function getItemsByCategory(category: string, options?: { limit?: n
     }
 
     return { items, order };
+}
+
+export async function updateSubcategoryAssignments(
+    category: string,
+    items: string[]
+) {
+    const regions = await getRegions();
+    const collection = admin.collection('items').withConverter(new ItemConverter(regions));
+
+    // Get all items that currently have this category
+    const { items: currentItems } = await getItemsByCategory(category);
+    const currentItemIds = new Set(currentItems.map(item => String(item.id)));
+    const checkedItemIdsSet = new Set(items);
+
+    // Determine which items to add and remove
+    const itemsToAdd = items.filter(id => !currentItemIds.has(id));
+    const itemsToRemove = Array.from(currentItemIds).filter(id => !checkedItemIdsSet.has(id));
+
+    // Process additions and removals in batches
+    const batchSize = 500;
+    let totalUpdated = 0;
+
+    // Add category to checked items that don't have it
+    if (itemsToAdd.length > 0) {
+        for (let i = 0; i < itemsToAdd.length; i += batchSize) {
+            const batch = itemsToAdd.slice(i, i + batchSize);
+            const writeBatch = admin.batch();
+
+            for (const itemId of batch) {
+                const docRef = collection.doc(itemId);
+                writeBatch.update(docRef, {
+                    subCategories: FieldValue.arrayUnion(category)
+                });
+            }
+
+            await writeBatch.commit();
+            totalUpdated += batch.length;
+        }
+    }
+
+    // Remove category from unchecked items that have it
+    if (itemsToRemove.length > 0) {
+        for (let i = 0; i < itemsToRemove.length; i += batchSize) {
+            const batch = itemsToRemove.slice(i, i + batchSize);
+            const writeBatch = admin.batch();
+
+            for (const itemId of batch) {
+                const docRef = collection.doc(itemId);
+                writeBatch.update(docRef, {
+                    subCategories: FieldValue.arrayRemove(category)
+                });
+            }
+
+            await writeBatch.commit();
+            totalUpdated += batch.length;
+        }
+    }
+
+    return {
+        success: true,
+        category,
+        added: itemsToAdd.length,
+        removed: itemsToRemove.length,
+        totalUpdated
+    };
 }

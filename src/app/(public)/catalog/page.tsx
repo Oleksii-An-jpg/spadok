@@ -6,7 +6,7 @@ import {
     Breadcrumb,
     HStack,
     Grid,
-    Heading, GridItem
+    Heading, GridItem, Box
 } from "@chakra-ui/react";
 import List from '@/components/list';
 import Link from "next/link";
@@ -38,7 +38,7 @@ export default async function Page(_: Props) {
                     <Breadcrumb.Item>
                         <Breadcrumb.Link asChild>
                             <Link href="/">
-                                <BiHome /> Головна
+                                <BiHome /> <Box hideBelow="lg">Головна</Box>
                             </Link>
                         </Breadcrumb.Link>
                     </Breadcrumb.Item>
@@ -46,7 +46,7 @@ export default async function Page(_: Props) {
                     <Breadcrumb.Item>
                         <Breadcrumb.CurrentLink>
                             <HStack>
-                                <BiCategory /> Каталог
+                                <BiCategory /> <Box hideBelow="lg">Каталог</Box>
                             </HStack>
                         </Breadcrumb.CurrentLink>
                     </Breadcrumb.Item>
@@ -64,7 +64,7 @@ export default async function Page(_: Props) {
                             <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
                                 Дослідіть наші колекції:
                             </Heading>
-                            <Grid templateColumns={{ base: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' }} gap={4}>
+                            <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
                                 {collections.map((item) => <Collection collection={item} key={item.id} />)}
                             </Grid>
                         </VStack>

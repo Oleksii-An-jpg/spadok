@@ -16,8 +16,8 @@ const Item: FC<ItemProps> = ({ item }) => {
                     <Link prefetch={false} href={`/items/${item.id}`}>
                         <VStack className="relative min-h-10">
                             <img src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`} alt={item.name} />
-                            <VStack align="stretch" gap={0.5} className="absolute bottom-2 left-0 mr-2 text-start p-2 bg-khaki">
-                                <Text fontSize="xs">
+                            <VStack align="stretch" gap={0.5} className="absolute bottom-2 left-2 mr-2 xl:bottom-6 xl:left-6 xl:mr-6 text-start p-2 bg-khaki">
+                                <Text fontSize={{ base: 'xx-small', xl: 'xs' }}>
                                     <Text as="b">{item.name.trim()}</Text>{item.regions[0]?.name && <Text as="span">&nbsp;/&nbsp;{item.regions[0]?.name}</Text>}
                                 </Text>
                             </VStack>

@@ -11,8 +11,8 @@ type AttributesProps = {
 };
 
 const Attributes: FC<AttributesProps> = ({ attributes }) => {
-    return <Box className="bg-gray-200 px-4 pb-4">
-        <DataList.Root className="bg-gray-200" orientation="horizontal" divideY="1px">
+    return <Box className="bg-concrete px-4 pb-4">
+        <DataList.Root className="bg-concrete" orientation="horizontal" divideY="1px">
             {attributes.map((item) => (
                 <DataList.Item key={item.name} pt="4">
                     <DataList.ItemLabel>{item.name}</DataList.ItemLabel>

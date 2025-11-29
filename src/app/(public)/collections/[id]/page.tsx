@@ -119,7 +119,7 @@ export default async function Page({params}: { params: Params }) {
                     <Breadcrumb.Item>
                         <Breadcrumb.Link asChild>
                             <Link href="/">
-                                <BiHome /> Головна
+                                <BiHome /> <Box hideBelow="lg">Головна</Box>
                             </Link>
                         </Breadcrumb.Link>
                     </Breadcrumb.Item>
@@ -127,7 +127,7 @@ export default async function Page({params}: { params: Params }) {
                     <Breadcrumb.Item>
                         <Breadcrumb.Link asChild>
                             <Link href="/collections">
-                                <BiCategory /> Колекції
+                                <BiCategory /> <Box hideBelow="lg">Колекції</Box>
                             </Link>
                         </Breadcrumb.Link>
                     </Breadcrumb.Item>
@@ -141,7 +141,7 @@ export default async function Page({params}: { params: Params }) {
             <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
                 {items.map((item) => <Item item={item} key={item.id} />)}
             </Box>
-            <Bleed inline="8">
+            <Bleed inline="30px">
                 <Banner />
             </Bleed>
         </VStack>

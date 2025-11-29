@@ -4,7 +4,7 @@ import Link from "next/link";
 import Section from "@/components/section";
 
 const Footer: FC = () => {
-    return <Section className="py-6 xl:py-16" variant="quinary" inset={false}>
+    return <Section className='py-6 xl:py-16 relative after:content-[""] after:absolute after:right-0 after:bottom-full after:w-[30px] after:h-[30px] after:bg-concrete after:border after:border-gray-200 after:border-b-0 after:border-r-0 before:content-[""] before:absolute before:left-0 before:bottom-full before:w-[30px] before:h-[30px] before:bg-concrete before:border before:border-gray-200 before:border-b-0 before:border-l-0' variant="quinary" inset={true}>
         <footer className="flex flex-wrap justify-between gap-y-10 gap-x-10 text-xs">
             <div>
                 <h4 className="text-sm xl:text-2xl mb-3.5 xl:mb-5">

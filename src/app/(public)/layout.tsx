@@ -3,7 +3,7 @@ import {Provider} from "@/components/ui/provider";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import system from "@/theme";
-import {Box} from "@chakra-ui/react";
+import {Box, Container} from "@chakra-ui/react";
 
 export default function RootLayout({
                                        children,
@@ -13,7 +13,9 @@ export default function RootLayout({
     return <Provider system={system} forcedTheme="light">
         <Box className="bg-white">
             <Header />
-            {children}
+            <Container py={10} px="30px">
+                {children}
+            </Container>
             <Footer />
         </Box>
     </Provider>;

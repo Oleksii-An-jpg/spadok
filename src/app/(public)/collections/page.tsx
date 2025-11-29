@@ -1,6 +1,6 @@
 'use server';
 
-import {Breadcrumb, Grid, Heading, HStack, VStack} from "@chakra-ui/react";
+import {Box, Breadcrumb, Grid, Heading, HStack, VStack} from "@chakra-ui/react";
 import {getCategories} from "@/api/categories";
 import Collection from "@/components/collection";
 import Link from "next/link";
@@ -14,7 +14,7 @@ export default async function Page() {
                 <Breadcrumb.Item>
                     <Breadcrumb.Link asChild>
                         <Link href="/">
-                            <BiHome /> Головна
+                            <BiHome /> <Box hideBelow="lg">Головна</Box>
                         </Link>
                     </Breadcrumb.Link>
                 </Breadcrumb.Item>
@@ -29,7 +29,7 @@ export default async function Page() {
             </Breadcrumb.List>
         </Breadcrumb.Root>
         <Heading size={{ base: '2xl', xl: '4xl' }} fontWeight="light">Наші колекції</Heading>
-        <Grid templateColumns={{ base: 'repeat(2, 1fr)', xl: 'repeat(4, 1fr)' }} gap={4}>
+        <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap={4}>
             {categories.filter(category => category.isCollection).map(category => (
                 <Collection collection={category} key={category.id} />
             ))}
