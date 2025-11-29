@@ -13,7 +13,7 @@ export default async function Page() {
         <>
             <Card.Header>
                 <VStack align="start">
-                    <Heading>Каталог</Heading>
+                    <Heading>Категорії</Heading>
                     <Create />
                 </VStack>
             </Card.Header>
