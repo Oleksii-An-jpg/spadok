@@ -4,9 +4,10 @@ import {Card, Heading, VStack} from "@chakra-ui/react";
 import Entities from "@/components/entities";
 import {getCuts} from "@/api/cuts";
 import Create from "@/components/cut/create";
+import {getItems} from "@/api/items";
 
 export default async function Page() {
-    const cuts = await getCuts();
+    const [cuts, {items}] = await Promise.all([getCuts(), getItems()]);
 
     return (
         <>
@@ -17,7 +18,10 @@ export default async function Page() {
                 </VStack>
             </Card.Header>
             <Card.Body>
-                <Entities items={cuts} />
+                <Entities items={cuts.map(cut => ({
+                    ...cut,
+                    count: items.filter(item => item.cuts?.includes(cut.id)).length
+                }))} />
             </Card.Body>
         </>
     )
