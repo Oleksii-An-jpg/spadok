@@ -281,8 +281,10 @@ export default async function Home() {
                       <Heading fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">
                           Дослідіть наші колекції:
                       </Heading>
-                      <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
-                          {categories.filter(category => category.isCollection).map((item) => (
+                      <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} className="[&>*]:hidden
+  [&>*:nth-child(-n+8)]:block
+  lg:[&>*:nth-child(-n+9)]:block" gap={4}>
+                          {categories.filter(category => category.isCollection && category.isHomepage).map((item) => (
                               <Collection collection={item} key={item.id} />
                           ))}
                       </Grid>

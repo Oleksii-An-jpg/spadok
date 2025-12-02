@@ -128,6 +128,22 @@ const Category: FC<CategoryProps> = ({ category, items }) => {
                             </Field.Root>
                         )}
                     />
+                    <Controller
+                        control={control}
+                        name="isHomepage"
+                        render={({ field }) => (
+                            <Field.Root>
+                                <Checkbox.Root
+                                    checked={field.value}
+                                    onCheckedChange={({ checked }) => field.onChange(checked)}
+                                >
+                                    <Checkbox.HiddenInput />
+                                    <Checkbox.Label css={{ 'width': 'var(--field-label-width)' }}>На головній</Checkbox.Label>
+                                    <Checkbox.Control />
+                                </Checkbox.Root>
+                            </Field.Root>
+                        )}
+                    />
                     <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
                 </VStack>
 

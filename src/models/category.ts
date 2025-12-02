@@ -4,6 +4,7 @@ export type Category = {
     description: string
     highlight?: string
     isCollection?: boolean
+    isHomepage?: boolean
 }
 
 export type CategoryUIModel = Omit<Category, 'highlight'> & {

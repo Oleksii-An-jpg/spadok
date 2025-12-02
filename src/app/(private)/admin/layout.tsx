@@ -21,10 +21,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     }
 
     // await adminAuth
-    //         .setCustomUserClaims('d3bVw75KTGZrSkUz0S0bSRbFaqo1', { admin: true })
+    //         .setCustomUserClaims('djzqcJq7ywgTMANE5S4UIfWfZrr2', { admin: true })
     //         .then(() => {
-    //             // The new custom claims will propagate to the user's ID token the
-    //             // next time a new one is issued.
+    //             console.log(321);
     //         });
 
     return <Grid gridTemplateColumns="200px 1fr" p={4} gap={4}>

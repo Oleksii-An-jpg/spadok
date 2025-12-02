@@ -46,7 +46,7 @@ export default async function Page(_: Props) {
                     <Breadcrumb.Item>
                         <Breadcrumb.CurrentLink>
                             <HStack>
-                                <BiCategory /> <Box hideBelow="lg">Каталог</Box>
+                                <BiCategory /> Каталог
                             </HStack>
                         </Breadcrumb.CurrentLink>
                     </Breadcrumb.Item>

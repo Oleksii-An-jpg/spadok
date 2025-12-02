@@ -21,6 +21,8 @@ import {
     getFilteredRowModel, getPaginationRowModel,
     getSortedRowModel,
     PaginationState,
+    getFacetedUniqueValues,
+    InitialTableState,
     useReactTable
 } from "@tanstack/react-table";
 import Filter from "@/components/filter";
@@ -35,9 +37,10 @@ type BaseItem = {
 type EntitiesProps<T> = {
     items: T[];
     columns?: ColumnDef<T>[];
+    initialState?: InitialTableState
 }
 
-function Entities<T extends BaseItem>({items, columns = []}: EntitiesProps<T>) {
+function Entities<T extends BaseItem>({items, initialState, columns = []}: EntitiesProps<T>) {
     const pathname = usePathname();
     const router = useRouter();
     const handleDelete = useCallback(async (item: T) => {
@@ -131,11 +134,14 @@ function Entities<T extends BaseItem>({items, columns = []}: EntitiesProps<T>) {
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
         onPaginationChange: setPagination,
+
         //no need to pass pageCount or rowCount with client-side pagination as it is calculated automatically
         state: {
             pagination,
         },
+        initialState
         // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
     })
     const { handleSubmit, formState: { isSubmitting } } = useForm();

@@ -47,16 +47,10 @@ export default async function Page({params}: { params: Params }) {
         <Attributes attributes={[
             {
                 name: 'Категорії',
-                collection: [item.mainCategory, ...(item.subCategories || [])].map(category => ({
-                    name: categories.find(({ id }) => id === category)?.name,
-                    link: `/catalog`
-                }))
-            },
-            {
-                name: 'Регіони',
-                collection: item.regions.map(region => ({
-                    name: region.name,
-                    link: `/catalog`
+                collection: categories.filter(category => !category.isCollection).map(category => ({
+                    name: category.name,
+                    link: `/catalog?Категорії=${category.id}`,
+                    active: [item.mainCategory, ...(item.subCategories || [])].includes(category.id),
                 }))
             },
         ]} />
