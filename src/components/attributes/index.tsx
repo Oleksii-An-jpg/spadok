@@ -1,14 +1,12 @@
 'use client'
 import {FC} from "react";
-import {DataList, HStack, Link as ChakraLink, Box} from "@chakra-ui/react";
+import {DataList, HStack, Link as ChakraLink, Box, Button} from "@chakra-ui/react";
 import Link from "next/link";
-import BrandButton from "@/components/brand/button";
 
 type AttributesProps = {
     attributes: { name: string; collection: {
         name?: string;
         link: string;
-        active: boolean
     }[] }[]
 };
 
@@ -21,16 +19,11 @@ const Attributes: FC<AttributesProps> = ({ attributes }) => {
                     <DataList.ItemValue>
                         <HStack wrap="wrap">
                             {item.collection.map(entry => (
-                                <BrandButton key={entry.name} size="xs" asChild {...entry.active ? {
-                                    variant: 'brand-primary'
-                                } : {
-                                    colorPalette: 'gray',
-                                    variant: 'subtle'
-                                }}>
+                                <Button key={entry.name} size="xs" asChild variant="subtle" colorPalette="gray">
                                     <ChakraLink asChild>
                                         <Link href={entry.link}>{entry.name}</Link>
                                     </ChakraLink>
-                                </BrandButton>
+                                </Button>
                             ))}
                         </HStack>
                     </DataList.ItemValue>

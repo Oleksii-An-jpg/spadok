@@ -47,11 +47,10 @@ export default async function Page({params}: { params: Params }) {
         <Attributes attributes={[
             {
                 name: 'Категорії',
-                collection: categories.filter(category => !category.isCollection).map(category => ({
-                    name: category.name,
-                    link: `/catalog?Категорії=${category.id}`,
-                    active: [item.mainCategory, ...(item.subCategories || [])].includes(category.id),
-                }))
+                collection: [item.mainCategory, ...(item.subCategories || [])].map(category => categories.find(({ id }) => id === category)).filter((category) => !category?.isCollection).map(category => ({
+                    name: category?.name,
+                    link: `/catalog?Категорії=${category?.id}`,
+                })),
             },
         ]} />
     </VStack>

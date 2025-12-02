@@ -96,16 +96,28 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
     const columnFilterValue = column.getFilterValue();
 
     const collection = useMemo(() => {
-        // Use table.getCoreRowModel() to get all rows, regardless of current filters
         const rows = table.getCoreRowModel().flatRows;
-        const values: { name: string, id: string }[] = rows.map(row => row.getValue(column.id));
 
-        // Remove duplicates and filter out null/undefined
-        const uniqueValues = Array.from(new Set(values.filter((value) => value != null)));
+        const map = new Map<string, { id: string; name: string }>();
 
-        const items = uniqueValues.map((value) => ({
-            value: value.id,
-            label: value.name
+        for (const row of rows) {
+            const v = row.getValue(column.id) as { id: string; name: string };
+
+            if (Array.isArray(v)) {
+                // accessorFn now returns arrays
+                for (const entry of v) {
+                    if (entry?.id) {
+                        map.set(entry.id, entry);
+                    }
+                }
+            } else if (v?.id) {
+                map.set(v.id, v);
+            }
+        }
+
+        const items = Array.from(map.values()).map(v => ({
+            value: v.id,
+            label: v.name,
         }));
 
         return createListCollection({ items });
@@ -143,13 +155,14 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
     </Accordion.Item>
 }
 
-const List: FC<ListProps> = ({ items, categories, regions }) => {
+const List: FC<ListProps> = ({ items, categories: rawCategories, regions }) => {
     const searchParams = useSearchParams();
     const initialFilters = parseFilters(searchParams);
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
         pageSize: 10,
     });
+    const categories = useMemo(() => rawCategories.filter(category => !category.isCollection), [rawCategories])
     const columns = useMemo<ColumnDef<ItemModel>[]>(
         () => [
             {
@@ -163,19 +176,21 @@ const List: FC<ListProps> = ({ items, categories, regions }) => {
             {
                 id: 'Категорії',
                 accessorFn: (row) => {
-                    return categories.find(({ id }) => id === row.mainCategory || row.subCategories?.includes(id));
+                    return categories.filter(({ id }) =>
+                        id === row.mainCategory || row.subCategories?.includes(id)
+                    );
                 },
                 cell: () => null,
                 enableHiding: false,
                 filterFn: (row, columnId, filterValue) => {
                     if (!filterValue || filterValue.length === 0) return true;
 
-                    const item = row.original;
-                    const category = categories.find(({ id }) =>
-                        id === item.mainCategory || item.subCategories?.includes(id)
+                    const itemCats = categories.filter(({ id }) =>
+                        id === row.original.mainCategory ||
+                        row.original.subCategories?.includes(id)
                     );
 
-                    return category ? filterValue.includes(category.id) : false;
+                    return itemCats.some(cat => filterValue.includes(cat.id));
                 }
             },
             {
@@ -197,7 +212,7 @@ const List: FC<ListProps> = ({ items, categories, regions }) => {
                 }
             }
         ],
-        [items]
+        [items, categories, regions]
     );
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initialFilters);
     const table = useReactTable({
