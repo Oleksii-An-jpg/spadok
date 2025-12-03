@@ -290,7 +290,10 @@ const Exhibition: FC<ExhibitionProps> = ({ item, authors, regions, materials, te
                 <Combo items={techniques} label="Техніки виконання" name="techniques" control={control} placeholder="Оберіть техніки" />
                 <Combo items={cuts} name="cuts" control={control} label="Крій" placeholder="Оберіть крій" />
                 <Picker items={categories} name="mainCategory" control={control} label="Основна категорія" placeholder="Оберіть категорію" />
-                <Combo items={categories} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
+                <Combo items={categories.map(category => ({
+                    ...category,
+                    group: category.isCollection ? 'Підбірки' : 'Категорії'
+                }))} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
                 <Date control={control} />
                 <Field.Root orientation="horizontal" required>
                     <Field.Label>

@@ -7,7 +7,8 @@ import {
     Field,
     useFilter,
     useListCollection,
-    Wrap
+    Wrap,
+    Text
 } from "@chakra-ui/react";
 import {Control, Controller, FieldPath} from "react-hook-form";
 import {ItemUIModel} from "@/models/item";
@@ -15,6 +16,7 @@ import {ItemUIModel} from "@/models/item";
 type BaseItem = {
     id: string;
     name: string;
+    group?: string;
 }
 
 type ComboProps<T> = {
@@ -31,6 +33,7 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
     const formatted = useMemo(() => items.map(item => ({
         label: item.name,
         value: item.id,
+        group: item.group
     })), [items]);
     const collection = useMemo(() => {
         return createListCollection({
@@ -40,10 +43,12 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
     const { collection: collectionOfItems, filter } = useListCollection({
         initialItems: formatted,
         filter: contains,
+        groupBy: (item) => item.group || "default",
     });
     const handleInputChange = (details: Combobox.InputValueChangeDetails) => {
         filter(details.inputValue)
     }
+
     return <Field.Root orientation="horizontal" required={required}>
         <Field.Label>
             {label}
@@ -80,11 +85,18 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
                 <Combobox.Positioner>
                     <Combobox.Content>
                         <Combobox.Empty>Не знайдено</Combobox.Empty>
-                        {collectionOfItems.items.map((item) => (
-                            <Combobox.Item key={item.value} item={item}>
-                                {item.label}
-                                <Combobox.ItemIndicator />
-                            </Combobox.Item>
+                        {collectionOfItems.group().map(([group, items]) => (
+                            <Combobox.ItemGroup key={group}>
+                                <Combobox.ItemGroupLabel>
+                                    <Text as="b">{group}</Text>
+                                </Combobox.ItemGroupLabel>
+                                {items.map((item) => (
+                                    <Combobox.Item key={item.value} item={item}>
+                                        {item.label}
+                                        <Combobox.ItemIndicator />
+                                    </Combobox.Item>
+                                ))}
+                            </Combobox.ItemGroup>
                         ))}
                     </Combobox.Content>
                 </Combobox.Positioner>
