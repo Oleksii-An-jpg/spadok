@@ -17,6 +17,7 @@ import {Metadata, ResolvingMetadata} from "next";
 import {getTechniques} from "@/api/techniques";
 import {getMaterials} from "@/api/materials";
 import {getCuts} from "@/api/cuts";
+import {getRegions} from "@/api/regions";
 
 type Props = {
     params: Promise<{ id: string }>
@@ -70,7 +71,7 @@ export async function generateMetadata(
 
 export default async function Page({params}: Props) {
     const {id} = await params;
-    const [item, categories, {items}, relation, techniques, materials, cuts] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id), getTechniques(), getMaterials(), getCuts()]);
+    const [item, categories, {items}, relation, techniques, materials, cuts, regions] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id), getTechniques(), getMaterials(), getCuts(), getRegions()]);
 
     if (!item) {
         return notFound();
@@ -120,6 +121,13 @@ export default async function Page({params}: Props) {
                 collection: [item.mainCategory, ...(item.subCategories || [])].map(category => categories.find(({ id }) => id === category)).filter((category) => !category?.isCollection).map(category => ({
                     name: category?.name,
                     link: `/catalog?Категорії=${category?.id}`,
+                })),
+            },
+            {
+                name: 'Регіони',
+                collection: [...item.region, ...item.subRegions].map(region => regions.find(({ id }) => id === region)).filter(isDefined).map(region => ({
+                    name: region?.name,
+                    link: `/catalog?Регіони=${region?.id}`,
                 })),
             },
         ]} />

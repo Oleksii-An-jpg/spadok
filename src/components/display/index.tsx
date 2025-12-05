@@ -66,12 +66,12 @@ const Display: FC<DisplayProps> = ({ item, simple = true }) => {
                         <br />
                         {item.size}.
                     </Text>
-                    <Text>
+                    {item.description && <Text>
                         {item.description}
-                    </Text>
-                    <Text>
+                    </Text>}
+                    {item.purchase && <Text>
                         {item.purchase}
-                    </Text>
+                    </Text>}
                 </VStack>}
                 <ChakraLink asChild variant="underline">
                     <Link target="_blank" href={item.sourceURL}>
