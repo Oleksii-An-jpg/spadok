@@ -157,7 +157,7 @@ export default async function Page({params}: Props) {
                 <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
                     Вам може сподобатися:
                 </Heading>
-                <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+                <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={2}>
                     {random.map((item) => <Item item={item} key={item.id} />)}
                 </Box>
                 <Box alignSelf="center">
