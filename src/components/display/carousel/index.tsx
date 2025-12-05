@@ -24,11 +24,11 @@ const CarouselThumbnails = ({ items }: { items: string[] }) => {
                                               }}>
                         <AspectRatio
                             ratio={1}
-                            w="16"
+                            w={{ base: 8, xl: 16 }}
                             cursor="button"
                             onClick={() => carousel.scrollTo(index)}
                         >
-                            <Image src={`https://storage.googleapis.com/spadok-images/${src}`} className="object-scale-down" alt="asd" fill />
+                            <Image src={`https://storage.googleapis.com/spadok-images/${src}`} className="object-scale-down" alt="Photo" fill />
                         </AspectRatio>
                     </ChakraCarousel.Indicator>
                 ))}

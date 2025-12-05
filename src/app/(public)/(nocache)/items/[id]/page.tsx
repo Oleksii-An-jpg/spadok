@@ -1,23 +1,36 @@
 'use server';
 
-import {getItem} from "@/api/items";
+import {getItem, getItems, getRelation} from "@/api/items";
 import {notFound} from "next/navigation";
 import Display from "@/components/display";
-import {Box, Breadcrumb, VStack} from "@chakra-ui/react";
+import {Box, Breadcrumb, Link as ChakraLink, Heading, VStack} from "@chakra-ui/react";
 import Link from "next/link";
 import {BiCategory, BiHome} from "react-icons/bi";
 import Attributes from "@/components/attributes";
 import {getCategories} from "@/api/categories";
+import Item from "@/components/items/item";
+import isDefined from "@/utils/isDefined";
+import BrandButton from "@/components/brand/button";
+import Banner from "@/components/banner";
+import {shuffleArray} from "@/utils/shuffle";
 
 type Params = Promise<{ id: string }>
 
 export default async function Page({params}: { params: Params }) {
     const {id} = await params;
-    const [item, categories] = await Promise.all([getItem(id), getCategories()]);
+    const [item, categories, {items}, relation] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id)]);
 
     if (!item) {
         return notFound();
     }
+
+    const related = relation?.related.map((item) => items.find(({ id }) => id === item)).filter(isDefined);
+
+    // Create a Set of IDs to exclude (the main item + related items)
+    const excludeIds = new Set([item.id, ...(related ? related.map((r) => r.id) : [])]);
+
+    // Filter items to exclude those in excludeIds
+    const random = shuffleArray(items.filter(({ id }) => !excludeIds.has(id))).slice(0, 10);
 
     return <VStack align="stretch" gap={8}>
         <Breadcrumb.Root>
@@ -53,5 +66,45 @@ export default async function Page({params}: { params: Params }) {
                 })),
             },
         ]} />
+        {related?.length && (
+            <VStack align="stretch" gap={8}>
+                <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
+                    Речі з однієї скрині:
+                </Heading>
+                <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+                    {related.map((item) => <Item item={item} key={item.id} />)}
+                </Box>
+                <Box alignSelf="center">
+                    <BrandButton variant="brand-primary" asChild>
+                        <ChakraLink asChild variant="underline">
+                            <Link prefetch={false} href={`/catalog`}>
+                                Більше
+                            </Link>
+                        </ChakraLink>
+                    </BrandButton>
+                </Box>
+            </VStack>
+        )}
+        <Banner />
+
+        {random?.length && (
+            <VStack align="stretch" gap={8}>
+                <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
+                    Вам може сподобатися:
+                </Heading>
+                <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+                    {random.map((item) => <Item item={item} key={item.id} />)}
+                </Box>
+                <Box alignSelf="center">
+                    <BrandButton variant="brand-primary" asChild>
+                        <ChakraLink asChild variant="underline">
+                            <Link prefetch={false} href={`/catalog`}>
+                                Перейти до каталогу
+                            </Link>
+                        </ChakraLink>
+                    </BrandButton>
+                </Box>
+            </VStack>
+        )}
     </VStack>
 }

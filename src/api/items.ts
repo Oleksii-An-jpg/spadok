@@ -8,9 +8,22 @@ import {UniqueIdentifier} from "@dnd-kit/core";
 import {getTextFromAddress} from "@/components/places/utils";
 import {extractCenturyPartAndFraction, getDateTupleFromExtractedInfo} from "@/lib/utils";
 import { FieldPath } from 'firebase-admin/firestore';
+import {Relation} from "@/models/relation";
 
 function isDefined<T>(value: T | undefined): value is T {
     return value !== undefined;
+}
+
+export class RelationConverter implements FirestoreDataConverter<Relation> {
+    fromFirestore(snapshot: QueryDocumentSnapshot<Relation>): Relation {
+        return {
+            ...snapshot.data(),
+            id: snapshot.id
+        }
+    }
+    toFirestore(relation: Relation): Relation {
+        return relation
+    }
 }
 
 export class ItemConverter implements FirestoreDataConverter<Item> {
@@ -244,4 +257,10 @@ export async function updateSubcategoryAssignments(
         removed: itemsToRemove.length,
         totalUpdated
     };
+}
+
+export async function getRelation(id: string) {
+    const doc = await admin.collection('related-items').withConverter(new RelationConverter()).doc(id).get()
+
+    return doc.data();
 }

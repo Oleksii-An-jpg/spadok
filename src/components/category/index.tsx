@@ -147,7 +147,15 @@ const Category: FC<CategoryProps> = ({ category, items }) => {
                     <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
                 </VStack>
 
-                {category && items && <Picker items={items} category={category} />}
+                {category && items && <Picker submitText="Додати/прибрати підбірку з підкатегорій обраних предметів" items={items} onSubmit={async (items) => {
+                    await fetch('/api/items/assign', {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            items: items,
+                            category: category.id
+                        }),
+                    });
+                }} initial={items.filter(item => item.mainCategory === category.id || item.subCategories?.includes(category.id)).map(item => String(item.id))} />}
             </VStack>
         </Container>
     </Card.Body>

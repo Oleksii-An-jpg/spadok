@@ -1,6 +1,6 @@
 'use client';
 
-import {FC, useMemo} from "react";
+import {FC} from "react";
 import {Item} from "@/models/item";
 import {
     Listbox,
@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import {useForm, Controller} from "react-hook-form";
 import Image from "next/image";
-import {Category} from "@/models/category";
 
 const ListboxItemCheckmark = () => {
     const itemState = useListboxItemContext()
@@ -31,14 +30,16 @@ const ListboxItemCheckmark = () => {
 
 type PickerProps = {
     items: Item[];
-    category: Category;
+    initial: string[];
+    onSubmit: (values: string[]) => Promise<void>;
+    submitText: string;
 }
 
 type Values = {
     items: string[]
 }
 
-const Picker: FC<PickerProps> = ({ items, category }) => {
+const Picker: FC<PickerProps> = ({ items, initial, submitText, onSubmit }) => {
     const { contains } = useFilter({ sensitivity: "base" })
     const { collection, filter } = useListCollection({
         initialItems: items.map(item => {
@@ -51,9 +52,6 @@ const Picker: FC<PickerProps> = ({ items, category }) => {
         }),
         filter: contains
     });
-    const initial = useMemo(() => {
-        return items.filter(item => item.mainCategory === category.id || item.subCategories?.includes(category.id)).map(item => String(item.id))
-    }, []);
     const {
         handleSubmit,
         formState: { isSubmitting },
@@ -66,13 +64,7 @@ const Picker: FC<PickerProps> = ({ items, category }) => {
     });
 
     return <VStack as="form" onSubmit={handleSubmit(async (data) => {
-        await fetch('/api/items/assign', {
-            method: 'PATCH',
-            body: JSON.stringify({
-                items: data.items,
-                category: category.id
-            }),
-        });
+        await onSubmit(data.items);
 
         reset(data);
     })} align="stretch" className="w-full">
@@ -82,7 +74,7 @@ const Picker: FC<PickerProps> = ({ items, category }) => {
                 <Listbox.Label>Оберіть предмети</Listbox.Label>
                 <Listbox.Input
                     as={Input}
-                    placeholder="Пошук по назві..."
+                    placeholder="Пошук по назві"
                     onChange={(e) => filter(e.target.value)}
                 />
                 <Listbox.Content>
@@ -113,7 +105,7 @@ const Picker: FC<PickerProps> = ({ items, category }) => {
                 </Listbox.Content>
             </Listbox.Root>
         )} name="items" />
-        <Button loading={isSubmitting} type="submit">Додати/прибрати підбірку з підкатегорій обраних предметів</Button>
+        <Button loading={isSubmitting} type="submit">{submitText}</Button>
     </VStack>
 }
 

@@ -11,8 +11,8 @@ import {getDisplayPrice} from "@/lib/price";
 import Avatar from "@/components/avatar";
 import Members from "@/components/members";
 import QNA from "@/components/q&a";
-import {getItems} from "@/api/items";
-import Display from "@/components/display";
+// import {getItems} from "@/api/items";
+// import Display from "@/components/display";
 import {getCategories} from "@/api/categories";
 import Collection from "@/components/collection";
 import Banner from "@/components/banner";
@@ -79,7 +79,7 @@ const MEMBERS = [
 export default async function Home() {
     const founds = await getFounds();
     const categories = await getCategories();
-    const {items} = await getItems();
+    // const {items} = await getItems();
   return (
       <Bleed inline="30px" block="10">
           <main className="text-sm xl:text-2xl font-extralight">
@@ -269,15 +269,15 @@ export default async function Home() {
                           звіт від БФ «КОЛО»
                       </Link>
                   </p>
-                  <h3 className="text-xl xl:text-4xl leading-10 mb-6 font-light mt-12 whitespace-nowrap">
-                      Передані речі до музею:
-                  </h3>
-                  <VStack align="stretch" gap={16} mb={24}>
-                      {items.slice(0, 6).map((item) => (
-                          <Display key={item.id} item={item} />
-                      ))}
-                  </VStack>
-                  <VStack gap={16} align="stretch">
+                  {/*<h3 className="text-xl xl:text-4xl leading-10 mb-6 font-light mt-12 whitespace-nowrap">*/}
+                  {/*    Передані речі до музею:*/}
+                  {/*</h3>*/}
+                  {/*<VStack align="stretch" gap={16} mb={24}>*/}
+                  {/*    {items.slice(0, 6).map((item) => (*/}
+                  {/*        <Display key={item.id} item={item} />*/}
+                  {/*    ))}*/}
+                  {/*</VStack>*/}
+                  <VStack mt={6} gap={16} align="stretch">
                       <Heading fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">
                           Дослідіть наші колекції:
                       </Heading>

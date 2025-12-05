@@ -1,6 +1,6 @@
 'use server';
 
-import {getItem} from "@/api/items";
+import {getItem, getItems, getRelation} from "@/api/items";
 import Exhibition from "@/components/exhibition";
 import {notFound} from "next/navigation";
 import {getAuthors} from "@/api/authors";
@@ -14,9 +14,10 @@ type Params = Promise<{ id: string }>
 
 export default async function Page({params}: { params: Params }) {
     const {id} = await params;
-    const [item, authors, regions, materials, techniques, categories, cuts] = await Promise.all([getItem(id), getAuthors(), getRegions(), getMaterials(), getTechniques(), getCategories(), getCuts()]);
+    const [item, authors, regions, materials, techniques, categories, cuts, {items}] = await Promise.all([getItem(id), getAuthors(), getRegions(), getMaterials(), getTechniques(), getCategories(), getCuts(), getItems()]);
     if (!item) {
         return notFound();
     }
-    return <Exhibition item={item} cuts={cuts} categories={categories} techniques={techniques} materials={materials} regions={regions} authors={authors} />
+    const relation = await getRelation(id);
+    return <Exhibition item={item} relation={relation} items={items.filter(item => item.id !== id)} cuts={cuts} categories={categories} techniques={techniques} materials={materials} regions={regions} authors={authors} />
 }

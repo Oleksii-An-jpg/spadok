@@ -20,7 +20,7 @@ const Item: FC<ItemProps> = ({ item }) => {
                                 <Text fontSize={{ base: 'xx-small', xl: 'xs' }}>
                                     <Text fontWeight="bold">{item.name.trim()}</Text>
                                     {/* TODO(@oleksii.a): get rid of this */}
-                                    {item.regions[0]?.name !== 'невідомо' && <Text as="span">/ {item.regions[0]?.name}</Text>}
+                                    {item.regions[0]?.name !== 'невідомо' && <Text as="span">{item.regions[0]?.name}</Text>}
                                 </Text>
                             </VStack>
                         </VStack>
