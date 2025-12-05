@@ -196,7 +196,9 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions }) => {
             {
                 id: 'Регіони',
                 accessorFn: (row) => {
-                    return regions.find(({ id }) => row.region.includes(id) || row.subRegions?.includes(id));
+                    return regions.filter(({ id }) =>
+                        row.region.includes(id) || row.subRegions?.includes(id)
+                    );
                 },
                 cell: () => null,
                 enableHiding: false,
@@ -204,11 +206,16 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions }) => {
                     if (!filterValue || filterValue.length === 0) return true;
 
                     const item = row.original;
-                    const region = regions.find(({ id }) =>
-                        item.region.includes(id) || item.subRegions?.includes(id)
-                    );
 
-                    return region ? filterValue.includes(region.id) : false;
+                    // Collect all regions this item belongs to
+                    const matched = regions
+                        .filter(({ id }) =>
+                            item.region.includes(id) || item.subRegions?.includes(id)
+                        )
+                        .map(r => r.id);
+
+                    // Keep item if ANY matched region is in filterValue
+                    return matched.some(id => filterValue.includes(id));
                 }
             }
         ],
