@@ -118,25 +118,38 @@ export async function generateMetadata(
         return {}
     }
 
-    const { openGraph, metadataBase } = await parent;
+    const { metadataBase, openGraph: parentOG } = await parent;
+    const previousImages = parentOG?.images ?? [];
 
-    const previousImages = openGraph?.images || [];
+    const currentImage = category.highlight
+        ? {
+            url: `https://storage.googleapis.com/spadok-images/${category.highlight}`,
+            secureUrl: `https://storage.googleapis.com/spadok-images/${category.highlight}`,
+        }
+        : null;
 
-    const images = category.highlight
-        ? [`https://storage.googleapis.com/spadok-images/${category.highlight}`, ...previousImages]
+    const images = currentImage
+        ? [currentImage, ...previousImages]
         : previousImages;
 
     return {
         metadataBase,
-        title: category?.name,
-        description: category?.description,
+        title: category.name,
+        description: category.description,
         openGraph: {
+            title: category.name,
+            description: category.description,
+            type: "website",
+            url: `/collection/${id}`,
             images,
         },
         twitter: {
+            card: "summary_large_image",
+            title: category.name,
+            description: category.description,
             images,
         },
-    }
+    };
 }
 
 export default async function Page({params}: Props) {

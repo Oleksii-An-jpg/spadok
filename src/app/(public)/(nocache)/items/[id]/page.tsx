@@ -31,25 +31,38 @@ export async function generateMetadata(
         return {}
     }
 
-    const { openGraph, metadataBase } = await parent;
+    const { metadataBase, openGraph: parentOG } = await parent;
+    const previousImages = parentOG?.images ?? [];
 
-    const previousImages = openGraph?.images || [];
+    const currentImage = item.images[0]
+        ? {
+            url: `https://storage.googleapis.com/spadok-images/${item.images[0]}`,
+            secureUrl: `https://storage.googleapis.com/spadok-images/${item.images[0]}`,
+        }
+        : null;
 
-    const images = item.images[0]
-        ? [`https://storage.googleapis.com/spadok-images/${item.images[0]}`, ...previousImages]
+    const images = currentImage
+        ? [currentImage, ...previousImages]
         : previousImages;
 
     return {
         metadataBase,
-        title: item?.name,
-        description: item?.description,
+        title: item.name,
+        description: item.description,
         openGraph: {
+            title: item.name,
+            description: item.description,
+            type: "website",
+            url: `/items/${id}`,
             images,
         },
         twitter: {
+            card: "summary_large_image",
+            title: item.name,
+            description: item.description,
             images,
         },
-    }
+    };
 }
 
 export default async function Page({params}: Props) {
