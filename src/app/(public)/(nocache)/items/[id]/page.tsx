@@ -14,6 +14,9 @@ import BrandButton from "@/components/brand/button";
 import Banner from "@/components/banner";
 import {shuffleArray} from "@/utils/shuffle";
 import {Metadata, ResolvingMetadata} from "next";
+import {getTechniques} from "@/api/techniques";
+import {getMaterials} from "@/api/materials";
+import {getCuts} from "@/api/cuts";
 
 type Props = {
     params: Promise<{ id: string }>
@@ -67,7 +70,7 @@ export async function generateMetadata(
 
 export default async function Page({params}: Props) {
     const {id} = await params;
-    const [item, categories, {items}, relation] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id)]);
+    const [item, categories, {items}, relation, techniques, materials, cuts] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id), getTechniques(), getMaterials(), getCuts()]);
 
     if (!item) {
         return notFound();
@@ -105,7 +108,12 @@ export default async function Page({params}: Props) {
                 </Breadcrumb.Item>
             </Breadcrumb.List>
         </Breadcrumb.Root>
-        <Display simple={false} item={item} />
+        <Display simple={false} item={{
+            ...item,
+            techniques: item.techniques.map(technique => techniques.find(({ id }) => id === technique)?.name).filter(isDefined),
+            materials: item.materials?.map(material => materials.find(({ id }) => id === material)?.name).filter(isDefined),
+            cuts: item.cuts?.map(cut => cuts.find(({ id }) => id === cut)?.name).filter(isDefined)
+        }} />
         <Attributes attributes={[
             {
                 name: 'Категорії',

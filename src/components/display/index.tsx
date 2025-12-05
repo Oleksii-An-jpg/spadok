@@ -42,14 +42,14 @@ const Display: FC<DisplayProps> = ({ item, simple = true }) => {
                 </ChakraCarousel.NextTrigger>
             </ChakraCarousel.Control>
         </ChakraCarousel.Root> : <Carousel item={item} />}
-        <Stack flex={1} direction={{ base: 'row', xl: 'column' }} columnGap={8} rowGap={3}>
+        <Stack fontWeight="lighter" flex={1} direction={{ base: 'row', xl: 'column' }} columnGap={8} rowGap={3}>
             <VStack align="stretch" gap={0}>
                 <Text fontSize={{ base: 'sm', xl: 'md' }}>Врятовано за:</Text>
                 <Text fontSize={{ base: 'sm', xl: '2xl' }}>{item.price ? getDisplayPrice(item.price) : 'Дарунок'}</Text>
             </VStack>
             <VStack align="stretch" fontSize={{ base: 'xs', xl: 'md' }} gap={3}>
                 <Box>
-                    <Text>{item.name}</Text>
+                    <Text>{item.name}.</Text>
                     <Text>{[item.address?.state, item.address?.region, item.address?.city]
                         .filter(Boolean)
                         .join(', ')} {item.region?.length && `(${item.regions.find(({ id }) => id === item.region[0])?.name})`}.</Text>
@@ -60,7 +60,19 @@ const Display: FC<DisplayProps> = ({ item, simple = true }) => {
                     <Collapsible.Content mt={4}>
                         {item.purchase}
                     </Collapsible.Content>
-                </Collapsible.Root> : item.purchase}
+                </Collapsible.Root> : <VStack align="stretch" gap={4}>
+                    <Text className="first-letter:uppercase">
+                        {[item.materials?.join(', '), item.techniques?.join(', '), item.cuts?.join(', ')].join('; ')}
+                        <br />
+                        {item.size}.
+                    </Text>
+                    <Text>
+                        {item.description}
+                    </Text>
+                    <Text>
+                        {item.purchase}
+                    </Text>
+                </VStack>}
                 <ChakraLink asChild variant="underline">
                     <Link target="_blank" href={item.sourceURL}>
                         Завантажити світлини у високій якості
