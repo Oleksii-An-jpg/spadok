@@ -42,7 +42,7 @@ export async function generateMetadata(
         : null;
 
     const images = currentImage
-        ? [currentImage, ...previousImages]
+        ? [currentImage]
         : previousImages;
 
     return {
