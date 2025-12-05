@@ -47,7 +47,7 @@ export default async function Page({
             <Card.Header>
                 <VStack align="start">
                     <Heading>Предмети</Heading>
-                    <Create authors={authors} regions={regions} materials={materials} techniques={techniques} categories={categories} cuts={cuts} />
+                    <Create authors={authors} regions={regions} items={all} materials={materials} techniques={techniques} categories={categories} cuts={cuts} />
                 </VStack>
             </Card.Header>
             <Card.Body>

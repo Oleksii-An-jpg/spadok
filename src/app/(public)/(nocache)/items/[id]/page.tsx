@@ -13,10 +13,46 @@ import isDefined from "@/utils/isDefined";
 import BrandButton from "@/components/brand/button";
 import Banner from "@/components/banner";
 import {shuffleArray} from "@/utils/shuffle";
+import {Metadata, ResolvingMetadata} from "next";
 
-type Params = Promise<{ id: string }>
+type Props = {
+    params: Promise<{ id: string }>
+}
 
-export default async function Page({params}: { params: Params }) {
+export async function generateMetadata(
+    { params }: Props,
+    parent: ResolvingMetadata
+): Promise<Metadata> {
+    const id = (await params).id
+
+    const item = await getItem(id);
+
+    if (!item) {
+        return {}
+    }
+
+    const { openGraph, metadataBase } = await parent;
+
+    const previousImages = openGraph?.images || [];
+
+    const images = item.images[0]
+        ? [`https://storage.googleapis.com/spadok-images/${item.images[0]}`, ...previousImages]
+        : previousImages;
+
+    return {
+        metadataBase,
+        title: item?.name,
+        description: item?.description,
+        openGraph: {
+            images,
+        },
+        twitter: {
+            images,
+        },
+    }
+}
+
+export default async function Page({params}: Props) {
     const {id} = await params;
     const [item, categories, {items}, relation] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id)]);
 

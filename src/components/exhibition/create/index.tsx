@@ -8,6 +8,7 @@ import {Material} from "@/models/material";
 import {Technique} from "@/models/technique";
 import {Category} from "@/models/category";
 import {Cut} from "@/models/cut";
+import {Item} from "@/models/item";
 
 type CreateProps = {
     authors: Author[]
@@ -16,6 +17,7 @@ type CreateProps = {
     techniques: Technique[]
     categories: Category[]
     cuts: Cut[]
+    items: Item[]
 }
 
 const Create: FC<CreateProps> = (props) => {

@@ -22,6 +22,7 @@ import {BiHome, BiCategory} from "react-icons/bi";
 import {notFound} from "next/navigation";
 import Item from "@/components/items/item";
 import Banner from "@/components/banner";
+import {Metadata, ResolvingMetadata} from "next";
 
 const ChakraMarkdownComponents: Components = {
     // Headings
@@ -101,9 +102,44 @@ const ChakraMarkdownComponents: Components = {
     },
 };
 
-type Params = Promise<{ id: string }>
+type Props = {
+    params: Promise<{ id: string }>
+}
 
-export default async function Page({params}: { params: Params }) {
+export async function generateMetadata(
+    { params }: Props,
+    parent: ResolvingMetadata
+): Promise<Metadata> {
+    const id = (await params).id
+
+    const category = await getCategory(id);
+
+    if (!category) {
+        return {}
+    }
+
+    const { openGraph, metadataBase } = await parent;
+
+    const previousImages = openGraph?.images || [];
+
+    const images = category.highlight
+        ? [`https://storage.googleapis.com/spadok-images/${category.highlight}`, ...previousImages]
+        : previousImages;
+
+    return {
+        metadataBase,
+        title: category?.name,
+        description: category?.description,
+        openGraph: {
+            images,
+        },
+        twitter: {
+            images,
+        },
+    }
+}
+
+export default async function Page({params}: Props) {
     const {id} = await params;
 
     const category = await getCategory(id);
