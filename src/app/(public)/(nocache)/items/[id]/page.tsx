@@ -111,7 +111,7 @@ export default async function Page({params}: Props) {
         </Breadcrumb.Root>
         <Display simple={false} item={{
             ...item,
-            techniques: item.techniques.map(technique => techniques.find(({ id }) => id === technique)?.name).filter(isDefined),
+            techniques: item.techniques?.map(technique => techniques.find(({ id }) => id === technique)?.name).filter(isDefined),
             materials: item.materials?.map(material => materials.find(({ id }) => id === material)?.name).filter(isDefined),
             cuts: item.cuts?.map(cut => cuts.find(({ id }) => id === cut)?.name).filter(isDefined)
         }} />
