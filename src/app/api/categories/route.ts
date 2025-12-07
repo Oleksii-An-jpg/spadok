@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
         description: formData.get('description'),
         isCollection: formData.get('isCollection') === 'true',
         isHomepage: formData.get('isHomepage') === 'true',
+        canFilter: formData.get('canFilter') === 'true',
         ...(highlight && {
             highlight: await uploadImageToBucket(highlight),
         })

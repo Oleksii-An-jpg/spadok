@@ -77,6 +77,7 @@ export default async function Page({params}: Props) {
         return notFound();
     }
 
+
     const related = relation?.related.map((item) => items.find(({ id }) => id === item)).filter(isDefined);
 
     // Create a Set of IDs to exclude (the main item + related items)
@@ -120,7 +121,9 @@ export default async function Page({params}: Props) {
                 name: 'Категорії',
                 collection: [item.mainCategory, ...(item.subCategories || [])].map(category => categories.find(({ id }) => id === category)).filter((category) => !category?.isCollection).map(category => ({
                     name: category?.name,
-                    link: `/catalog?Категорії=${category?.id}`,
+                    ...(category?.canFilter && {
+                        link: `/catalog?Категорії=${category?.id}`,
+                    })
                 })),
             },
             {

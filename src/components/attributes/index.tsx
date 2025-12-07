@@ -6,7 +6,7 @@ import Link from "next/link";
 type AttributesProps = {
     attributes: { name: string; collection: {
         name?: string;
-        link: string;
+        link?: string;
     }[] }[]
 };
 
@@ -19,10 +19,12 @@ const Attributes: FC<AttributesProps> = ({ attributes }) => {
                     <DataList.ItemValue>
                         <HStack wrap="wrap">
                             {item.collection.map(entry => (
-                                <Button key={entry.name} size="xs" asChild variant="subtle" colorPalette="gray">
-                                    <ChakraLink asChild>
-                                        <Link href={entry.link}>{entry.name}</Link>
-                                    </ChakraLink>
+                                <Button disabled={!entry.link} key={entry.name} size="xs" asChild variant="subtle" colorPalette="gray">
+                                    {entry.link ? (
+                                        <ChakraLink asChild>
+                                            <Link href={entry.link}>{entry.name}</Link>
+                                        </ChakraLink>
+                                    ) : entry.name}
                                 </Button>
                             ))}
                         </HStack>

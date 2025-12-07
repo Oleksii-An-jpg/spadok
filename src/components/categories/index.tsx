@@ -64,7 +64,27 @@ const Categories: FC<CategoriesProps> = ({ categories, items }) => {
             meta: {
                 filterVariant: 'select'
             }
-        }
+        },
+        {
+            accessorFn: (row) => Boolean(!row.isCollection && row.canFilter),
+            header: 'У фільтрах',
+            enableColumnFilter: true,
+            invertSorting: true,
+            cell: info => <Icon color={info.getValue() ? 'green' : 'red'}>
+                {info.getValue() ? <BiHappy /> : <BiSad />}
+            </Icon>,
+            sortingFn: (rowA, rowB) => {
+                const valueA = rowA.original.isCollection;
+                const valueB = rowB.original.isCollection;
+
+                if (valueA === valueB) return 0; // Values are the same
+                if (valueA === false) return 1; // True comes before false (ascending)
+                return -1; // False comes after true (ascending)
+            }, // Assign the custom sortType,
+            meta: {
+                filterVariant: 'select'
+            }
+        },
     ]} />
 }
 

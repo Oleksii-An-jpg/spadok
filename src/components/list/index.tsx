@@ -162,7 +162,7 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions }) => {
         pageIndex: 0,
         pageSize: 10,
     });
-    const categories = useMemo(() => rawCategories.filter(category => !category.isCollection), [rawCategories])
+    const categories = useMemo(() => rawCategories.filter(category => !category.isCollection && category.canFilter), [rawCategories])
     const columns = useMemo<ColumnDef<ItemModel>[]>(
         () => [
             {
