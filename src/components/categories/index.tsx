@@ -66,7 +66,7 @@ const Categories: FC<CategoriesProps> = ({ categories, items }) => {
             }
         },
         {
-            accessorFn: (row) => Boolean(!row.isCollection && row.canFilter),
+            accessorFn: (row) => Boolean(row.canFilter),
             header: 'У фільтрах',
             enableColumnFilter: true,
             invertSorting: true,

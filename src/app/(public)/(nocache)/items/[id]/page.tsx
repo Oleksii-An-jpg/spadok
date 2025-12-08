@@ -119,7 +119,7 @@ export default async function Page({params}: Props) {
         <Attributes attributes={[
             {
                 name: 'Категорії',
-                collection: [item.mainCategory, ...(item.subCategories || [])].map(category => categories.find(({ id }) => id === category)).filter((category) => !category?.isCollection).map(category => ({
+                collection: [item.mainCategory, ...(item.subCategories || [])].map(category => categories.find(({ id }) => id === category)).map(category => ({
                     name: category?.name,
                     ...(category?.canFilter && {
                         link: `/catalog?Категорії=${category?.id}`,

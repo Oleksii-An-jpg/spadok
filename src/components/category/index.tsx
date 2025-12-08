@@ -52,12 +52,7 @@ const Category: FC<CategoryProps> = ({ category, items }) => {
     const { register, handleSubmit, setValue, watch, control, formState: { isValid, isSubmitting }, reset } = useForm<CategoryUIModel>({
         defaultValues: rest
     });
-    const [file, isCollection] = watch(['highlight', 'isCollection']);
-    useEffect(() => {
-        if (isCollection) {
-            setValue('canFilter', false)
-        }
-    }, [isCollection]);
+    const [file] = watch(['highlight']);
     useEffect(() => {
         async function parseImage() {
             if (highlight) {
@@ -156,12 +151,11 @@ const Category: FC<CategoryProps> = ({ category, items }) => {
                         render={({ field }) => (
                             <Field.Root>
                                 <Checkbox.Root
-                                    disabled={isCollection}
                                     checked={field.value}
                                     onCheckedChange={({ checked }) => field.onChange(checked)}
                                 >
                                     <Checkbox.HiddenInput />
-                                    <Checkbox.Label css={{ 'width': 'var(--field-label-width)' }}>На фільтрах (не для підбірок)</Checkbox.Label>
+                                    <Checkbox.Label css={{ 'width': 'var(--field-label-width)' }}>На фільтрах</Checkbox.Label>
                                     <Checkbox.Control />
                                 </Checkbox.Root>
                             </Field.Root>
