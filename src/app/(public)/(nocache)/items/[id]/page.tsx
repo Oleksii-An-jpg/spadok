@@ -128,7 +128,7 @@ export default async function Page({params}: Props) {
             },
             {
                 name: 'Регіони',
-                collection: [...item.region, ...item.subRegions].map(region => regions.find(({ id }) => id === region)).filter(isDefined).map(region => ({
+                collection: [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).filter(isDefined).map(region => ({
                     name: region?.name,
                     link: `/catalog?Регіони=${region?.id}`,
                 })),
