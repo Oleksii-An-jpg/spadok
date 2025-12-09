@@ -16,6 +16,7 @@ type DisplayProps = {
 }
 
 const Display: FC<DisplayProps> = ({ item, simple = true }) => {
+    console.log(item);
     return <Stack direction={{ base: 'column', xl: 'row' }} gap={{ base: 4, xl: 16 }}>
         {simple ? <ChakraCarousel.Root slideCount={items.length}>
             <ChakraCarousel.Control justifyContent="center" xl={{ width: 'xl' }}>
@@ -62,9 +63,13 @@ const Display: FC<DisplayProps> = ({ item, simple = true }) => {
                     </Collapsible.Content>
                 </Collapsible.Root> : <VStack align="stretch" gap={4}>
                     <Text className="first-letter:uppercase">
-                        {[item.materials?.join(', '), item.techniques?.join(', '), item.cuts?.join(', ')].join('; ')}
-                        <br />
-                        {item.size}.
+                        {item.materials?.length || item.techniques?.length || item.cuts?.length &&
+                            [item.materials?.join(', '), item.techniques?.join(', '), item.cuts?.join(', ')].join('; ')
+                        }
+                        {item.size ? <>
+                            <br />
+                            {item.size}.
+                        </> : null}
                     </Text>
                     {item.description && <Text>
                         {item.description}

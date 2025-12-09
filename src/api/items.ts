@@ -194,6 +194,39 @@ export async function getItemsByCategory(category: string, options?: { limit?: n
     return { items, order };
 }
 
+export async function getItemsByRegion(region: string, options?: { limit?: number }) {
+    const regions = await getRegions();
+    const { order, position } = await getOrderAndPosition();
+
+    const collection = admin.collection('items').withConverter(new ItemConverter(regions));
+
+    // Firestore doesn't support OR directly, so we do two queries
+    const [mainSnap, subSnap] = await Promise.all([
+        collection.where('region', 'array-contains', region).get(),
+        collection.where('subRegions', 'array-contains', region).get(),
+    ]);
+
+    // Merge and deduplicate by id
+    const allDocs = new Map<string, FirebaseFirestore.QueryDocumentSnapshot<Item>>();
+    for (const doc of [...mainSnap.docs, ...subSnap.docs]) {
+        allDocs.set(doc.id, doc);
+    }
+
+    let items = Array.from(allDocs.values())
+        .map((doc) => doc.data())
+        .sort((a, b) => {
+            const posA = position.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+            const posB = position.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+            return posA - posB;
+        });
+
+    if (options?.limit) {
+        items = items.slice(0, options.limit);
+    }
+
+    return { items, order };
+}
+
 export async function updateSubcategoryAssignments(
     category: string,
     items: string[]

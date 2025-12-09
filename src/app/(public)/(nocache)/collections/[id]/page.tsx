@@ -1,6 +1,6 @@
 'use server';
 
-import {getItemsByCategory} from "@/api/items";
+import {getItemsByCategory, getItemsByRegion} from "@/api/items";
 import {
     Box, Text, VStack,
     Heading,
@@ -23,6 +23,8 @@ import {notFound} from "next/navigation";
 import Item from "@/components/items/item";
 import Banner from "@/components/banner";
 import {Metadata, ResolvingMetadata} from "next";
+import {getRegion} from "@/api/regions";
+import { Item as ItemModel } from "@/models/item";
 
 const ChakraMarkdownComponents: Components = {
     // Headings
@@ -112,19 +114,24 @@ export async function generateMetadata(
 ): Promise<Metadata> {
     const id = (await params).id
 
-    const category = await getCategory(id);
+    const [category, region] = await Promise.all([getCategory(id), getRegion(id)]);
+    let entity
 
-    if (!category) {
+    if (category) {
+        entity = category;
+    } else if (region) {
+        entity = region;
+    } else {
         return {}
     }
 
     const { metadataBase, openGraph: parentOG } = await parent;
     const previousImages = parentOG?.images ?? [];
 
-    const currentImage = category.highlight
+    const currentImage = entity.highlight
         ? {
-            url: `https://storage.googleapis.com/spadok-images/${category.highlight}`,
-            secureUrl: `https://storage.googleapis.com/spadok-images/${category.highlight}`,
+            url: `https://storage.googleapis.com/spadok-images/${entity.highlight}`,
+            secureUrl: `https://storage.googleapis.com/spadok-images/${entity.highlight}`,
         }
         : null;
 
@@ -134,19 +141,19 @@ export async function generateMetadata(
 
     return {
         metadataBase,
-        title: category.name,
-        description: category.description,
+        title: entity.name,
+        description: entity.description,
         openGraph: {
-            title: category.name,
-            description: category.description,
+            title: entity.name,
+            description: entity.description,
             type: "website",
             url: `/collection/${id}`,
             images,
         },
         twitter: {
             card: "summary_large_image",
-            title: category.name,
-            description: category.description,
+            title: entity.name,
+            description: entity.description,
             images,
         },
     };
@@ -155,11 +162,24 @@ export async function generateMetadata(
 export default async function Page({params}: Props) {
     const {id} = await params;
 
-    const category = await getCategory(id);
-    if (!category) {
+    const [category, region] = await Promise.all([getCategory(id), getRegion(id)]);
+    let entity;
+    if (region) {
+        entity = region;
+    } else if (category) {
+        entity = category;
+    } else {
         return notFound();
     }
-    const {items} = await getItemsByCategory(id);
+    let items: ItemModel[];
+    if (region) {
+        const result = await getItemsByRegion(id);
+
+        items = result.items;
+    } else {
+        const result = await getItemsByCategory(id);
+        items = result.items;
+    }
 
     return (
         <VStack align="stretch" gap={4}>
@@ -182,11 +202,11 @@ export default async function Page({params}: Props) {
                     </Breadcrumb.Item>
                     <Breadcrumb.Separator />
                     <Breadcrumb.Item>
-                        <Breadcrumb.CurrentLink>{category?.name}</Breadcrumb.CurrentLink>
+                        <Breadcrumb.CurrentLink>{entity?.name}</Breadcrumb.CurrentLink>
                     </Breadcrumb.Item>
                 </Breadcrumb.List>
             </Breadcrumb.Root>
-            <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{category?.description}</Markdown>
+            <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{entity?.description}</Markdown>
             <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
                 {items.map((item) => <Item item={item} key={item.id} />)}
             </Box>

@@ -43,14 +43,16 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
     const { collection: collectionOfItems, filter } = useListCollection({
         initialItems: formatted,
         filter: contains,
-        groupBy: (item) => item.group || "default",
+        groupBy: formatted.every(item => item.group) ? (item) => {
+            return item.group || ''
+        } : undefined,
     });
     const handleInputChange = (details: Combobox.InputValueChangeDetails) => {
         filter(details.inputValue)
     }
 
     return <Field.Root orientation="horizontal" required={required}>
-        <Field.Label>
+        <Field.Label alignSelf="start">
             {label}
             {required && <Field.RequiredIndicator />}
         </Field.Label>
@@ -77,9 +79,16 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
 
                 <Wrap gap="2">
                     {/* @ts-expect-error something is wrong with the typings */}
-                    {field.value?.map((item) => (
-                        <Badge key={item}>{collection.find(item)?.label}</Badge>
-                    ))}
+                    {field.value?.map((item) => {
+                        const label = collection.find(item)?.label;
+                        if (!label) {
+                            return null
+                        }
+
+                        return (
+                            <Badge key={item}>{collection.find(item)?.label}</Badge>
+                        )
+                    })}
                 </Wrap>
 
                 <Combobox.Positioner>

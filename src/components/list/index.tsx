@@ -155,7 +155,7 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
     </Accordion.Item>
 }
 
-const List: FC<ListProps> = ({ items, categories: rawCategories, regions }) => {
+const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawRegions }) => {
     const searchParams = useSearchParams();
     const initialFilters = parseFilters(searchParams);
     const [pagination, setPagination] = useState<PaginationState>({
@@ -163,6 +163,7 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions }) => {
         pageSize: 10,
     });
     const categories = useMemo(() => rawCategories.filter(category => category.canFilter), [rawCategories])
+    const regions = useMemo(() => rawRegions.filter(category => category.canFilter), [rawRegions])
     const columns = useMemo<ColumnDef<ItemModel>[]>(
         () => [
             {

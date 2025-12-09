@@ -295,10 +295,8 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                     <Combo items={techniques} label="Техніки виконання" name="techniques" control={control} placeholder="Оберіть техніки" />
                     <Combo items={cuts} name="cuts" control={control} label="Крій" placeholder="Оберіть крій" />
                     <Picker items={categories} name="mainCategory" control={control} label="Основна категорія" placeholder="Оберіть категорію" />
-                    <Combo items={categories.map(category => ({
-                        ...category,
-                        group: category.isCollection ? 'Підбірки' : 'Категорії'
-                    }))} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
+                    <Combo items={categories.filter(category => !category.isCollection)} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
+                    <Combo items={categories.filter(category => category.isCollection)} name="subCategories" control={control} label="Підбірки" placeholder="Оберіть підбірки" />
                     <Date control={control} />
                     <Field.Root orientation="horizontal" required>
                         <Field.Label>

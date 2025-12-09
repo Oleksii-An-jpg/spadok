@@ -5,9 +5,10 @@ import {getCategories} from "@/api/categories";
 import Collection from "@/components/collection";
 import Link from "next/link";
 import {BiCategory, BiHome} from "react-icons/bi";
+import {getRegions} from "@/api/regions";
 
 export default async function Page() {
-    const categories = await getCategories();
+    const [categories, regions] = await Promise.all([getCategories(), getRegions()]);
     return <VStack align="stretch" gap={8}>
         <Breadcrumb.Root>
             <Breadcrumb.List>
@@ -30,8 +31,8 @@ export default async function Page() {
         </Breadcrumb.Root>
         <Heading size={{ base: '2xl', xl: '4xl' }} fontWeight="light">Наші колекції</Heading>
         <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap={4}>
-            {categories.filter(category => category.isCollection).map(category => (
-                <Collection collection={category} key={category.id} />
+            {[...categories, ...regions].filter(entity => entity.isCollection).map(entity => (
+                <Collection collection={entity} key={entity.id} />
             ))}
         </Grid>
     </VStack>

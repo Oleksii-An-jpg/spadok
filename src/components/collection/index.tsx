@@ -3,9 +3,10 @@ import {FC} from "react";
 import {LinkBox, LinkOverlay, VStack, Link as ChakraLink} from "@chakra-ui/react";
 import Link from "next/link";
 import {Category} from "@/models/category";
+import {Region} from "@/models/region";
 
 type CollectionProps = {
-    collection: Category;
+    collection: Category | Region;
 }
 
 const Collection: FC<CollectionProps> = ({ collection }) => {

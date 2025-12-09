@@ -2,9 +2,9 @@
 
 import {Card, Heading, VStack} from "@chakra-ui/react";
 import {getRegions} from "@/api/regions";
-import Entities from "@/components/entities";
 import Create from "@/components/region/create";
 import {getItems} from "@/api/items";
+import Regions from "@/components/regions";
 
 export default async function Page() {
     const [regions, {items}] = await Promise.all([getRegions(), getItems()]);
@@ -18,10 +18,7 @@ export default async function Page() {
                 </VStack>
             </Card.Header>
             <Card.Body>
-                <Entities items={regions.map(region => ({
-                    ...region,
-                    count: items.filter(item => item.region?.includes(region.id)).length
-                }))} />
+                <Regions regions={regions} items={items} />
             </Card.Body>
         </>
     )

@@ -85,6 +85,7 @@ export default async function Page({params}: Props) {
 
     // Filter items to exclude those in excludeIds
     const random = shuffleArray(items.filter(({ id }) => !excludeIds.has(id))).slice(0, 10);
+    const hasRegions = [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).some(item => item?.canFilter);
 
     return <VStack align="stretch" gap={8}>
         <Breadcrumb.Root>
@@ -126,13 +127,15 @@ export default async function Page({params}: Props) {
                     })
                 })),
             },
-            {
+            ...(hasRegions ? [{
                 name: 'Регіони',
                 collection: [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).filter(isDefined).map(region => ({
                     name: region?.name,
-                    link: `/catalog?Регіони=${region?.id}`,
+                    ...(region?.canFilter && {
+                        link: `/catalog?Регіони=${region?.id}`,
+                    })
                 })),
-            },
+            }] : [])
         ]} />
         {related?.length && (
             <VStack align="stretch" gap={8}>
