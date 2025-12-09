@@ -1,6 +1,6 @@
 'use client'
 import {FC} from "react";
-import {DataList, HStack, Link as ChakraLink, Box, Button} from "@chakra-ui/react";
+import {DataList, HStack, Link as ChakraLink, Box, Button, Text} from "@chakra-ui/react";
 import Link from "next/link";
 
 type AttributesProps = {
@@ -24,7 +24,7 @@ const Attributes: FC<AttributesProps> = ({ attributes }) => {
                                         <ChakraLink asChild>
                                             <Link href={entry.link}>{entry.name}</Link>
                                         </ChakraLink>
-                                    ) : entry.name}
+                                    ) : <Text>{entry.name}</Text>}
                                 </Button>
                             ))}
                         </HStack>

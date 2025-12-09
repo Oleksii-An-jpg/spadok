@@ -200,7 +200,7 @@ function Entities<T extends BaseItem>({items, initialState, columns = []}: Entit
         </Table.Body>
         <Table.Footer>
             <Table.Row>
-                <Table.Cell colSpan={columns.length}>
+                <Table.Cell colSpan={table.getAllFlatColumns().length}>
                     <VStack align="stretch">
                         <HStack justify="space-between">
                             <Group>
