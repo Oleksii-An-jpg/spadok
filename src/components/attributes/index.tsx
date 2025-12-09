@@ -18,7 +18,8 @@ const Attributes: FC<AttributesProps> = ({ attributes }) => {
                     <DataList.ItemLabel>{item.name}</DataList.ItemLabel>
                     <DataList.ItemValue>
                         <HStack wrap="wrap">
-                            {item.collection.map(entry => (
+                            {item.collection.filter(entry => entry.link).map(entry => (
+                                // TODO(@oleksii.a): perhaps show collection as a special link
                                 <Button disabled={!entry.link} key={entry.name} size="xs" asChild variant="subtle" colorPalette="gray">
                                     {entry.link ? (
                                         <ChakraLink asChild>
