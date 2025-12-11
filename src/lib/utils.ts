@@ -274,8 +274,8 @@ export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo
         return {};
     }
 
-    const startYear = dates[0].getFullYear();
-    const endYear = dates.length === 2 ? dates[1].getFullYear() : startYear;
+    const startYear = dates[0].getUTCFullYear()
+    const endYear = dates.length === 2 ? dates[1].getUTCFullYear() : startYear;
     const duration = endYear - startYear + 1;
 
     const dateType = inferDateType(duration);
@@ -315,3 +315,12 @@ export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo
 export const sortAlphabetically = <T extends { name: string }>(a: T, b: T): number => {
     return a.name.localeCompare(b.name, 'uk'); // Ukrainian locale for proper sorting
 };
+
+export function toUTCDate(date: Date): Date {
+    return new Date(Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        12, 0, 0  // Use noon to avoid any edge cases
+    ));
+}

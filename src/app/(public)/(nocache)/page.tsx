@@ -77,9 +77,7 @@ const MEMBERS = [
 ]
 
 export default async function Home() {
-    const founds = await getFounds();
-    const categories = await getCategories();
-    // const {items} = await getItems();
+    const [categories, founds] = await Promise.all([getCategories(), getFounds()]);
   return (
       <Bleed inline="30px" block="10">
           <main className="text-sm xl:text-2xl font-extralight">

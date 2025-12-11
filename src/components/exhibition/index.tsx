@@ -30,18 +30,26 @@ import {Cut} from "@/models/cut";
 import Combo from "@/components/exhibition/combo";
 import Picker from "@/components/exhibition/picker";
 import ItemsPicker from "@/components/picker";
-import Date from "@/components/exhibition/date";
+import ExhibitionDate from "@/components/exhibition/date";
 import Gallery from "@/components/exhibition/gallery";
 import {Relation} from "@/models/relation";
+import {toUTCDate} from "@/lib/utils";
 
-function itemToFormData(item: ItemUIModel): FormData {
+function itemToFormData(item: Omit<ItemUIModel, 'regions'> & {
+    regions: string[];
+}): FormData {
     const formData = new FormData();
-    const { images, ...rest } = item;
+    const { images, date, ...rest } = item;
 
     // Append images
     images.forEach((file) => {
         formData.append('images', file);
     });
+
+    if (date && Array.isArray(date)) {
+        const utcDates = date.map(d => toUTCDate(new Date(d)));
+        formData.append('date', JSON.stringify(utcDates));
+    }
 
     // Append all other fields
     Object.entries(rest).forEach(([key, value]) => {
@@ -118,7 +126,10 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
         <Container maxW="5xl">
             <VStack align="stretch" gap={8}>
                 <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
-                    const formData = itemToFormData(data);
+                    const formData = itemToFormData({
+                        ...data,
+                        regions: data.regions.map(region => region.id)
+                    });
                     await fetch('/api/items', {
                         method: 'POST',
                         body: formData,
@@ -297,7 +308,7 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                     <Picker items={categories} name="mainCategory" control={control} label="Основна категорія" placeholder="Оберіть категорію" />
                     <Combo items={categories.filter(category => !category.isCollection)} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
                     <Combo items={categories.filter(category => category.isCollection)} name="subCategories" control={control} label="Підбірки" placeholder="Оберіть підбірки" />
-                    <Date control={control} />
+                    <ExhibitionDate control={control} />
                     <Field.Root orientation="horizontal" required>
                         <Field.Label>
                             Посилання на високу якість
