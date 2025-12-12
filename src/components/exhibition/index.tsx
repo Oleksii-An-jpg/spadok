@@ -9,7 +9,7 @@ import {
     CheckboxGroup,
     Container,
     Field,
-    FileUpload,
+    FileUpload, Heading,
     HStack,
     Input,
     InputGroup,
@@ -33,22 +33,22 @@ import ItemsPicker from "@/components/picker";
 import ExhibitionDate from "@/components/exhibition/date";
 import Gallery from "@/components/exhibition/gallery";
 import {Relation} from "@/models/relation";
-import {toUTCDate} from "@/lib/utils";
 
 function itemToFormData(item: Omit<ItemUIModel, 'regions'> & {
     regions: string[];
 }): FormData {
     const formData = new FormData();
-    const { images, date, ...rest } = item;
+    const { images, illustrations, ...rest } = item;
 
     // Append images
     images.forEach((file) => {
         formData.append('images', file);
     });
 
-    if (date && Array.isArray(date)) {
-        const utcDates = date.map(d => toUTCDate(new Date(d)));
-        formData.append('date', JSON.stringify(utcDates));
+    if (illustrations) {
+        illustrations.forEach(file => {
+            formData.append('illustrations', file);
+        })
     }
 
     // Append all other fields
@@ -81,7 +81,7 @@ type ExhibitionProps = {
 }
 
 const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regions, materials, techniques, categories, cuts }) => {
-    const { images = [], ...rest } = item || {};
+    const { images = [], illustrations = [], ...rest } = item || {};
     const { register, watch, reset, formState: { errors, isValid, isSubmitting }, setValue, control, handleSubmit } = useForm<ItemUIModel>({
         defaultValues: rest
     });
@@ -95,7 +95,7 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
         name: 'matureness'
     });
     const [map, setMap] = useState<[google.maps.Map, google.maps.marker.AdvancedMarkerElement]>()
-    const [files] = watch(['images']);
+    const [files, photos] = watch(['images', 'illustrations']);
 
     useEffect(() => {
         async function parseImages() {
@@ -112,6 +112,23 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
 
         parseImages();
     }, [images]);
+
+    useEffect(() => {
+        async function parseImages() {
+            if (illustrations && illustrations.length > 0) {
+                const files = await Promise.all(illustrations.map(async (image) => {
+                    const imageUrl = `https://storage.googleapis.com/spadok-images/${image}`
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    return new File([blob], image, {type: blob.type});
+                }));
+                setValue('illustrations', files);
+            }
+        }
+
+        parseImages();
+    }, [illustrations]);
+
     useEffect(() => {
         if (map && item?.address) {
             const [mapInstance, markerInstance] = map
@@ -219,15 +236,6 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                         <div className="w-full h-96" ref={mapRef} />
                         <Field.HelperText />
                         <Field.ErrorText />
-                    </Field.Root>
-                    <Field.Root orientation="horizontal">
-                        <Field.Label>
-                        <span>
-                            Опис (<ChakraLink variant="underline" colorPalette="blue" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown base syntax</ChakraLink>)
-                        </span>
-                        </Field.Label>
-                        <Textarea size="xs" autoresize {...register('description')} />
-                        <Field.HelperText />
                     </Field.Root>
                     <Picker items={authors.map(author => ({
                         name: `${author.firstName} ${author.lastName}`,
@@ -351,6 +359,33 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                             }} name="images" control={control} />
                         </Box>
                     </HStack>
+
+                    <Heading>Блок цікавинки</Heading>
+
+                    <Field.Root orientation="horizontal">
+                        <Field.Label>
+                        <span>
+                            Опис (<ChakraLink variant="underline" colorPalette="blue" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown base syntax</ChakraLink>)
+                        </span>
+                        </Field.Label>
+                        <Textarea size="xs" autoresize {...register('description')} />
+                        <Field.HelperText />
+                    </Field.Root>
+
+                    <HStack align="start" w="full">
+                        <Text css={{ 'width': 'var(--field-label-width)' }} fontSize="sm">Іллюстрації</Text>
+                        <Box flex={1}>
+                            <Controller render={({ field }) => {
+                                return <FileUpload.Root onFileChange={({ acceptedFiles }) => {
+                                    field.onChange(acceptedFiles);
+                                }} acceptedFiles={photos} maxFiles={Infinity} accept="image/*">
+                                    <FileUpload.HiddenInput />
+                                    <Gallery multiple />
+                                </FileUpload.Root>
+                            }} name="illustrations" control={control} />
+                        </Box>
+                    </HStack>
+
                     <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
                 </VStack>
 

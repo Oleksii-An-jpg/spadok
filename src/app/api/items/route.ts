@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
     // Extract images
     const images = formData.getAll('images') as File[];
+    const illustrations = formData.getAll('illustrations') as File[];
 
     // Parse form data
     const data = {
@@ -52,7 +53,8 @@ export async function POST(request: NextRequest) {
         region: JSON.parse(formData.get('region') as string),
         regions: JSON.parse(formData.get('regions') as string),
         date: JSON.parse(formData.get('date') as string),
-        images: await Promise.all(images.map(uploadImageToBucket))
+        images: await Promise.all(images.map(uploadImageToBucket)),
+        illustrations: await Promise.all(illustrations.map(uploadImageToBucket)),
     };
 
     const item = removeUndefined(data);

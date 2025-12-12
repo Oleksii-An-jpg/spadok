@@ -5,17 +5,24 @@ import {Item} from "@/models/item";
 import {getDisplayPrice} from "@/lib/price";
 import Link from "next/link";
 import Carousel from "@/components/display/carousel";
+import Attributes from "@/components/attributes";
+import {Category} from "@/models/category";
+import {Region} from "@/models/region";
+import isDefined from "@/utils/isDefined";
 
 type DisplayProps = {
     item: Item
+    categories: Category[];
+    regions: Region[];
 }
 
-const Display: FC<DisplayProps> = ({ item }) => {
+const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
+    const hasRegions = [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).some(item => item?.canFilter);
     return <VStack align="stretch" gap={{ base: 4, xl: 16 }}>
-        <Grid gridTemplateColumns="390px auto" gap={4}>
-            <Carousel item={item} />
-            <Grid as={GridItem} fontWeight="lighter" templateColumns="subgrid" gridColumn="span 2" columnGap={8} rowGap={3}>
-                <VStack align="stretch" gap={0} w={390}>
+        <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={4}>
+            <Carousel images={item.images} />
+            <Grid as={GridItem} fontWeight="lighter" templateColumns="subgrid" gridColumn="1 / -1" columnGap={8} rowGap={3}>
+                <VStack align="stretch" gap={0} w={{ xl: 390 }}>
                     <Heading lineHeight="normal" fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">{item.name}</Heading>
                     <Text color="gray.400" fontSize={{ base: 'sm', xl: 'lg' }}>{item.price ? `Врятовано за ${getDisplayPrice(item.price)}` : 'Дарунок'}</Text>
                 </VStack>
@@ -48,6 +55,29 @@ const Display: FC<DisplayProps> = ({ item }) => {
                             Завантажити світлини у високій якості
                         </Link>
                     </ChakraLink>
+
+                    <Box mt={6}>
+                        <Attributes attributes={[
+                            {
+                                name: 'Категорії',
+                                collection: [item.mainCategory, ...(item.subCategories || [])].map(category => categories.find(({ id }) => id === category)).map(category => ({
+                                    name: category?.name,
+                                    ...(category?.canFilter && {
+                                        link: `/catalog?Категорії=${category?.id}`,
+                                    })
+                                })),
+                            },
+                            ...(hasRegions ? [{
+                                name: 'Регіони',
+                                collection: [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).filter(isDefined).map(region => ({
+                                    name: region?.name,
+                                    ...(region?.canFilter && {
+                                        link: `/catalog?Регіони=${region?.id}`,
+                                    })
+                                })),
+                            }] : [])
+                        ]} />
+                    </Box>
                 </VStack>
             </Grid>
         </Grid>

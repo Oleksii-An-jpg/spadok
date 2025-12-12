@@ -3,10 +3,9 @@
 import {getItem, getItems, getRelation} from "@/api/items";
 import {notFound} from "next/navigation";
 import Display from "@/components/display";
-import {Box, Breadcrumb, Link as ChakraLink, Heading, VStack} from "@chakra-ui/react";
+import {Box, Breadcrumb, Link as ChakraLink, Heading, VStack, Bleed, Grid, GridItem, Container} from "@chakra-ui/react";
 import Link from "next/link";
 import {BiCategory, BiHome} from "react-icons/bi";
-import Attributes from "@/components/attributes";
 import {getCategories} from "@/api/categories";
 import Item from "@/components/items/item";
 import isDefined from "@/utils/isDefined";
@@ -18,6 +17,11 @@ import {getTechniques} from "@/api/techniques";
 import {getMaterials} from "@/api/materials";
 import {getCuts} from "@/api/cuts";
 import {getRegions} from "@/api/regions";
+import ChakraMarkdownComponents from "@/components/markdown";
+import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
+import Markdown from "react-markdown";
+import Carousel from "@/components/display/carousel";
 
 type Props = {
     params: Promise<{ id: string }>
@@ -85,7 +89,6 @@ export default async function Page({params}: Props) {
 
     // Filter items to exclude those in excludeIds
     const random = shuffleArray(items.filter(({ id }) => !excludeIds.has(id))).slice(0, 10);
-    const hasRegions = [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).some(item => item?.canFilter);
 
     return <VStack align="stretch" gap={8}>
         <Breadcrumb.Root>
@@ -111,32 +114,28 @@ export default async function Page({params}: Props) {
                 </Breadcrumb.Item>
             </Breadcrumb.List>
         </Breadcrumb.Root>
-        <Display item={{
+        <Display categories={categories} regions={regions} item={{
             ...item,
             techniques: item.techniques?.map(technique => techniques.find(({ id }) => id === technique)?.name).filter(isDefined),
             materials: item.materials?.map(material => materials.find(({ id }) => id === material)?.name).filter(isDefined),
             cuts: item.cuts?.map(cut => cuts.find(({ id }) => id === cut)?.name).filter(isDefined)
         }} />
-        <Attributes attributes={[
-            {
-                name: 'Категорії',
-                collection: [item.mainCategory, ...(item.subCategories || [])].map(category => categories.find(({ id }) => id === category)).map(category => ({
-                    name: category?.name,
-                    ...(category?.canFilter && {
-                        link: `/catalog?Категорії=${category?.id}`,
-                    })
-                })),
-            },
-            ...(hasRegions ? [{
-                name: 'Регіони',
-                collection: [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).filter(isDefined).map(region => ({
-                    name: region?.name,
-                    ...(region?.canFilter && {
-                        link: `/catalog?Регіони=${region?.id}`,
-                    })
-                })),
-            }] : [])
-        ]} />
+        <Bleed inline="30px">
+            <Box className="py-20 bg-concrete">
+                <Container>
+                    <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={4}>
+                        <GridItem>
+                            <Heading lineHeight="normal" fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">Цікавинки</Heading>
+                        </GridItem>
+                        <GridItem>
+                            <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{item.description}</Markdown>
+
+                            {item.illustrations?.length ? <Carousel thumbnails={false} images={item.illustrations} /> : null}
+                        </GridItem>
+                    </Grid>
+                </Container>
+            </Box>
+        </Bleed>
         {related?.length && (
             <VStack align="stretch" gap={8}>
                 <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">

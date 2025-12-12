@@ -34,6 +34,7 @@ type ItemBaseModel= {
     author: string;
     cuts: string[];
     published: boolean;
+    illustrations?: string[];
 }
 
 export type Item = ItemBaseModel & {
@@ -43,13 +44,14 @@ export type Item = ItemBaseModel & {
     sex: Sex[];
 }
 
-export type ItemUIModel = Omit<Item, 'images'> & {
+export type ItemUIModel = Omit<Item, 'images' | 'illustrations'> & {
     images: File[]
+    illustrations?: File[];
 };
 
 export type ItemDBModel = ItemBaseModel & {
     region: string[];
     date: string[];
     sex: Sex[] | null;
-    images: string[]
+    images: string[];
 }
