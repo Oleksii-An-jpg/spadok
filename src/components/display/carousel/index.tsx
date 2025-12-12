@@ -1,43 +1,15 @@
 'use client';
-import {FC, forwardRef} from "react";
+import {FC, forwardRef, useState, useRef} from "react";
 import {
     Carousel as ChakraCarousel,
-    useCarouselContext,
     Box,
-    AspectRatio,
     IconButton,
     IconButtonProps,
-    Grid, GridItem, VStack
+    Grid, GridItem
 } from "@chakra-ui/react";
 import Image from "next/image";
 import {BiLeftArrowAlt, BiRightArrowAlt} from "react-icons/bi";
-
-const CarouselThumbnails = ({ images }: { images: string[] }) => {
-    const carousel = useCarouselContext()
-
-    return (
-        <VStack justify="center">
-            <VStack as={ChakraCarousel.IndicatorGroup}>
-                {images.map((src, index) => (
-                    <ChakraCarousel.Indicator index={index} key={index} unstyled
-                                              _current={{
-                                                  outline: "2px solid salmon",
-                                                  outlineOffset: "2px",
-                                              }}>
-                        <AspectRatio
-                            ratio={1}
-                            w={{ base: 8, xl: 16 }}
-                            cursor="button"
-                            onClick={() => carousel.scrollTo(index)}
-                        >
-                            <Image src={`https://storage.googleapis.com/spadok-images/${src}`} className="object-scale-down" alt="Photo" fill />
-                        </AspectRatio>
-                    </ChakraCarousel.Indicator>
-                ))}
-            </VStack>
-        </VStack>
-    )
-}
+import clsx from "clsx";
 
 const ActionButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     function ActionButton(props, ref) {
@@ -54,22 +26,79 @@ const ActionButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 )
 
 type CarouselProps = {
-    images: string[]
+    images: string[];
+    alt: string;
     thumbnails?: boolean;
+    fullSize?: boolean;
 }
 
-const Carousel: FC<CarouselProps> = ({ images, thumbnails = true }) => {
-    return <ChakraCarousel.Root
-        slideCount={images.length}
-        flex={1}
-        gap={4}
-        asChild
-    >
-        <Grid as={GridItem} templateColumns="subgrid" gridColumn="1 / -1">
-            <GridItem>
-                {thumbnails && <CarouselThumbnails images={images} />}
-            </GridItem>
-            <GridItem className="relative">
+const Carousel: FC<CarouselProps> = ({ images, alt, fullSize = true, thumbnails = true }) => {
+    const [horizontalPage, setHorizontalPage] = useState(0);
+    const [verticalPage, setVerticalPage] = useState(0);
+    const verticalNextRef = useRef<HTMLButtonElement>(null);
+    const verticalPrevRef = useRef<HTMLButtonElement>(null);
+    const lastVerticalPageRef = useRef(0);
+
+    const handleHorizontalPageChange = (e: { page: number }) => {
+        setHorizontalPage(e.page);
+        const newVerticalPage = Math.floor(e.page / 2);
+
+        // Trigger button clicks to animate the vertical carousel
+        if (newVerticalPage !== lastVerticalPageRef.current) {
+            const direction = newVerticalPage > lastVerticalPageRef.current ? 'next' : 'prev';
+            const button = direction === 'next' ? verticalNextRef.current : verticalPrevRef.current;
+
+            if (button) {
+                button.click();
+            }
+
+            lastVerticalPageRef.current = newVerticalPage;
+        }
+    };
+
+    return <Grid as={GridItem} templateColumns="subgrid" gridColumn="1 / -1">
+        <GridItem>
+            <Box display={{ base: 'none', xl: 'block' }}>
+                {thumbnails && (
+                    <ChakraCarousel.Root
+                        slideCount={images.length}
+                        allowMouseDrag={false}
+                        slidesPerPage={2}
+                        flex={1}
+                        spacing="8px"
+                        asChild
+                        orientation="vertical"
+                        page={verticalPage}
+                        onPageChange={(e) => setVerticalPage(e.page)}
+                    >
+                        <ChakraCarousel.Control gap="4" className="h-full">
+                            <ChakraCarousel.ItemGroup width="full" className="h-full">
+                                {images.map((image, index) => (
+                                    <ChakraCarousel.Item key={index} index={index}>
+                                        <Box w="100%" fontSize="2.5rem" className={clsx('border border-transparent relative h-full bg-concrete', {
+                                            ['border-salmon!']: horizontalPage === index
+                                        })}>
+                                            {fullSize ? <Image src={`https://storage.googleapis.com/spadok-images/${image}`} className="object-scale-down" alt={alt} fill /> : <img src={`https://storage.googleapis.com/spadok-images/${image}`} alt={alt} />}
+                                        </Box>
+                                    </ChakraCarousel.Item>
+                                ))}
+                            </ChakraCarousel.ItemGroup>
+                            {/* Hidden control buttons for programmatic triggering */}
+                            <ChakraCarousel.PrevTrigger ref={verticalPrevRef} className="hidden" />
+                            <ChakraCarousel.NextTrigger ref={verticalNextRef} className="hidden" />
+                        </ChakraCarousel.Control>
+                    </ChakraCarousel.Root>
+                )}
+            </Box>
+        </GridItem>
+        <GridItem className="relative">
+            <ChakraCarousel.Root
+                slideCount={images.length}
+                flex={1}
+                gap={4}
+                page={horizontalPage}
+                onPageChange={handleHorizontalPageChange}
+            >
                 <ChakraCarousel.Control gap="4" className="h-full">
                     <ChakraCarousel.ItemGroup width="full" className="bg-concrete h-full">
                         <Box className="absolute bottom-0 left-0 z-1">
@@ -81,8 +110,10 @@ const Carousel: FC<CarouselProps> = ({ images, thumbnails = true }) => {
                         </Box>
                         {images.map((image, index) => (
                             <ChakraCarousel.Item key={index} index={index}>
-                                <Box w="100%" rounded="lg" fontSize="2.5rem" className="relative h-full min-h-[calc(100dvh-18rem)]">
-                                    <Image src={`https://storage.googleapis.com/spadok-images/${image}`} className="object-scale-down" alt="Фото" fill />
+                                <Box w="100%" rounded="lg" fontSize="2.5rem" className={clsx({
+                                    ["relative h-full min-h-[calc(100dvh-18rem)]"]: fullSize
+                                })}>
+                                    {fullSize ? <Image src={`https://storage.googleapis.com/spadok-images/${image}`} className="object-scale-down" alt={alt} fill /> : <img src={`https://storage.googleapis.com/spadok-images/${image}`} alt={alt} />}
                                 </Box>
                             </ChakraCarousel.Item>
                         ))}
@@ -95,9 +126,9 @@ const Carousel: FC<CarouselProps> = ({ images, thumbnails = true }) => {
                         </Box>
                     </ChakraCarousel.ItemGroup>
                 </ChakraCarousel.Control>
-            </GridItem>
-        </Grid>
-    </ChakraCarousel.Root>
+            </ChakraCarousel.Root>
+        </GridItem>
+    </Grid>
 }
 
 export default Carousel;

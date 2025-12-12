@@ -19,9 +19,9 @@ type DisplayProps = {
 const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
     const hasRegions = [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).some(item => item?.canFilter);
     return <VStack align="stretch" gap={{ base: 4, xl: 16 }}>
-        <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={4}>
-            <Carousel images={item.images} />
-            <Grid as={GridItem} fontWeight="lighter" templateColumns="subgrid" gridColumn="1 / -1" columnGap={8} rowGap={3}>
+        <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} columnGap={2.5} rowGap={8}>
+            <Carousel images={item.images} alt={item.name} />
+            <Grid as={GridItem} fontWeight="lighter" templateColumns="subgrid" gridColumn="1 / -1">
                 <VStack align="stretch" gap={0} w={{ xl: 390 }}>
                     <Heading lineHeight="normal" fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">{item.name}</Heading>
                     <Text color="gray.400" fontSize={{ base: 'sm', xl: 'lg' }}>{item.price ? `Врятовано за ${getDisplayPrice(item.price)}` : 'Дарунок'}</Text>
@@ -43,9 +43,6 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
                                 {item.size}.
                             </> : null}
                         </Text>
-                        {item.description && <Text>
-                            {item.description}
-                        </Text>}
                         {item.purchase && <Text>
                             {item.purchase}
                         </Text>}

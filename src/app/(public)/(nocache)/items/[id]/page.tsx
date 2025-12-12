@@ -120,22 +120,22 @@ export default async function Page({params}: Props) {
             materials: item.materials?.map(material => materials.find(({ id }) => id === material)?.name).filter(isDefined),
             cuts: item.cuts?.map(cut => cuts.find(({ id }) => id === cut)?.name).filter(isDefined)
         }} />
-        <Bleed inline="30px">
+        {item.description || item.illustrations ? <Bleed inline="30px">
             <Box className="py-20 bg-concrete">
                 <Container>
-                    <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={4}>
+                    <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={2.5}>
                         <GridItem>
                             <Heading lineHeight="normal" fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">Цікавинки</Heading>
                         </GridItem>
                         <GridItem>
                             <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{item.description}</Markdown>
 
-                            {item.illustrations?.length ? <Carousel thumbnails={false} images={item.illustrations} /> : null}
+                            {item.illustrations?.length ? <Carousel alt={item.description} thumbnails={false} fullSize={false} images={item.illustrations} /> : null}
                         </GridItem>
                     </Grid>
                 </Container>
             </Box>
-        </Bleed>
+        </Bleed> : null}
         {related?.length && (
             <VStack align="stretch" gap={8}>
                 <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
@@ -155,7 +155,10 @@ export default async function Page({params}: Props) {
                 </Box>
             </VStack>
         )}
-        <Banner />
+
+        <Bleed inline="30px">
+            <Banner />
+        </Bleed>
 
         {random?.length && (
             <VStack align="stretch" gap={8}>

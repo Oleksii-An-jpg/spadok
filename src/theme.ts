@@ -77,7 +77,17 @@ const config = defineConfig({
                     500: { value: "#2F6DADFF" },
                 },
                 khaki: {
-                    500: { value: "#F2E294FF" },
+                    50: { value: "#FEFBF0" },
+                    100: { value: "#FDF6D9" },
+                    200: { value: "#FAEFC3" },
+                    300: { value: "#F7E9AC" },
+                    400: { value: "#F5E5A0" },
+                    500: { value: "#F2E294" },
+                    600: { value: "#EBCE5C" },
+                    700: { value: "#D9B52F" },
+                    800: { value: "#A88B24" },
+                    900: { value: "#76621A" },
+                    950: { value: "#4D4011" },
                 },
                 travertine: {
                     500: { value: "#FFFDEAFF" },

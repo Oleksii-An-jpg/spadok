@@ -4,6 +4,8 @@ import clsx from "clsx";
 import Link from "next/link";
 import {Logo} from "@/components/logo";
 import BrandButton from "@/components/brand/button";
+import {HStack, IconButton, Link as ChakraLink} from "@chakra-ui/react";
+import {BiLogoInstagram} from "react-icons/bi";
 
 const Header: FC<HTMLAttributes<HTMLHeadingElement>> = ({
                                                             className,
@@ -23,11 +25,22 @@ const Header: FC<HTMLAttributes<HTMLHeadingElement>> = ({
                 <Link href="/">
                     <Logo />
                 </Link>
-                <Link href="https://www.patreon.com/spilnyi_spadok" target="_blank">
-                    <BrandButton variant="brand-primary" size={{ base: 'sm', md: 'xl' }}>
-                        Доєднатися
-                    </BrandButton>
-                </Link>
+                <HStack>
+                    <IconButton size={{ base: 'sm', md: 'xl' }} asChild variant="solid" colorPalette="yellow" bg="khaki">
+                        <ChakraLink asChild>
+                            <Link href="https://instagram.com/spilnyi.spadok"
+                                  className="underline"
+                                  target="_blank">
+                                <BiLogoInstagram className="w-6! h-6! xl:w-9! xl:h-9!" />
+                            </Link>
+                        </ChakraLink>
+                    </IconButton>
+                    <Link href="https://www.patreon.com/spilnyi_spadok" target="_blank">
+                        <BrandButton variant="brand-primary" size={{ base: 'sm', md: 'xl' }}>
+                            Доєднатися
+                        </BrandButton>
+                    </Link>
+                </HStack>
             </div>
         </header>
     );
