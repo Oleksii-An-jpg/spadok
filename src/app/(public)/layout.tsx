@@ -27,7 +27,6 @@ export default function RootLayout({
             s.async = 1, s.src = 'https://statics.esputnik.com/scripts/' + n + '.js';
             var r = e.scripts[0];
             r.parentNode.insertBefore(s, r);
-            console.log(r);
             var f = function () {
             f.c(arguments);
         };
