@@ -77,7 +77,7 @@ const MEMBERS = [
 
 export default async function Home() {
     const [categories, founds] = await Promise.all([getCategories({
-        filter: Filter.and(Filter.where('isCollection', '==', true), Filter.where('isHomepage', '==', true))
+        filters: [Filter.and(Filter.where('isCollection', '==', true), Filter.where('isHomepage', '==', true))]
     }), getFounds()]);
   return (
       <Bleed inline="30px" block="10">

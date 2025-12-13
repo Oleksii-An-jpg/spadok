@@ -1,12 +1,6 @@
 'use client';
-import {FC, forwardRef, useState, useRef} from "react";
-import {
-    Carousel as ChakraCarousel,
-    Box,
-    IconButton,
-    IconButtonProps,
-    Grid, GridItem
-} from "@chakra-ui/react";
+import {FC, forwardRef, useRef, useState} from "react";
+import {Box, Carousel as ChakraCarousel, Grid, GridItem, IconButton, IconButtonProps} from "@chakra-ui/react";
 import Image from "next/image";
 import {BiLeftArrowAlt, BiRightArrowAlt} from "react-icons/bi";
 import clsx from "clsx";
@@ -37,7 +31,22 @@ const Carousel: FC<CarouselProps> = ({ images, alt, fullSize = true, thumbnails 
     const [verticalPage, setVerticalPage] = useState(0);
     const verticalNextRef = useRef<HTMLButtonElement>(null);
     const verticalPrevRef = useRef<HTMLButtonElement>(null);
+    const horizontalNextRef = useRef<HTMLButtonElement>(null);
+    const horizontalPrevRef = useRef<HTMLButtonElement>(null);
     const lastVerticalPageRef = useRef(0);
+
+    const handleThumbnailClick = (index: number) => {
+        const direction = index > horizontalPage ? 'next' : 'prev';
+
+        const button = direction === 'next' ? horizontalNextRef.current : horizontalPrevRef.current;
+
+        if (button) {
+            button.click();
+        }
+
+        setHorizontalPage(index);
+        lastVerticalPageRef.current = Math.floor(index / 2);
+    };
 
     const handleHorizontalPageChange = (e: { page: number }) => {
         setHorizontalPage(e.page);
@@ -58,7 +67,7 @@ const Carousel: FC<CarouselProps> = ({ images, alt, fullSize = true, thumbnails 
 
     return <Grid as={GridItem} templateColumns="subgrid" gridColumn="1 / -1">
         <GridItem>
-            <Box display={{ base: 'none', xl: 'block' }}>
+            <Box className="h-full" display={{ base: 'none', xl: 'block' }}>
                 {thumbnails && (
                     <ChakraCarousel.Root
                         slideCount={images.length}
@@ -77,7 +86,7 @@ const Carousel: FC<CarouselProps> = ({ images, alt, fullSize = true, thumbnails 
                                     <ChakraCarousel.Item key={index} index={index}>
                                         <Box w="100%" fontSize="2.5rem" className={clsx('border border-transparent relative h-full bg-concrete', {
                                             ['border-salmon!']: horizontalPage === index
-                                        })}>
+                                        })} onClick={() => handleThumbnailClick(index)}>
                                             {fullSize ? <Image src={`https://storage.googleapis.com/spadok-images/${image}`} className="object-scale-down" alt={alt} fill /> : <img src={`https://storage.googleapis.com/spadok-images/${image}`} alt={alt} />}
                                         </Box>
                                     </ChakraCarousel.Item>
@@ -102,7 +111,7 @@ const Carousel: FC<CarouselProps> = ({ images, alt, fullSize = true, thumbnails 
                 <ChakraCarousel.Control gap="4" className="h-full">
                     <ChakraCarousel.ItemGroup width="full" className="bg-concrete h-full">
                         <Box className="absolute bottom-0 left-0 z-1">
-                            <ChakraCarousel.PrevTrigger asChild>
+                            <ChakraCarousel.PrevTrigger ref={horizontalPrevRef} asChild>
                                 <ActionButton>
                                     <BiLeftArrowAlt className="w-9! h-9!" color="black" />
                                 </ActionButton>
@@ -118,7 +127,7 @@ const Carousel: FC<CarouselProps> = ({ images, alt, fullSize = true, thumbnails 
                             </ChakraCarousel.Item>
                         ))}
                         <Box className="absolute bottom-0 right-0">
-                            <ChakraCarousel.NextTrigger asChild>
+                            <ChakraCarousel.NextTrigger ref={horizontalNextRef} asChild>
                                 <ActionButton>
                                     <BiRightArrowAlt className="w-9! h-9!" color="black" />
                                 </ActionButton>

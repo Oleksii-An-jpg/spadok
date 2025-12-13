@@ -3,7 +3,8 @@ import {admin} from "@/lib/admin";
 import {
     FirestoreDataConverter,
     QueryDocumentSnapshot,
-    Filter
+    Filter,
+    Query
 } from "firebase-admin/firestore";
 import {Category} from "@/models/category";
 
@@ -22,8 +23,14 @@ export class CategoriesConverter implements FirestoreDataConverter<Category> {
 
 
 
-export async function getCategories({ filter }: { filter: Filter } = { filter: {} }) {
-    const snapshot = await admin.collection('categories').where(filter).withConverter(new CategoriesConverter()).get()
+export async function getCategories({ filters }: { filters?: Array<Filter> } = { filters: [] }) {
+    let query: Query<Category> = admin.collection('categories').withConverter(new CategoriesConverter());
+
+    filters?.forEach((filter) => {
+        query = query.where(filter);
+    });
+
+    const snapshot = await query.get();
     return snapshot.docs.map((doc) => doc.data());
 }
 
