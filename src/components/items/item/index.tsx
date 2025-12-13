@@ -3,13 +3,15 @@ import {Item as ItemModel} from "@/models/item";
 import {FC} from "react";
 import {Card, LinkOverlay, Text, VStack, Link as ChakraLink, Box} from "@chakra-ui/react";
 import Link from "next/link";
+import clsx from "clsx";
 
 type ItemProps = {
-    item: ItemModel
+    item: ItemModel;
+    className?: string
 }
 
-const Item: FC<ItemProps> = ({ item }) => {
-    return <Card.Root unstyled size="sm" key={item.id} className="break-inside-avoid relative pb-0.5">
+const Item: FC<ItemProps> = ({ item, className }) => {
+    return <Card.Root unstyled size="sm" key={item.id} className={clsx('break-inside-avoid relative pb-0.5', className)}>
         <Card.Body>
             <LinkOverlay asChild>
                 <ChakraLink asChild variant="plain">

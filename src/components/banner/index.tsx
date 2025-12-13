@@ -16,7 +16,7 @@ const Banner: FC = () => {
             target="_blank"
         >
             <BrandButton decorated size="xl" variant="brand-secondary">
-                Доєднатися
+                Доєднатися до спільноти
             </BrandButton>
         </Link>
     </Box>

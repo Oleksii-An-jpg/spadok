@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-    --color-salmon: rgb(255, 123, 123);
+    --color-salmon: rgb(255, 117, 135);
     --color-azure: rgb(47, 109, 173);
     --color-khaki: rgb(242, 226, 148);
     --color-travertine: rgb(255, 253, 234);

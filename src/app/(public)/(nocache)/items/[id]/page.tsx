@@ -22,6 +22,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import Markdown from "react-markdown";
 import Carousel from "@/components/display/carousel";
+import Related from "@/components/related";
 
 type Props = {
     params: Promise<{ id: string }>
@@ -137,23 +138,7 @@ export default async function Page({params}: Props) {
             </Box>
         </Bleed> : null}
         {related?.length && (
-            <VStack align="stretch" gap={8}>
-                <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
-                    Речі з однієї скрині:
-                </Heading>
-                <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
-                    {related.map((item) => <Item item={item} key={item.id} />)}
-                </Box>
-                <Box alignSelf="center">
-                    <BrandButton variant="brand-primary" asChild>
-                        <ChakraLink asChild variant="underline">
-                            <Link prefetch={false} href={`/catalog`}>
-                                Більше
-                            </Link>
-                        </ChakraLink>
-                    </BrandButton>
-                </Box>
-            </VStack>
+            <Related items={related} />
         )}
 
         <Bleed inline="30px">

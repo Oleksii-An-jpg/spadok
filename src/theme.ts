@@ -63,6 +63,22 @@ const config = defineConfig({
                                 color: "gray.500",
                                 cursor: "not-allowed",
                             },
+                        },
+                        'brand-quaternary': {
+                            // bg-salmon hover:bg-azure text-black hover:text-travertine
+                            background: "concrete.500",
+                            color: "black",
+                            _hover: {
+                                background: "salmon.500",
+                            },
+                            _active: {
+                                background: "salmon.500",
+                            },
+                            _disabled: {
+                                background: "gray.300",
+                                color: "gray.500",
+                                cursor: "not-allowed",
+                            },
                         }
                     }
                 },

@@ -1,3 +1,5 @@
+import isDefined from "@/utils/isDefined";
+
 'server only';
 import {getRegions} from "@/api/regions";
 import {Item, ItemDBModel} from "@/models/item";
@@ -9,10 +11,6 @@ import {getTextFromAddress} from "@/components/places/utils";
 import {extractCenturyPartAndFraction, getDateTupleFromExtractedInfo} from "@/lib/utils";
 import { FieldPath } from 'firebase-admin/firestore';
 import {Relation} from "@/models/relation";
-
-function isDefined<T>(value: T | undefined): value is T {
-    return value !== undefined;
-}
 
 export class RelationConverter implements FirestoreDataConverter<Relation> {
     fromFirestore(snapshot: QueryDocumentSnapshot<Relation>): Relation {

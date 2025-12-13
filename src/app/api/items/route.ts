@@ -13,6 +13,38 @@ function removeUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> 
     ) as Partial<T>;
 }
 
+async function processImages(
+    newImages: File[],
+    existingImages: string[] = []
+): Promise<string[]> {
+    const result: string[] = [];
+
+    for (let i = 0; i < newImages.length; i++) {
+        const file = newImages[i];
+
+        // If it's an empty file or placeholder, use existing image if available
+        if (file.size === 0 && existingImages[i]) {
+            result.push(existingImages[i]);
+        } else if (file.size > 0) {
+            // Upload new image
+            const uploadedUrl = await uploadImageToBucket(file);
+            result.push(uploadedUrl);
+
+            // Delete old image if it exists and is different
+            if (existingImages[i] && existingImages[i] !== uploadedUrl) {
+                await deleteImageFromBucket(existingImages[i]);
+            }
+        }
+    }
+
+    // If there are fewer new images than existing, keep the remaining existing ones
+    if (newImages.length < existingImages.length) {
+        result.push(...existingImages.slice(newImages.length));
+    }
+
+    return result;
+}
+
 export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const regions = await getRegions()
@@ -21,9 +53,21 @@ export async function POST(request: NextRequest) {
     const images = formData.getAll('images') as File[];
     const illustrations = formData.getAll('illustrations') as File[];
 
+    const itemId = formData.get('id') as string | null;
+
+    // Get existing item if updating
+    let existingItem: Item | null = null;
+    if (itemId) {
+        const collection = admin.collection('items').withConverter(new ItemConverter(regions));
+        const doc = await collection.doc(itemId).get();
+        if (doc.exists) {
+            existingItem = doc.data() as Item;
+        }
+    }
+
     // Parse form data
     const data = {
-        id: formData.get('id'),
+        id: itemId,
         name: formData.get('name'),
         description: formData.get('description'),
         purchase: formData.get('purchase'),
@@ -53,19 +97,17 @@ export async function POST(request: NextRequest) {
         region: JSON.parse(formData.get('region') as string),
         regions: JSON.parse(formData.get('regions') as string),
         date: JSON.parse(formData.get('date') as string),
-        images: await Promise.all(images.map(uploadImageToBucket)),
-        illustrations: await Promise.all(illustrations.map(uploadImageToBucket)),
+        images: await processImages(images, existingItem?.images || []),
+        illustrations: await processImages(illustrations, existingItem?.illustrations || []),
     };
 
     const item = removeUndefined(data);
 
     const collection = admin.collection('items').withConverter(new ItemConverter(regions));
 
-    const doc = typeof item.id === 'string' && await collection.doc(item.id).get();
-
-    if (typeof item.id === 'string' && doc && doc.exists) {
-        await collection.doc(item.id).set(item as Item, { merge: true });
-        await saveItemToAlgolia(item.id, item as Item);
+    if (itemId && existingItem) {
+        await collection.doc(itemId).set(item as Item, { merge: true });
+        await saveItemToAlgolia(itemId, item as Item);
     } else {
         const { id, ...rest } = item;
         const ref = await collection.add(rest as Item);
