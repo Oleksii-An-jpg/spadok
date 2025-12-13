@@ -3,12 +3,12 @@
 import {getItemsByCategory, getItemsByRegion} from "@/api/items";
 import {
     Box, VStack,
-    Breadcrumb, Bleed,
+    Breadcrumb, Bleed, Heading, Grid, GridItem, Link as ChakraLink
 } from "@chakra-ui/react";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from 'rehype-raw'
-import {getCategory} from "@/api/categories";
+import {getCategories, getCategory} from "@/api/categories";
 import Link from "next/link";
 import {BiHome, BiCategory} from "react-icons/bi";
 import {notFound} from "next/navigation";
@@ -18,6 +18,9 @@ import {Metadata, ResolvingMetadata} from "next";
 import {getRegion} from "@/api/regions";
 import { Item as ItemModel } from "@/models/item";
 import ChakraMarkdownComponents from "@/components/markdown";
+import {Filter} from "firebase-admin/firestore";
+import Collection from "@/components/collection";
+import BrandButton from "@/components/brand/button";
 
 type Props = {
     params: Promise<{ id: string }>
@@ -77,7 +80,9 @@ export async function generateMetadata(
 export default async function Page({params}: Props) {
     const {id} = await params;
 
-    const [category, region] = await Promise.all([getCategory(id), getRegion(id)]);
+    const [category, region, collections] = await Promise.all([getCategory(id), getRegion(id), getCategories({
+        filters: [Filter.and(Filter.where('isCollection', '==', true), Filter.where('isHomepage', '==', false))]
+    })]);
     let entity;
     if (region) {
         entity = region;
@@ -125,9 +130,26 @@ export default async function Page({params}: Props) {
             <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
                 {items.map((item) => <Item item={item} key={item.id} />)}
             </Box>
-            <Bleed inline="30px">
+            <Bleed inline="30px" mb={12}>
                 <Banner />
             </Bleed>
+            <GridItem colStart={2}>
+                <VStack align="stretch" gap={8}>
+                    <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
+                        Дослідіть наші колекції:
+                    </Heading>
+                    <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
+                        {collections.map((item) => <Collection collection={item} key={item.id} />)}
+                    </Grid>
+                    <Box className="self-center">
+                        <BrandButton asChild variant="brand-primary">
+                            <ChakraLink asChild>
+                                <Link href="/collections">Колекції</Link>
+                            </ChakraLink>
+                        </BrandButton>
+                    </Box>
+                </VStack>
+            </GridItem>
         </VStack>
     )
 }

@@ -98,6 +98,12 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                 },
             },
             {
+                header: 'Ідентифікатор',
+                accessorKey: 'id',
+                enableColumnFilter: false,
+                enableSorting: false,
+            },
+            {
                 header: 'Регіони',
                 accessorFn: item => item.regions.map(region => region.name).join(', '),
                 cell: info => {
@@ -117,7 +123,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                 enableSorting: false,
             },
             {
-                accessorKey: 'id',
+                id: 'actions',
                 header: 'Дії',
                 enableSorting: false,
                 enableColumnFilter: false,
@@ -254,7 +260,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
             </Table.Body>
             <Table.Footer>
                 <Table.Row>
-                    <Table.Cell colSpan={columns.length}>
+                    <Table.Cell colSpan={table.getAllFlatColumns().length}>
                         <VStack align="stretch">
                             <HStack justify="space-between">
                                 <Group>

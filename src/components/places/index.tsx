@@ -70,7 +70,7 @@ export const WrappedPlacesAutocompleteInputView: ForwardRefRenderFunction<
     const searchOptions: Omit<google.maps.places.AutocompletionRequest, 'input'> = useMemo(() => {
         return {
             componentRestrictions: {
-                country: 'ua',
+                country: ['ua', 'ro', 'pl', 'sk'],
             },
             language: 'uk',
             types: [
