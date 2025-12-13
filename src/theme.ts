@@ -102,6 +102,13 @@ const config = defineConfig({
                     500: { value: "#F3F3F3FF"}
                 }
             },
+        },
+        semanticTokens: {
+            colors: {
+                salmon: {
+                    solid: {value: "{colors.salmon.500}"},
+                }
+            }
         }
     },
 });

@@ -5,11 +5,10 @@ import {
     Box,
     Text,
     VStack,
-    HStack,
     IconButton,
     Heading,
     createListCollection,
-    Listbox, useListboxItemContext, Checkmark, GridItem
+    Listbox, useListboxItemContext, Checkmark, GridItem, ButtonGroup, Pagination, useAccordionItemContext, Icon, Stack
 } from "@chakra-ui/react";
 import {
     Table,
@@ -25,7 +24,7 @@ import {
     useReactTable, Column, ColumnFiltersState,
 } from '@tanstack/react-table';
 import {Item as ItemModel} from "@/models/item";
-import {BiLastPage, BiRightArrowAlt, BiFirstPage, BiLeftArrowAlt} from "react-icons/bi";
+import {BiRightArrowAlt, BiLeftArrowAlt, BiMinus, BiPlus} from "react-icons/bi";
 import {Category} from "@/models/category";
 import {Cut} from "@/models/cut";
 import {Technique} from "@/models/technique";
@@ -82,6 +81,7 @@ function parseFilters(searchParams: URLSearchParams) {
 
 const ListboxItemCheckmark = () => {
     const itemState = useListboxItemContext()
+
     return (
         <Checkmark
             filled
@@ -92,8 +92,16 @@ const ListboxItemCheckmark = () => {
     )
 }
 
+const AccordionItemIcon: FC = () => {
+    const { expanded } = useAccordionItemContext();
+
+    return <Icon size="lg">
+        {expanded ? <BiMinus /> : <BiPlus />}
+    </Icon>
+}
+
 const Filter: FC<FilterProps> = ({ column, table }) => {
-    const columnFilterValue = column.getFilterValue();
+    const columnFilterValue = column.getFilterValue() as string[];
 
     const collection = useMemo(() => {
         const rows = table.getCoreRowModel().flatRows;
@@ -123,17 +131,17 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
         return createListCollection({ items });
     }, [table, column.id]);
 
-    return <Accordion.Item value={column.id}>
-        <Listbox.Root variant="plain" collection={collection} value={columnFilterValue as string[]}
+    return <Accordion.Item css={{ borderBottomWidth: 2 }} value={column.id}>
+        <Listbox.Root variant="plain" collection={collection} value={columnFilterValue}
                       onValueChange={({ value }) => {
                           column.setFilterValue(value);
                       }}
                       selectionMode="multiple">
             <Accordion.ItemTrigger justifyContent="space-between">
                 <Listbox.Label>
-                    <Text fontSize="sm">{column.id}</Text>
+                    <Text fontSize="sm">{column.id} {columnFilterValue?.length ? <Text as="b">({columnFilterValue.length})</Text> : null}</Text>
                 </Listbox.Label>
-                <Accordion.ItemIndicator />
+                <AccordionItemIcon />
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
                 <Accordion.ItemBody>
@@ -160,7 +168,7 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
     const initialFilters = parseFilters(searchParams);
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
-        pageSize: 10,
+        pageSize: 16,
     });
     const categories = useMemo(() => rawCategories.filter(category => category.canFilter), [rawCategories])
     const regions = useMemo(() => rawRegions.filter(category => category.canFilter), [rawRegions])
@@ -242,7 +250,15 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
     return <>
         <GridItem>
             <VStack align="stretch">
-                <Accordion.Root multiple defaultValue={Object.values(initialFilters).filter(v => v.value.length > 0).map(v => v.id)}>
+                <Accordion.Root className="border-t-2 xl:hidden" multiple>
+                    {table.getHeaderGroups().map(headerGroup => {
+                        return headerGroup.headers.filter(header => header.column.getCanFilter()).map(header => {
+                            return <Filter table={table} column={header.column} key={header.id} />
+                        })
+                    })}
+                </Accordion.Root>
+
+                <Accordion.Root className="border-t-2 hidden xl:block" multiple defaultValue={table.getAllColumns().map((column) => column.id)}>
                     {table.getHeaderGroups().map(headerGroup => {
                         return headerGroup.headers.filter(header => header.column.getCanFilter()).map(header => {
                             return <Filter table={table} column={header.column} key={header.id} />
@@ -253,42 +269,39 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
         </GridItem>
         <GridItem>
             <VStack align="stretch" gap={8}>
-                <HStack justify="space-between">
+                <Stack direction={{ base: 'column', xl: 'row' }} justify="space-between" className="">
                     <Heading fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">
                         Врятовані речі
                     </Heading>
-                    <HStack>
-                        <Text fontSize="xs">Сторінка {table.getState().pagination.pageIndex + 1} із {table.getPageCount()}</Text>
-                        <IconButton
-                            size="2xs"
-                            onClick={() => table.firstPage()}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            <BiFirstPage />
-                        </IconButton>
-                        <IconButton
-                            size="2xs"
-                            onClick={() => table.previousPage()}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            <BiLeftArrowAlt />
-                        </IconButton>
-                        <IconButton
-                            size="2xs"
-                            onClick={() => table.nextPage()}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            <BiRightArrowAlt />
-                        </IconButton>
-                        <IconButton
-                            size="2xs"
-                            onClick={() => table.lastPage()}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            <BiLastPage />
-                        </IconButton>
-                    </HStack>
-                </HStack>
+                    <Pagination.Root count={table.getFilteredRowModel().rows.length} page={table.getState().pagination.pageIndex + 1}
+                                     onPageChange={(e) => table.setPageIndex(e.page - 1)} pageSize={table.getState().pagination.pageSize} defaultPage={table.getState().pagination.pageIndex + 1}>
+                        <ButtonGroup variant="ghost" size={{ base: '2xs', xl: 'xs' }}>
+                            <Pagination.PrevTrigger asChild>
+                                <IconButton variant="solid"
+                                            colorPalette="salmon">
+                                    <BiLeftArrowAlt className="w-6! h-6!" color="black" />
+                                </IconButton>
+                            </Pagination.PrevTrigger>
+
+                            <Text fontSize={{ base: '2xs', xl: 'md' }}>Сторінка</Text>
+
+                            <Pagination.Items
+                                render={(page) => (
+                                    <IconButton colorPalette={{ _selected: 'pink' }}>
+                                        {page.value}
+                                    </IconButton>
+                                )}
+                            />
+
+                            <Pagination.NextTrigger asChild>
+                                <IconButton variant="solid"
+                                            colorPalette="salmon">
+                                    <BiRightArrowAlt className="w-6! h-6!" color="black" />
+                                </IconButton>
+                            </Pagination.NextTrigger>
+                        </ButtonGroup>
+                    </Pagination.Root>
+                </Stack>
                 <Box columnCount={{ base: 2, md: 3, lg: 4 }} gap={2}>
                     {table.getRowModel().rows.map(row => {
                         return <Fragment key={row.id}>

@@ -35,7 +35,7 @@ const Related: FC<RelatedProps> = ({ items }) => {
             <ButtonGroup variant="ghost" size="2xs">
                 <Pagination.PrevTrigger asChild>
                     <IconButton variant="solid"
-                                colorPalette="red">
+                                colorPalette="salmon">
                         <BiLeftArrowAlt className="w-6! h-6!" color="black" />
                     </IconButton>
                 </Pagination.PrevTrigger>
@@ -52,7 +52,7 @@ const Related: FC<RelatedProps> = ({ items }) => {
 
                 <Pagination.NextTrigger asChild>
                     <IconButton variant="solid"
-                                colorPalette="red">
+                                colorPalette="salmon">
                         <BiRightArrowAlt className="w-6! h-6!" color="black" />
                     </IconButton>
                 </Pagination.NextTrigger>

@@ -29,7 +29,7 @@ export default async function Page(_: Props) {
     const [categories, cuts, techniques, authors, materials, regions] = await Promise.all([getCategories(), getCuts(), getTechniques(), getAuthors(), getMaterials(), getRegions()]);
     const {items} = await getItems();
 
-    const collections = categories.filter(category => category.isCollection && !category.isHomepage);
+    const collections = categories.filter(category => category.isCollection && category.isHomepage);
 
     return (
         <VStack align="stretch" gap={8}>
@@ -53,13 +53,13 @@ export default async function Page(_: Props) {
                 </Breadcrumb.List>
             </Breadcrumb.Root>
             <VStack align="stretch">
-                <Grid templateColumns="300px auto" gap={8}>
-                    <Grid templateColumns="subgrid" gridColumn={`span 2`}>
+                <Grid templateColumns={{ xl: "300px auto" }} gap={8}>
+                    <Grid templateColumns="subgrid" gridColumn="1 / -1" gap={8}>
                         <Suspense fallback={null}>
                             <List items={items} categories={categories} cuts={cuts} authors={authors} materials={materials} techniques={techniques} regions={regions} />
                         </Suspense>
                     </Grid>
-                    <GridItem colStart={2}>
+                    <GridItem colStart={{ xl: 2 }}>
                         <VStack align="stretch" gap={8}>
                             <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
                                 Дослідіть наші колекції:

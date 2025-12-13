@@ -13,7 +13,7 @@ const ActionButton = forwardRef<HTMLButtonElement, IconButtonProps>(
                 ref={ref}
                 size="lg"
                 variant="solid"
-                colorPalette="red"
+                colorPalette="salmon"
             />
         )
     },
