@@ -1,11 +1,9 @@
 'use client';
 
 import {FC, useState} from "react";
-import {Box, ButtonGroup, Heading, IconButton, Pagination, VStack, Link as ChakraLink, Text} from "@chakra-ui/react";
+import {Box, ButtonGroup, Heading, IconButton, Pagination, VStack, Text} from "@chakra-ui/react";
 import ItemComponent from "@/components/items/item";
 import {BiLeftArrowAlt, BiRightArrowAlt} from "react-icons/bi";
-import BrandButton from "@/components/brand/button";
-import Link from "next/link";
 import {Item} from "@/models/item";
 import clsx from "clsx";
 
@@ -60,15 +58,6 @@ const Related: FC<RelatedProps> = ({ items }) => {
                 </Pagination.NextTrigger>
             </ButtonGroup>
         </Pagination.Root>
-        <Box alignSelf="center">
-            <BrandButton variant="brand-primary" asChild>
-                <ChakraLink asChild variant="underline">
-                    <Link prefetch={false} href={`/catalog`}>
-                        Більше
-                    </Link>
-                </ChakraLink>
-            </BrandButton>
-        </Box>
     </VStack>
 }
 
