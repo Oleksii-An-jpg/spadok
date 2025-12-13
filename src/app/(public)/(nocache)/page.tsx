@@ -282,7 +282,7 @@ export default async function Home() {
                       <VStack>
                           <BrandButton asChild size="xl" variant="brand-primary">
                               <ChakraLink asChild>
-                                  <Link href="/catalog">Перейти до каталогу</Link>
+                                  <Link prefetch={false} href="/catalog">Перейти до каталогу</Link>
                               </ChakraLink>
                           </BrandButton>
                       </VStack>
