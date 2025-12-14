@@ -23,7 +23,7 @@ const Sidebar: FC = () => {
     return <VStack align="justify" gap={2}>
         {links.map(link => (
             <Button colorPalette="blue" variant="subtle" disabled={link.active} key={link.name} asChild justifyContent="flex-start">
-                <Link href={link.href}>
+                <Link prefetch={false} href={link.href}>
                     <link.icon /> {link.name}
                 </Link>
             </Button>

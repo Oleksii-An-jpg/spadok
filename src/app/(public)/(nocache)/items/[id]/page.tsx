@@ -157,7 +157,7 @@ export default async function Page({params}: Props) {
                     <BrandButton variant="brand-primary" asChild>
                         <ChakraLink asChild variant="underline">
                             <Link prefetch={false} href={`/catalog`}>
-                                Перейти до каталогу
+                                Каталог
                             </Link>
                         </ChakraLink>
                     </BrandButton>

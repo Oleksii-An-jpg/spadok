@@ -18,7 +18,7 @@ const Tags: FC<TagsProps> = ({ items }) => {
                         <LinkBox>
                             <LinkOverlay asChild>
                                 <ChakraLink asChild variant="underline">
-                                    <Link href={`/admin/items/${item.id}`}>
+                                    <Link prefetch={false} href={`/admin/items/${item.id}`}>
                                         <HStack gap={2}>
                                             <Image src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`} alt={item.name} width={50} height={50} />
                                             <Text fontSize="xs">{item.name}</Text>

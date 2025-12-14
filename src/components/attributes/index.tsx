@@ -19,7 +19,7 @@ const Attributes: FC<AttributesProps> = ({ attributes }) => {
                     <BrandButton disabled={!entry.link} key={entry.name} size="sm" asChild variant="brand-quaternary">
                         {entry.link ? (
                             <ChakraLink asChild>
-                                <Link href={entry.link}>{entry.name}</Link>
+                                <Link prefetch={false} href={entry.link}>{entry.name}</Link>
                             </ChakraLink>
                         ) : <Text>{entry.name}</Text>}
                     </BrandButton>
