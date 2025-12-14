@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
         id: itemId,
         name: formData.get('name'),
         description: formData.get('description'),
+        inventory: formData.get('inventory'),
         purchase: formData.get('purchase'),
         subRegions: JSON.parse(formData.get('subRegions') as string),
         regionOfUse: JSON.parse(formData.get('regionOfUse') as string),

@@ -35,7 +35,7 @@ function DebouncedInput({
     }, [value])
 
     return <Field.Root>
-        <Input placeholder="me@example.com" {...props} size="xs" value={value} onChange={e => setValue(e.target.value)} />
+        <Input autoComplete="off" {...props} size="xs" value={value} onChange={e => setValue(e.target.value)} />
     </Field.Root>
 }
 

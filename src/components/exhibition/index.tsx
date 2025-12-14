@@ -167,6 +167,16 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                         <Field.HelperText />
                         <Field.ErrorText />
                     </Field.Root>
+                    <Field.Root orientation="horizontal">
+                        <Field.Label>
+                            Інвентарний номер
+                        </Field.Label>
+                        <InputGroup>
+                            <Input size="xs" autoComplete="off" {...register('inventory')} />
+                        </InputGroup>
+                        <Field.HelperText />
+                        <Field.ErrorText />
+                    </Field.Root>
                     <Field.Root orientation="horizontal" required className="z-10">
                         <Field.Label htmlFor="addressLine">Географічна адреса</Field.Label>
                         <InputGroup>

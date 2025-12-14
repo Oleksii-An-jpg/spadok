@@ -98,9 +98,8 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                 },
             },
             {
-                header: 'Ідентифікатор',
-                accessorKey: 'id',
-                enableColumnFilter: false,
+                header: 'Інвентарний номер',
+                accessorKey: 'inventory',
                 enableSorting: false,
             },
             {

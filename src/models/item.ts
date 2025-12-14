@@ -15,6 +15,7 @@ export enum Matureness {
 
 type ItemBaseModel= {
     id: UniqueIdentifier;
+    inventory: string;
     name: string;
     description: string;
     purchase: string;
