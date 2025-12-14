@@ -20,6 +20,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         redirect("/auth");
     }
 
+    // await normalizeSpecialParts();
     // await analyzeDateIssues(false);
     // await adminAuth
     //         .setCustomUserClaims('djzqcJq7ywgTMANE5S4UIfWfZrr2', { admin: true })

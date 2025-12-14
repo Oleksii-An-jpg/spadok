@@ -269,12 +269,39 @@ export const getDateTupleFromExtractedInfo = (info: ExtractedDateInfo): [Date, D
 }
 
 // Extract all date components from date range
+// Helper to check if a range matches MIDDLE pattern
+const isMiddleRange = (startYear: number, endYear: number, centuryStartYear: number): boolean => {
+    const duration = endYear - startYear + 1;
+    const offset = startYear - centuryStartYear;
+
+    // MIDDLE: exactly years 26-75 (offset 26, duration 50)
+    return duration === 50 && offset === 26;
+};
+
+// Helper to check if a range matches BEGINNING pattern
+const isBeginningRange = (startYear: number, endYear: number, centuryStartYear: number): boolean => {
+    const duration = endYear - startYear + 1;
+    const offset = startYear - centuryStartYear;
+
+    // BEGINNING: exactly years 1-5 (offset 1, duration 5)
+    return duration === 5 && offset === 1;
+};
+
+// Helper to check if a range matches END pattern
+const isEndRange = (startYear: number, endYear: number, centuryStartYear: number): boolean => {
+    const duration = endYear - startYear + 1;
+    const offset = startYear - centuryStartYear;
+
+    // END: exactly years 96-100 (offset 96, duration 5)
+    return duration === 5 && offset === 96;
+};
+
 export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo => {
     if (!dates || dates.length === 0) {
         return {};
     }
 
-    const startYear = dates[0].getUTCFullYear()
+    const startYear = dates[0].getUTCFullYear();
     const endYear = dates.length === 2 ? dates[1].getUTCFullYear() : startYear;
     const duration = endYear - startYear + 1;
 
@@ -293,18 +320,43 @@ export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo
         }
     }
 
-    // For full century
     if (dateType === DateType.CENTURIES) {
         return { dateType, century };
     }
 
-    // For parts
     const centuryStartYear = (Math.floor((startYear - 1) / 100)) * 100;
+
+    // Check for special parts first (they don't have fractions)
+    if (isBeginningRange(startYear, endYear, centuryStartYear)) {
+        return {
+            dateType: DateType.PARTS,
+            century,
+            part: Part.BEGINNING
+        };
+    }
+
+    if (isMiddleRange(startYear, endYear, centuryStartYear)) {
+        return {
+            dateType: DateType.PARTS,
+            century,
+            part: Part.MIDDLE
+        };
+    }
+
+    if (isEndRange(startYear, endYear, centuryStartYear)) {
+        return {
+            dateType: DateType.PARTS,
+            century,
+            part: Part.END
+        };
+    }
+
+    // For regular parts with fractions
     const fraction = inferFraction(duration);
     const part = inferPart(startYear, endYear, centuryStartYear, fraction);
 
     return {
-        dateType,
+        dateType: DateType.PARTS,
         century,
         part,
         fraction

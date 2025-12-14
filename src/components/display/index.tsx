@@ -31,7 +31,7 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
                         <Text>{[item.address?.state, item.address?.region, item.address?.city]
                             .filter(Boolean)
                             .join(', ')} {item.region?.length && `(${item.regions.find(({ id }) => id === item.region[0])?.name})`}.</Text>
-                        <Text>{[item.date.part, item.date.fraction, item.date.century && `${item.date.century} ст.`].filter(Boolean).join(' ')}</Text>
+                        <Text className="lowercase first-letter:uppercase">{[item.date.part, item.date.fraction, item.date.century && `${item.date.century} ст.`].filter(Boolean).join(' ')}</Text>
                     </Box>
                     <VStack align="stretch" gap={4}>
                         <Text className="first-letter:uppercase">
