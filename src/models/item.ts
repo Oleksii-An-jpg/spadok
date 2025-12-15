@@ -18,6 +18,7 @@ type ItemBaseModel= {
     inventory: string;
     name: string;
     description: string;
+    facts: string;
     purchase: string;
     subRegions: string[];
     regionOfUse: string[];

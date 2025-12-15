@@ -42,6 +42,10 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
                                 <br />
                                 {item.size}.
                             </> : null}
+                            {item.description && <>
+                                <br />
+                                {item.description}
+                            </>}
                         </Text>
                         {item.purchase && <Text>
                             {item.purchase}

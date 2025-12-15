@@ -121,7 +121,7 @@ export default async function Page({params}: Props) {
             materials: item.materials?.map(material => materials.find(({ id }) => id === material)?.name).filter(isDefined),
             cuts: item.cuts?.map(cut => cuts.find(({ id }) => id === cut)?.name).filter(isDefined)
         }} />
-        {item.description || item.illustrations ? <Bleed inline="30px">
+        {item.facts || item.illustrations?.length ? <Bleed inline="30px">
             <Box className="py-20 bg-concrete">
                 <Container>
                     <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={2.5}>

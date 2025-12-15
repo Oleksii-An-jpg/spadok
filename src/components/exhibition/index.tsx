@@ -177,6 +177,15 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                         <Field.HelperText />
                         <Field.ErrorText />
                     </Field.Root>
+                    <Field.Root orientation="horizontal">
+                        <Field.Label>
+                        <span>
+                            Опис (<ChakraLink variant="underline" colorPalette="blue" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown base syntax</ChakraLink>)
+                        </span>
+                        </Field.Label>
+                        <Textarea size="xs" autoresize {...register('description')} />
+                        <Field.HelperText />
+                    </Field.Root>
                     <Field.Root orientation="horizontal" required className="z-10">
                         <Field.Label htmlFor="addressLine">Географічна адреса</Field.Label>
                         <InputGroup>
@@ -378,7 +387,7 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                             Опис (<ChakraLink variant="underline" colorPalette="blue" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown base syntax</ChakraLink>)
                         </span>
                         </Field.Label>
-                        <Textarea size="xs" autoresize {...register('description')} />
+                        <Textarea size="xs" autoresize {...register('facts')} />
                         <Field.HelperText />
                     </Field.Root>
 
