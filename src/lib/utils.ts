@@ -16,9 +16,9 @@ export enum Century {
 }
 
 export enum Fraction {
-    HALF = 'Половина',
-    THIRD = 'Третина',
-    QUARTER = 'Чверть',
+    HALF = 'половина',
+    THIRD = 'третина',
+    QUARTER = 'чверть',
 }
 
 export enum Part {
@@ -137,7 +137,7 @@ export const createDateTuple = (
         endYear = startYear + partLength - 1;
     }
 
-    return [new Date(startYear, 0, 1), new Date(endYear, 11, 31)];
+    return [toUTCDate(new Date(startYear, 0, 1)), toUTCDate(new Date(endYear, 11, 31))];
 };
 
 // Get numeric index for regular parts
@@ -157,7 +157,7 @@ export const getCenturyDatesRange = (century: Century): [Date, Date] => {
     const startYear = (centuryNumber - 1) * 100 + 1;
     const endYear = centuryNumber * 100;
 
-    return [new Date(startYear, 0, 1), new Date(endYear, 11, 31)];
+    return [toUTCDate(new Date(startYear, 0, 1)), toUTCDate(new Date(endYear, 11, 31))];
 };
 
 // Infer century from year
@@ -259,12 +259,12 @@ export const getDateTupleFromExtractedInfo = (info: ExtractedDateInfo): [Date, D
     if (dateType === DateType.DECADES && century && info.decade !== undefined) {
         const centuryNumber = getCenturyNumber(century);
         const startYear = (centuryNumber - 1) * 100 + info.decade * 10;
-        return [new Date(startYear, 0, 1), new Date(startYear + 9, 11, 31)];
+        return [toUTCDate(new Date(startYear, 0, 1)), toUTCDate(new Date(startYear + 9, 11, 31))];
     }
     if (dateType === DateType.YEARS && century && info.decade !== undefined) {
         const centuryNumber = getCenturyNumber(century);
         const year = (centuryNumber - 1) * 100 + info.decade;
-        return [new Date(year, 0, 1), new Date(year, 11, 31)];
+        return [toUTCDate(new Date(year, 0, 1)), toUTCDate(new Date(year, 11, 31))];
     }
 }
 

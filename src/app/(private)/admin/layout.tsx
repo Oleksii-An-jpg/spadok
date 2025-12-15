@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     }
 
     // await normalizeSpecialParts();
-    // await analyzeDateIssues(false);
+    // await normalizeSpecialParts(false);
     // await adminAuth
     //         .setCustomUserClaims('djzqcJq7ywgTMANE5S4UIfWfZrr2', { admin: true })
     //         .then(() => {

@@ -39,12 +39,37 @@ function needsNormalization(
     idealStart: number,
     idealEnd: number
 ): boolean {
-    // Allow small tolerance (±2 years on each end)
-    const tolerance = 2;
-    return (
-        Math.abs(startYear - idealStart) > tolerance ||
-        Math.abs(endYear - idealEnd) > tolerance
-    );
+    // Exact match required
+    return startYear !== idealStart || endYear !== idealEnd;
+}
+
+// Try to infer intended pattern from approximate dates
+function inferIntendedPattern(
+    startYear: number,
+    endYear: number,
+    century: Century
+): Part | null {
+    const centuryNumber = getCenturyNumber(century);
+    const centuryStart = (centuryNumber - 1) * 100;
+    const offset = startYear - centuryStart;
+    const duration = endYear - startYear + 1;
+
+    // Check if close to BEGINNING (years 1-5, duration 5)
+    if (duration >= 4 && duration <= 7 && offset >= 0 && offset <= 5) {
+        return Part.BEGINNING;
+    }
+
+    // Check if close to MIDDLE (years 26-75, duration 50)
+    if (duration >= 45 && duration <= 55 && offset >= 20 && offset <= 30) {
+        return Part.MIDDLE;
+    }
+
+    // Check if close to END (years 96-100, duration 5)
+    if (duration >= 4 && duration <= 7 && offset >= 91 && offset <= 97) {
+        return Part.END;
+    }
+
+    return null;
 }
 
 async function normalizeSpecialParts(dryRun = true): Promise<NormalizeIssue[]> {
@@ -75,19 +100,27 @@ async function normalizeSpecialParts(dryRun = true): Promise<NormalizeIssue[]> {
         // Extract current interpretation
         const info = extractCenturyPartAndFraction(currentDates);
 
-        // Only normalize BEGINNING, MIDDLE, END (special parts without fractions)
+        // First check: if it already matches a special pattern exactly, skip it
         if (
-            !info.part ||
-            !info.century ||
-            (info.part !== Part.BEGINNING &&
-                info.part !== Part.MIDDLE &&
-                info.part !== Part.END)
+            info.part &&
+            info.century &&
+            (info.part === Part.BEGINNING ||
+                info.part === Part.MIDDLE ||
+                info.part === Part.END)
         ) {
             continue;
         }
 
-        // Get ideal range
-        const idealRange = getIdealDateRange(info.century, info.part);
+        // Second check: try to infer what pattern this SHOULD be
+        // by looking at the start year's century
+        const century = info.century;
+        if (!century) continue;
+
+        const intendedPart = inferIntendedPattern(startYear, endYear, century);
+        if (!intendedPart) continue;
+
+        // Get ideal range for the inferred pattern
+        const idealRange = getIdealDateRange(century, intendedPart);
         if (!idealRange) continue;
 
         const [idealStart, idealEnd] = idealRange;
@@ -106,7 +139,7 @@ async function normalizeSpecialParts(dryRun = true): Promise<NormalizeIssue[]> {
                 newDates,
                 oldRange: `${startYear}-${endYear}`,
                 newRange: `${idealStart}-${idealEnd}`,
-                pattern: `${info.part} ${info.century} ст.`,
+                pattern: `${intendedPart} ${century} ст.`,
             });
         }
     }
@@ -161,10 +194,6 @@ async function normalizeSpecialParts(dryRun = true): Promise<NormalizeIssue[]> {
 
     return issues;
 }
-
-// Run the script
-// For dry run (safe, just shows what would change):
-// normalizeSpecialParts(true).catch(console.error);
 
 // To actually normalize the data, uncomment this:
 // normalizeSpecialParts(false).catch(console.error);
