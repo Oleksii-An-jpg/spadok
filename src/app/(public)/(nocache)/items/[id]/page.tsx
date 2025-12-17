@@ -122,14 +122,14 @@ export default async function Page({params}: Props) {
             cuts: item.cuts?.map(cut => cuts.find(({ id }) => id === cut)?.name).filter(isDefined)
         }} />
         {item.facts || item.illustrations?.length ? <Bleed inline="30px">
-            <Box className="py-20 bg-concrete">
+            <Box className="py-8 xl:py-20 bg-concrete">
                 <Container>
                     <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={2.5}>
                         <GridItem>
-                            <Heading lineHeight="normal" fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">Цікавинки</Heading>
+                            <Heading lineHeight="normal" fontSize={{ base: '2xl', xl: '5xl' }} fontWeight="light">Цікавинки</Heading>
                         </GridItem>
                         <GridItem>
-                            <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{item.description}</Markdown>
+                            <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{item.facts}</Markdown>
 
                             {item.illustrations?.length ? <Carousel alt={item.description} thumbnails={false} fullSize={false} images={item.illustrations} /> : null}
                         </GridItem>
