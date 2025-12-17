@@ -20,6 +20,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         redirect("/auth");
     }
 
+    // await migrateDimensions();
     // await normalizeSpecialParts();
     // await normalizeSpecialParts(false);
     // await adminAuth

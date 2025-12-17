@@ -179,9 +179,7 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                     </Field.Root>
                     <Field.Root orientation="horizontal">
                         <Field.Label>
-                        <span>
-                            Опис (<ChakraLink variant="underline" colorPalette="blue" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown base syntax</ChakraLink>)
-                        </span>
+                            Опис
                         </Field.Label>
                         <Textarea size="xs" autoresize {...register('description')} />
                         <Field.HelperText />

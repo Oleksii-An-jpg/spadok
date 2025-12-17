@@ -1,8 +1,18 @@
+import sharp from 'sharp';
 import { getStorage } from 'firebase-admin/storage';
 
-export async function uploadImageToBucket(file: File) {
+export type ImageDimensions = { width: number; height: number };
+
+export async function uploadImageToBucket(file: File): Promise<{ filename: string; dimensions: ImageDimensions }> {
     const bucket = getStorage().bucket('spadok-images');
     const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Get image dimensions
+    const metadata = await sharp(buffer).metadata();
+    const dimensions: ImageDimensions = {
+        width: metadata.width || 500,
+        height: metadata.height || 500
+    };
 
     const fileRef = bucket.file(file.name);
 
@@ -16,12 +26,19 @@ export async function uploadImageToBucket(file: File) {
     // Make public
     await fileRef.makePublic();
 
-    return fileRef.name;
+    return {
+        filename: fileRef.name,
+        dimensions
+    };
 }
 
-export async function deleteImageFromBucket(fileName: string) {
+export async function deleteImageFromBucket(filename: string) {
     const bucket = getStorage().bucket('spadok-images');
-    const fileRef = bucket.file(fileName);
+    const fileRef = bucket.file(filename);
 
-    await fileRef.delete();
+    try {
+        await fileRef.delete();
+    } catch (error) {
+        console.error('Error deleting image:', error);
+    }
 }

@@ -10,6 +10,8 @@ export async function POST(request: NextRequest) {
 
     const highlight = formData.get('highlight') as File
 
+    const { filename } = await uploadImageToBucket(highlight);
+
     const data = {
         id: formData.get('id'),
         name: formData.get('name'),
@@ -17,7 +19,7 @@ export async function POST(request: NextRequest) {
         isCollection: formData.get('isCollection') === 'true',
         canFilter: formData.get('canFilter') === 'true',
         ...(highlight && {
-            highlight: await uploadImageToBucket(highlight),
+            highlight: filename,
         })
     }
 

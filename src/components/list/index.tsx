@@ -285,6 +285,24 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
 
                             <Text fontSize={{ base: '2xs', xl: 'md' }}>Сторінка</Text>
 
+                            {/*<Pagination.Context>*/}
+                            {/*    {({ pages }) =>*/}
+                            {/*        pages.map((page, index) =>*/}
+                            {/*            page.type === "page" ? page.value <= 3 || index === pages.length - 1 ? <Pagination.Item key={index} {...page}>*/}
+                            {/*                <IconButton colorPalette={{ _selected: 'pink' }}>*/}
+                            {/*                    {page.value}*/}
+                            {/*                </IconButton>*/}
+                            {/*            </Pagination.Item> : null : (*/}
+                            {/*                <Pagination.Ellipsis key={index} index={index}>*/}
+                            {/*                    <IconButton>*/}
+                            {/*                        <BiDotsHorizontal />*/}
+                            {/*                    </IconButton>*/}
+                            {/*                </Pagination.Ellipsis>*/}
+                            {/*            ),*/}
+                            {/*        )*/}
+                            {/*    }*/}
+                            {/*</Pagination.Context>*/}
+
                             <Pagination.Items
                                 render={(page) => (
                                     <IconButton colorPalette={{ _selected: 'pink' }}>

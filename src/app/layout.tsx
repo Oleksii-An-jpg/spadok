@@ -16,6 +16,11 @@ const eUkraine = localFont({
             style: 'normal',
         },
         {
+            path: './e-Ukraine-Medium.otf',
+            weight: '600',
+            style: 'normal',
+        },
+        {
             path: './e-Ukraine-Bold.otf',
             weight: '700',
             style: 'bold',

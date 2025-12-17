@@ -2,6 +2,7 @@ import {Region} from "@/models/region";
 import {UniqueIdentifier} from "@dnd-kit/core";
 import {Address} from "@/components/places/utils";
 import {ExtractedDateInfo} from "@/lib/utils";
+import {ImageDimensions} from "@/lib/upload";
 
 export enum Sex {
     MALE = 'Чоловіча',
@@ -24,6 +25,7 @@ type ItemBaseModel= {
     regionOfUse: string[];
     sex: Sex[] | null;
     images: string[]
+    imageDimensions: ImageDimensions[];
     techniques: string[]
     mainCategory: string;
     subCategories?: string[]
@@ -37,6 +39,7 @@ type ItemBaseModel= {
     cuts: string[];
     published: boolean;
     illustrations?: string[];
+    illustrationDimensions?: ImageDimensions[];
 }
 
 export type Item = ItemBaseModel & {

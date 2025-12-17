@@ -5,7 +5,7 @@ import {ItemConverter} from "@/api/items";
 import {getRegions} from "@/api/regions";
 import {Item} from "@/models/item";
 import {saveItemToAlgolia} from "@/lib/algolia";
-import {deleteImageFromBucket, uploadImageToBucket} from "@/lib/upload";
+import {deleteImageFromBucket, ImageDimensions, uploadImageToBucket} from "@/lib/upload";
 
 function removeUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
     return Object.fromEntries(
@@ -15,23 +15,27 @@ function removeUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> 
 
 async function processImages(
     newImages: File[],
-    existingImages: string[] = []
-): Promise<string[]> {
-    const result: string[] = [];
+    existingImages: string[] = [],
+    existingDimensions: ImageDimensions[] = []
+): Promise<{ images: string[]; dimensions: ImageDimensions[] }> {
+    const images: string[] = [];
+    const dimensions: ImageDimensions[] = [];
 
     for (let i = 0; i < newImages.length; i++) {
         const file = newImages[i];
 
         // If it's an empty file or placeholder, use existing image if available
         if (file.size === 0 && existingImages[i]) {
-            result.push(existingImages[i]);
+            images.push(existingImages[i]);
+            dimensions.push(existingDimensions[i] || 1);
         } else if (file.size > 0) {
-            // Upload new image
-            const uploadedUrl = await uploadImageToBucket(file);
-            result.push(uploadedUrl);
+            // Upload new image and get aspect ratio
+            const { filename, dimensions: imageDimensions } = await uploadImageToBucket(file);
+            images.push(filename);
+            dimensions.push(imageDimensions);
 
             // Delete old image if it exists and is different
-            if (existingImages[i] && existingImages[i] !== uploadedUrl) {
+            if (existingImages[i] && existingImages[i] !== filename) {
                 await deleteImageFromBucket(existingImages[i]);
             }
         }
@@ -39,10 +43,11 @@ async function processImages(
 
     // If there are fewer new images than existing, keep the remaining existing ones
     if (newImages.length < existingImages.length) {
-        result.push(...existingImages.slice(newImages.length));
+        images.push(...existingImages.slice(newImages.length));
+        dimensions.push(...dimensions.slice(newImages.length));
     }
 
-    return result;
+    return { images, dimensions };
 }
 
 export async function POST(request: NextRequest) {
@@ -64,6 +69,19 @@ export async function POST(request: NextRequest) {
             existingItem = doc.data() as Item;
         }
     }
+
+    // Process images with aspect ratios
+    const processedImages = await processImages(
+        images,
+        existingItem?.images || [],
+        existingItem?.imageDimensions || []
+    );
+
+    const processedIllustrations = await processImages(
+        illustrations,
+        existingItem?.illustrations || [],
+        existingItem?.illustrationDimensions || []
+    );
 
     // Parse form data
     const data = {
@@ -99,8 +117,10 @@ export async function POST(request: NextRequest) {
         region: JSON.parse(formData.get('region') as string),
         regions: JSON.parse(formData.get('regions') as string),
         date: JSON.parse(formData.get('date') as string),
-        images: await processImages(images, existingItem?.images || []),
-        illustrations: await processImages(illustrations, existingItem?.illustrations || []),
+        images: processedImages.images,
+        imageDimensions: processedImages.dimensions,
+        illustrations: processedIllustrations.images,
+        illustrationAspectRatios: processedIllustrations.dimensions,
     };
 
     const item = removeUndefined(data);

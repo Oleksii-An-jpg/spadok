@@ -51,7 +51,7 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
                             {item.purchase}
                         </Text>}
                     </VStack>
-                    <ChakraLink asChild variant="underline">
+                    <ChakraLink asChild variant="underline" color="salmon.500" fontWeight={600} fontSize='sm'>
                         <Link target="_blank" href={item.sourceURL}>
                             Завантажити світлини у високій якості
                         </Link>
