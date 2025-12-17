@@ -36,6 +36,7 @@ const Item: FC<ItemProps> = ({ item, className }) => {
                             <Skeleton loading={value} className="relative w-full" aspectRatio={`${item.imageDimensions[0].width} / ${item.imageDimensions[0].height}`}>
                                 {!error ? (
                                     <Image
+                                        priority={false}
                                         src={`https://storage.googleapis.com/spadok-images/${item.images[0]}`}
                                         alt={item.name}
                                         fill

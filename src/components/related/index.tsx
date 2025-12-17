@@ -19,7 +19,7 @@ const Related: FC<RelatedProps> = ({ items }) => {
         <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
             Речі з однієї скрині:
         </Heading>
-        <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+        <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={2}>
             {items.map((item, index) => {
                 const itemPage = Math.floor(index / pageSize) + 1;
                 const isVisibleOnMobile = itemPage === page;
