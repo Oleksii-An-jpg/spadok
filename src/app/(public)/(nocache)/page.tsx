@@ -163,10 +163,10 @@ export default async function Home() {
                           звіт від БФ «КОЛО»
                       </Link>
                   </p>
-                  <VStack mt={6} gap={16} align="stretch">
-                      <Heading fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">
+                  <VStack mt={6} gap={6} align="stretch">
+                      <h2 className="text-2xl xl:text-4xl mb-0 font-light">
                           Дослідіть наші колекції:
-                      </Heading>
+                      </h2>
                       <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} className="[&>*]:hidden
   [&>*:nth-child(-n+8)]:block
   lg:[&>*:nth-child(-n+9)]:block" gap={4}>
