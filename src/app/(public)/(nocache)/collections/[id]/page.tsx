@@ -143,7 +143,7 @@ export default async function Page({params}: Props) {
                     <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} className="[&>*]:hidden
   [&>*:nth-child(-n+4)]:block
   lg:[&>*:nth-child(-n+6)]:block" gap={4}>
-                        {[...collections, ...regions].slice(0, 6).map((item) => <Collection collection={item} key={item.id} />)}
+                        {[...collections, ...regions].filter(entity => entity.id !== id).slice(0, 6).map((item) => <Collection collection={item} key={item.id} />)}
                     </Grid>
                     <Box className="self-center">
                         <BrandButton asChild variant="brand-primary">
