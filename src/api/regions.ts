@@ -3,7 +3,8 @@ import {Region} from "@/models/region";
 'server only';
 import {admin} from "@/lib/admin";
 import {
-    FirestoreDataConverter,
+    Filter,
+    FirestoreDataConverter, Query,
     QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 
@@ -20,8 +21,14 @@ export class RegionConverter implements FirestoreDataConverter<Region> {
     }
 }
 
-export async function getRegions() {
-    const snapshot = await admin.collection('regions').withConverter(new RegionConverter()).get()
+export async function getRegions({ filters }: { filters?: Array<Filter> } = { filters: [] }) {
+    let query: Query<Region> = admin.collection('regions').withConverter(new RegionConverter());
+
+    filters?.forEach((filter) => {
+        query = query.where(filter);
+    });
+
+    const snapshot = await query.get();
     return snapshot.docs.map((doc) => doc.data());
 }
 

@@ -15,7 +15,7 @@ import {notFound} from "next/navigation";
 import Item from "@/components/items/item";
 import Banner from "@/components/banner";
 import {Metadata, ResolvingMetadata} from "next";
-import {getRegion} from "@/api/regions";
+import {getRegion, getRegions} from "@/api/regions";
 import { Item as ItemModel } from "@/models/item";
 import ChakraMarkdownComponents from "@/components/markdown";
 import {Filter} from "firebase-admin/firestore";
@@ -80,8 +80,10 @@ export async function generateMetadata(
 export default async function Page({params}: Props) {
     const {id} = await params;
 
-    const [category, region, collections] = await Promise.all([getCategory(id), getRegion(id), getCategories({
+    const [category, region, collections, regions] = await Promise.all([getCategory(id), getRegion(id), getCategories({
         filters: [Filter.and(Filter.where('isCollection', '==', true), Filter.where('isHomepage', '==', false))]
+    }), getRegions({
+        filters: [Filter.where('isCollection', '==', true)]
     })]);
     let entity;
     if (region) {
@@ -138,8 +140,10 @@ export default async function Page({params}: Props) {
                     <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
                         Дослідіть наші колекції:
                     </Heading>
-                    <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
-                        {collections.map((item) => <Collection collection={item} key={item.id} />)}
+                    <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} className="[&>*]:hidden
+  [&>*:nth-child(-n+4)]:block
+  lg:[&>*:nth-child(-n+6)]:block" gap={4}>
+                        {[...collections, ...regions].slice(0, 6).map((item) => <Collection collection={item} key={item.id} />)}
                     </Grid>
                     <Box className="self-center">
                         <BrandButton asChild variant="brand-primary">
