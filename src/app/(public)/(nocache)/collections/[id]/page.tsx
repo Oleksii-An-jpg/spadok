@@ -5,9 +5,6 @@ import {
     Box, VStack,
     Breadcrumb, Bleed, Heading, Grid, GridItem, Link as ChakraLink
 } from "@chakra-ui/react";
-import Markdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
-import rehypeRaw from 'rehype-raw'
 import {getCategories, getCategory} from "@/api/categories";
 import Link from "next/link";
 import {BiHome, BiCategory} from "react-icons/bi";
@@ -17,10 +14,10 @@ import Banner from "@/components/banner";
 import {Metadata, ResolvingMetadata} from "next";
 import {getRegion, getRegions} from "@/api/regions";
 import { Item as ItemModel } from "@/models/item";
-import ChakraMarkdownComponents from "@/components/markdown";
 import {Filter} from "firebase-admin/firestore";
 import Collection from "@/components/collection";
 import BrandButton from "@/components/brand/button";
+import Description from "@/components/collection/description";
 
 type Props = {
     params: Promise<{ id: string }>
@@ -128,7 +125,7 @@ export default async function Page({params}: Props) {
                     </Breadcrumb.Item>
                 </Breadcrumb.List>
             </Breadcrumb.Root>
-            <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{entity?.description}</Markdown>
+            <Description entity={entity} />
             <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
                 {items.map((item) => <Item item={item} key={item.id} />)}
             </Box>
@@ -137,7 +134,7 @@ export default async function Page({params}: Props) {
             </Bleed>
             <GridItem colStart={2}>
                 <VStack align="stretch" gap={8}>
-                    <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
+                    <Heading fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">
                         Дослідіть наші колекції:
                     </Heading>
                     <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} className="[&>*]:hidden

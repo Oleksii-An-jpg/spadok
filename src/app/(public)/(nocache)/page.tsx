@@ -271,7 +271,7 @@ export default async function Home() {
                           звіт від БФ «КОЛО»
                       </Link>
                   </p>
-                  <VStack mt={6} gap={6} align="stretch">
+                  <VStack mt={24} gap={6} align="stretch">
                       <h2 className="text-2xl xl:text-4xl mb-0 font-light">
                           Дослідіть наші колекції:
                       </h2>

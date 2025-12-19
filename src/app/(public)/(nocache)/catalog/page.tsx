@@ -53,7 +53,7 @@ export default async function Page(_: Props) {
                 </Breadcrumb.List>
             </Breadcrumb.Root>
             <VStack align="stretch">
-                <Grid templateColumns={{ xl: "300px auto" }} gap={8}>
+                <Grid templateColumns={{ xl: "300px auto" }} rowGap={16} columnGap={8}>
                     <Grid templateColumns="subgrid" gridColumn="1 / -1" gap={8}>
                         <Suspense fallback={null}>
                             <List items={items} categories={categories} cuts={cuts} authors={authors} materials={materials} techniques={techniques} regions={regions} />
@@ -61,7 +61,7 @@ export default async function Page(_: Props) {
                     </Grid>
                     <GridItem colStart={{ xl: 2 }}>
                         <VStack align="stretch" gap={8}>
-                            <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
+                            <Heading fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">
                                 Дослідіть наші колекції:
                             </Heading>
                             <Grid templateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>

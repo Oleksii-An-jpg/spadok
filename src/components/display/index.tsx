@@ -21,9 +21,9 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
     return <VStack align="stretch" gap={{ base: 4, xl: 16 }}>
         <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} columnGap={2.5} rowGap={8}>
             <Carousel images={item.images} alt={item.name} />
-            <Grid as={GridItem} fontWeight="lighter" templateColumns="subgrid" gridColumn="1 / -1">
-                <VStack align="stretch" gap={0} w={{ xl: 390 }}>
-                    <Heading lineHeight="normal" fontSize={{ base: 'xl', xl: '5xl' }} fontWeight="light">{item.name}</Heading>
+            <Grid as={GridItem} fontWeight="lighter" gap={{ base: 2, xl: 2.5 }} templateColumns="subgrid" gridColumn="1 / -1">
+                <VStack align="stretch" gap={{ base: 1, xl: 2 }} w={{ xl: 390 }}>
+                    <Heading className="!leading-10" fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">{item.name}</Heading>
                     <Text color="gray.400" fontSize={{ base: 'sm', xl: 'lg' }}>{item.price ? `Врятовано за ${getDisplayPrice(item.price)}` : 'Дарунок'}</Text>
                 </VStack>
                 <VStack align="stretch" fontSize={{ base: 'xs', xl: 'md' }} gap={3}>
@@ -38,15 +38,13 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
                             {(item.materials?.length || item.techniques?.length || item.cuts?.length) > 0 &&
                                 [item.materials?.join(', '), item.techniques?.join(', '), item.cuts?.join(', ')].join('; ')
                             }
-                            {item.size ? <>
-                                <br />
-                                {item.size}.
-                            </> : null}
-                            {item.description && <>
-                                <br />
-                                {item.description}
-                            </>}
                         </Text>
+                        {item.size ? <Text>
+                            {item.size}.
+                        </Text> : null}
+                        {item.description && <Text>
+                            {item.description}
+                        </Text>}
                         {item.purchase && <Text>
                             {item.purchase}
                         </Text>}

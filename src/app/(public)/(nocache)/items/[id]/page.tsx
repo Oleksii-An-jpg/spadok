@@ -131,7 +131,7 @@ export default async function Page({params}: Props) {
                         <GridItem>
                             <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{item.facts}</Markdown>
 
-                            {item.illustrations?.length ? <Carousel alt={item.description} thumbnails={false} fullSize={false} images={item.illustrations} /> : null}
+                            {item.illustrations?.length ? <Carousel alt={item.description} fullSize={false} images={item.illustrations} /> : null}
                         </GridItem>
                     </Grid>
                 </Container>
@@ -147,7 +147,7 @@ export default async function Page({params}: Props) {
 
         {random?.length && (
             <VStack align="stretch" gap={8}>
-                <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
+                <Heading fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">
                     Вам може сподобатися:
                 </Heading>
                 <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={2}>

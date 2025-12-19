@@ -102,6 +102,10 @@ const config = defineConfig({
                     500: { value: "#F3F3F3FF"}
                 }
             },
+            fonts: {
+                heading: { value: "var(--font-e-ukraine)" },
+                body: { value: "var(--font-e-ukraine)" },
+            }
         },
         semanticTokens: {
             colors: {
