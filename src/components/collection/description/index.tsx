@@ -24,11 +24,14 @@ const Description: FC<DescriptionProps> = ({ entity }) => {
         </GridItem>
         <GridItem>
             <Box {...value && {
-                lineClamp: 3
+                lineClamp: {
+                    base: 3,
+                    xl: 'none'
+                }
             }}>
                 <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{entity?.description}</Markdown>
             </Box>
-            <ChakraLink onClick={toggle} fontSize="sm" color="gray.500" variant="underline">
+            <ChakraLink className="xl:hidden!" onClick={toggle} fontSize="sm" color="gray.500" variant="underline">
                 {value ? 'Повний опис' : 'Приховати'}
             </ChakraLink>
         </GridItem>
