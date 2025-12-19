@@ -85,7 +85,7 @@ const Avatar: FC<AvatarProps> = ({
                 <div className={clsx('inline-flex relative bg-khaki', image)}>
                     <picture>
                         <source srcSet={srcSet} media="(min-width: 80rem)" />
-                        <Image fill {...rest} />
+                        <Image fill {...rest} objectFit="contain" />
                     </picture>
                     {decorated ? (
                         <>

@@ -39,8 +39,8 @@ const Members: FC<TeamMemberProps> = ({ members }) => {
             <Accordion.Item css={{ borderBottomWidth: 2 }} key={index} value={member.name}>
                 <Accordion.ItemTrigger className="cursor-pointer">
                     <HStack justify="space-between" w="full">
-                        <Text fontSize="xl" fontWeight="extralight" lg={{ fontSize: '2xl' }}>{member.name}</Text>
-                        <Text className="w-28 xl:w-52" fontSize="xs" fontWeight="extralight" lg={{ fontSize: 'medium' }}>{member.role}</Text>
+                        <Text fontSize="lg" fontWeight="extralight" lg={{ fontSize: '2xl' }}>{member.name}</Text>
+                        <Text className="w-24 xl:w-80 leading-4 xl:leading-6" fontSize="xs" fontWeight="extralight" lg={{ fontSize: 'medium' }}>{member.role}</Text>
                     </HStack>
                     <AccordionItemIcon />
                 </Accordion.ItemTrigger>
