@@ -118,7 +118,7 @@ const MEMBERS = [
         instagram: "https://www.instagram.com/art_traditional_ua",
     },
     {
-        photo: "/photos/Наталія Суховій.png",
+        photo: "/photos/nataliia_sukhoviy.png",
         name: "Наталія Суховій",
         role: "Менеджерка з пошуку речей",
         description: "Ціную творчість у всіх її проявах, займаюся туризмом, йогою, люблю подорожі і книги.",

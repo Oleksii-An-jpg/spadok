@@ -47,7 +47,7 @@ const Item: FC<ItemProps> = ({ item, className }) => {
                                             setFalse();
                                             setTrue();
                                         }}
-                                        style={{ objectFit: "cover" }}
+                                        className="object-cover"
                                     />
                                 ) : (
                                     <Flex className="bg-gray-100 h-full items-center justify-around">
