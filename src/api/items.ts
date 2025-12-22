@@ -84,6 +84,34 @@ async function getOrderAndPosition() {
     return { order, position };
 }
 
+export async function setOrderAndPosition(id: string) {
+    const orderRef = admin
+        .collection('order')
+        .doc('default')
+        .withConverter<{ items: UniqueIdentifier[] }>({
+            fromFirestore(snapshot: QueryDocumentSnapshot<{ items: UniqueIdentifier[] }>) {
+                return snapshot.data();
+            },
+            toFirestore(data) {
+                return data;
+            },
+        });
+
+
+    await admin.runTransaction(async (tx) => {
+        const snap = await tx.get(orderRef);
+
+        const items = snap.exists ? [...snap.data()!.items] : [];
+
+        // true unshift
+        items?.unshift(id);
+
+        if (items?.length) {
+            tx.set(orderRef, {items}, { merge: true });
+        }
+    });
+}
+
 type WhereFilter = {
     field: string | FirebaseFirestore.FieldPath;
     operator: FirebaseFirestore.WhereFilterOp;

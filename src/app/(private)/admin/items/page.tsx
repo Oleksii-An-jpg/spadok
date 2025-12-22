@@ -42,6 +42,7 @@ export default async function Page({
 
     const [authors, regions, materials, techniques, categories, cuts] = await Promise.all([getAuthors(), getRegions(), getMaterials(), getTechniques(), getCategories(), getCuts()]);
 
+    console.log(all[0]);
     return (
         <>
             <Card.Header>

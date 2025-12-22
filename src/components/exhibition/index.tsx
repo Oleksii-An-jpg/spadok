@@ -145,7 +145,7 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                 <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
                     const formData = itemToFormData({
                         ...data,
-                        regions: data.regions.map(region => region.id)
+                        regions: data.subRegions
                     });
                     await fetch('/api/items', {
                         method: 'POST',
@@ -184,17 +184,15 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                         <Textarea size="xs" autoresize {...register('description')} />
                         <Field.HelperText />
                     </Field.Root>
-                    <Field.Root orientation="horizontal" required className="z-10">
+                    <Field.Root orientation="horizontal" className="z-10">
                         <Field.Label htmlFor="addressLine">Географічна адреса</Field.Label>
                         <InputGroup>
                             <Controller
-                                rules={{ required: true }}
                                 render={({ field }) => {
                                     return (
                                         <PlacesAutocompleteInput
                                             {...field}
                                             invalid={Boolean(errors?.address?.line)}
-                                            required
                                             size="xs"
                                             id="addressLine"
                                             onReady={async () => {

@@ -1,7 +1,7 @@
 // app/api/items/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import {admin} from "@/lib/admin";
-import {ItemConverter} from "@/api/items";
+import {ItemConverter, setOrderAndPosition} from "@/api/items";
 import {getRegions} from "@/api/regions";
 import {Item} from "@/models/item";
 import {saveItemToAlgolia} from "@/lib/algolia";
@@ -133,7 +133,11 @@ export async function POST(request: NextRequest) {
     } else {
         const { id, ...rest } = item;
         const ref = await collection.add(rest as Item);
-        await saveItemToAlgolia(ref.id, rest as Item);
+
+        await Promise.all([
+            saveItemToAlgolia(ref.id, rest as Item),
+            setOrderAndPosition(ref.id),
+        ]);
     }
 
     return NextResponse.json({ success: true, data: item });

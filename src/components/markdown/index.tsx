@@ -22,7 +22,7 @@ const ChakraMarkdownComponents: Components = {
     h6: (props) => <Heading as="h6" size="md" my={2} {...props} />,
 
     // Paragraph
-    p: (props) => <Text mb={4} fontSize="sm" {...props} />,
+    p: (props) => <Text mb={4} fontSize="md" {...props} />,
 
     // Links
     a: (props) => <ChakraLink color="blue.500" {...props} target="_blank" />,
