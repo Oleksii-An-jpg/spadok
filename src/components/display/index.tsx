@@ -30,7 +30,7 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
                     <Box>
                         <Text>{[item.address?.state, item.address?.region, item.address?.city]
                             .filter(Boolean)
-                            .join(', ')} {item.region?.length && `(${item.regions.find(({ id }) => id === item.region[0])?.name})`}.</Text>
+                            .join(', ')} {item.region?.length && `(${item.regions.map(({ name }) => name).join(', ')})`}.</Text>
                         <Text>{[item.date.part, item.date.fraction, item.date.century && `${item.date.century} ст.`].filter(Boolean).join(' ')}</Text>
                     </Box>
                     <VStack align="stretch" gap={4}>
