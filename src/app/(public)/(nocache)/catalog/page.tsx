@@ -27,7 +27,13 @@ type Props = {
 
 export default async function Page(_: Props) {
     const [categories, cuts, techniques, authors, materials, regions] = await Promise.all([getCategories(), getCuts(), getTechniques(), getAuthors(), getMaterials(), getRegions()]);
-    const {items} = await getItems();
+    const {items} = await getItems({
+        where: {
+            field: 'published',
+            operator: '==',
+            value: true
+        }
+    });
 
     const collections = categories.filter(category => category.isCollection && category.isHomepage).slice(0, 6);
 
