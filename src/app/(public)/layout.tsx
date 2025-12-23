@@ -12,6 +12,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return <Provider system={system} forcedTheme="light">
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-XVG0Z2GNK0" />
+        <Script dangerouslySetInnerHTML={{__html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-XVG0Z2GNK0');
+        `}} />
         <Box className="bg-white">
             <Header />
             <Container py={10} px="30px">
