@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
     return <Provider system={system} forcedTheme="light">
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-XVG0Z2GNK0" />
-        <Script dangerouslySetInnerHTML={{__html: `
+        <Script id="google-analytics" dangerouslySetInnerHTML={{__html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
