@@ -21,31 +21,34 @@ async function processImages(
     const images: string[] = [];
     const dimensions: ImageDimensions[] = [];
 
-    for (let i = 0; i < newImages.length; i++) {
-        const file = newImages[i];
+    // Create a map of existing images for quick lookup
+    const existingImageMap = new Map<string, ImageDimensions>();
+    for (let i = 0; i < existingImages.length; i++) {
+        existingImageMap.set(existingImages[i], existingDimensions[i] || 1);
+    }
 
-        // If it's an empty file or placeholder, use existing image if available
-        if (file.size === 0 && existingImages[i]) {
-            images.push(existingImages[i]);
-            dimensions.push(existingDimensions[i] || 1);
+    // Track which existing images are still being used
+    const usedExistingImages = new Set<string>();
+
+    for (const file of newImages) {
+        // Check if this is an existing image (by filename)
+        if (existingImageMap.has(file.name)) {
+            // Reused existing image - keep it
+            images.push(file.name);
+            dimensions.push(existingImageMap.get(file.name)!);
+            usedExistingImages.add(file.name);
         } else if (file.size > 0) {
-            // Upload new image and get aspect ratio
+            // New image - upload it
             const { filename, dimensions: imageDimensions } = await uploadImageToBucket(file);
             images.push(filename);
             dimensions.push(imageDimensions);
-
-            // Delete old image if it exists and is different
-            if (existingImages[i] && existingImages[i] !== filename) {
-                await deleteImageFromBucket(existingImages[i]);
-            }
         }
+        // Skip files with size 0 that aren't in existing images
     }
 
-    // If there are fewer new images than existing, keep the remaining existing ones
-    if (newImages.length < existingImages.length) {
-        images.push(...existingImages.slice(newImages.length));
-        dimensions.push(...dimensions.slice(newImages.length));
-    }
+    // Delete images that were removed (existed before but aren't in the new list)
+    const imagesToDelete = existingImages.filter(img => !usedExistingImages.has(img));
+    await Promise.all(imagesToDelete.map(img => deleteImageFromBucket(img)));
 
     return { images, dimensions };
 }

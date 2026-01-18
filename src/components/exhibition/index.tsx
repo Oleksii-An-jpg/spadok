@@ -365,11 +365,19 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                         <Text css={{ 'width': 'var(--field-label-width)' }} fontSize="sm">Фотографії</Text>
                         <Box flex={1}>
                             <Controller render={({ field }) => {
+                                const handleReorder = (fromIndex: number, toIndex: number) => {
+                                    const newFiles = [...files];
+                                    const [movedFile] = newFiles.splice(fromIndex, 1);
+                                    newFiles.splice(toIndex, 0, movedFile);
+                                    console.log(newFiles);
+                                    field.onChange(newFiles);
+                                };
+
                                 return <FileUpload.Root onFileChange={({ acceptedFiles }) => {
                                     field.onChange(acceptedFiles);
                                 }} acceptedFiles={files} maxFiles={Infinity} accept="image/*">
                                     <FileUpload.HiddenInput />
-                                    <Gallery multiple />
+                                    <Gallery onReorder={handleReorder} multiple />
                                 </FileUpload.Root>
                             }} name="images" control={control} />
                         </Box>
