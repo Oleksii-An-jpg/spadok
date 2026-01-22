@@ -23,7 +23,7 @@ import {
     PaginationState,
     useReactTable, Column, ColumnFiltersState,
 } from '@tanstack/react-table';
-import {Item as ItemModel} from "@/models/item";
+import {Item as ItemModel, Matureness, Sex} from "@/models/item";
 import {BiRightArrowAlt, BiLeftArrowAlt, BiMinus, BiPlus} from "react-icons/bi";
 import {Category} from "@/models/category";
 import {Cut} from "@/models/cut";
@@ -226,6 +226,52 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
                     // Keep item if ANY matched region is in filterValue
                     return matched.some(id => filterValue.includes(id));
                 }
+            },
+            {
+                id: 'Стать',
+                accessorKey: 'sex',
+                cell: () => null,
+                enableHiding: false,
+                filterFn: (row, columnId, filterValue) => {
+                    if (!filterValue || filterValue.length === 0) return true;
+
+                    const item = row.original;
+
+                    return item.sex?.some(sex => filterValue.includes(sex));
+                },
+                accessorFn: () => {
+                    return [{
+                        id: Sex.MALE,
+                        name: Sex.MALE,
+                    }, {
+                        id: Sex.FEMALE,
+                        name: Sex.FEMALE
+                    }]
+                },
+            },
+            {
+                id: 'Вік',
+                accessorKey: 'matureness',
+                cell: () => null,
+                enableHiding: false,
+                filterFn: (row, columnId, filterValue) => {
+                    if (!filterValue || filterValue.length === 0) return true;
+
+                    const item = row.original;
+
+                    if (!item.matureness) return false;
+
+                    return item.matureness.some(matureness => filterValue.includes(matureness));
+                },
+                accessorFn: () => {
+                    return [{
+                        id: Matureness.ADULT,
+                        name: Matureness.ADULT,
+                    }, {
+                        id: Matureness.CHILD,
+                        name: Matureness.CHILD
+                    }]
+                },
             }
         ],
         [items, categories, regions]

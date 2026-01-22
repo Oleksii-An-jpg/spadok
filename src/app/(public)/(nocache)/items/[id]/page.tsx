@@ -131,7 +131,7 @@ export default async function Page({params}: Props) {
                         <GridItem>
                             <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{item.facts}</Markdown>
 
-                            {item.illustrations?.length ? <Carousel alt={item.description} fullSize={false} images={item.illustrations} /> : null}
+                            {item.illustrations?.length ? <Carousel alt={item.description} fullSize={true} images={item.illustrations} /> : null}
                         </GridItem>
                     </Grid>
                 </Container>
