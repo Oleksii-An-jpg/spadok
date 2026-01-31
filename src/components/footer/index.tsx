@@ -2,6 +2,7 @@
 import {FC} from "react";
 import Link from "next/link";
 import Section from "@/components/section";
+import {VStack} from "@chakra-ui/react";
 
 const Footer: FC = () => {
     return <Section className='py-6 xl:py-16 relative after:content-[""] after:absolute after:right-0 after:bottom-full after:w-[30px] after:h-[30px] after:bg-concrete after:border after:border-gray-200 after:border-b-0 after:border-r-0 before:content-[""] before:absolute before:left-0 before:bottom-full before:w-[30px] before:h-[30px] before:bg-concrete before:border before:border-gray-200 before:border-b-0 before:border-l-0' variant="quinary" inset={true}>
@@ -107,9 +108,19 @@ const Footer: FC = () => {
                     </li>
                 </ul>
             </div>
-            <p className="min-w-full">
-                Спільний спадок © {new Date().getFullYear()}
-            </p>
+            <VStack align="stretch">
+                <p className="text-gray-600">
+                    <Link
+                        className="underline"
+                        href="https://www.cufoundation.ca/"
+                        target="_blank">
+                        Каталог врятованих речей створений за підтримки Канадсько-української фундації.
+                    </Link>
+                </p>
+                <p>
+                    Спільний спадок © {new Date().getFullYear()}
+                </p>
+            </VStack>
         </footer>
     </Section>
 }
