@@ -1,5 +1,5 @@
 'use client'
-import {useMemo} from "react";
+import {ReactNode, useMemo} from "react";
 import {
     Badge,
     Combobox,
@@ -8,7 +8,7 @@ import {
     useFilter,
     useListCollection,
     Wrap,
-    Text
+    Text, HStack
 } from "@chakra-ui/react";
 import {Control, Controller, FieldPath} from "react-hook-form";
 import {ItemUIModel} from "@/models/item";
@@ -17,6 +17,7 @@ type BaseItem = {
     id: string;
     name: string;
     group?: string;
+    hint?: ReactNode
 }
 
 type ComboProps<T> = {
@@ -33,7 +34,8 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
     const formatted = useMemo(() => items.map(item => ({
         label: item.name,
         value: item.id,
-        group: item.group
+        group: item.group,
+        hint: item.hint,
     })), [items]);
     const collection = useMemo(() => {
         return createListCollection({
@@ -101,7 +103,7 @@ function Combo<T extends BaseItem>({ items, label, control, name, placeholder, r
                                 </Combobox.ItemGroupLabel>
                                 {items.map((item) => (
                                     <Combobox.Item key={item.value} item={item}>
-                                        {item.label}
+                                        {item.label} {item.hint}
                                         <Combobox.ItemIndicator />
                                     </Combobox.Item>
                                 ))}

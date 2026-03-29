@@ -1,6 +1,7 @@
 'use client';
 import {FC, useEffect, useRef, useState} from "react";
 import {Item, ItemUIModel, Matureness} from "@/models/item";
+import { toaster } from "@/components/ui/toaster"
 import {
     Box,
     Button,
@@ -33,6 +34,7 @@ import ItemsPicker from "@/components/picker";
 import ExhibitionDate from "@/components/exhibition/date";
 import Gallery from "@/components/exhibition/gallery";
 import {Relation} from "@/models/relation";
+import {BiHappy} from "react-icons/bi";
 
 function itemToFormData(item: Omit<ItemUIModel, 'regions'> & {
     regions: string[];
@@ -143,6 +145,14 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
         <Container maxW="5xl">
             <VStack align="stretch" gap={8}>
                 <VStack as="form" align="start" onSubmit={handleSubmit(async (data) => {
+                    const id = "submitting";
+                    if (!toaster.isVisible(id)) {
+                        toaster.loading({
+                            id,
+                            title: "Працюємо...",
+                            description: "Дочекайтесь завершення операції.",
+                        })
+                    }
                     const formData = itemToFormData({
                         ...data,
                         regions: data.subRegions
@@ -151,6 +161,13 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                         method: 'POST',
                         body: formData,
                     });
+
+                    toaster.update(id, {
+                        title: "Мой як файно 🥳🥳🥳!!!",
+                        description: "Операцію завершено.",
+                        type: "success",
+                        duration: 3000,
+                    })
 
                     reset(data)
                 })} gap={4}>
@@ -329,8 +346,12 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                     <Combo items={techniques} label="Техніки виконання" name="techniques" control={control} placeholder="Оберіть техніки" />
                     <Combo items={cuts} name="cuts" control={control} label="Крій" placeholder="Оберіть крій" />
                     <Picker items={categories} name="mainCategory" control={control} label="Основна категорія" placeholder="Оберіть категорію" />
-                    <Combo items={categories.filter(category => !category.isCollection)} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
-                    <Combo items={categories.filter(category => category.isCollection)} name="subCategories" control={control} label="Підбірки" placeholder="Оберіть підбірки" />
+                    <Combo items={categories.map(category => ({
+                        ...category,
+                        ...(category.isCollection && {
+                            hint: '(підбірка)'
+                        })
+                    }))} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
                     <ExhibitionDate control={control} />
                     <Field.Root orientation="horizontal" required>
                         <Field.Label>
