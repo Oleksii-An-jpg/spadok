@@ -101,10 +101,10 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
         let targetIndex: number;
 
         if (direction === 'up') {
-            // If at the top, move to the very end; otherwise, move up one
+            // ONLY wrap if we are at the absolute top (index 0)
             targetIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
         } else {
-            // If at the bottom, move to the very start; otherwise, move down one
+            // ONLY wrap if we are at the absolute bottom
             targetIndex = currentIndex === items.length - 1 ? 0 : currentIndex + 1;
         }
 
@@ -120,7 +120,8 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
         // Boundary check
         if (targetIndex < 0 || targetIndex >= items.length) return;
 
-        const newOrder = arrayMove(items, currentIndex, targetIndex).map(i => i.id);
+        const newItems = arrayMove(items, currentIndex, targetIndex);
+        const newOrder = newItems.map(i => i.id);
 
         await fetch(`/api/items/reorder`, {
             method: 'PATCH',
