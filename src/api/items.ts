@@ -112,6 +112,31 @@ export async function setOrderAndPosition(id: string) {
     });
 }
 
+export async function reorderItems(newOrder: UniqueIdentifier[]) {
+    const orderRef = admin
+        .collection('order')
+        .doc('default')
+        .withConverter<{ items: UniqueIdentifier[] }>({
+            fromFirestore(snapshot) {
+                return snapshot.data() as { items: UniqueIdentifier[] };
+            },
+            toFirestore(data) {
+                return data;
+            },
+        });
+
+    return await admin.runTransaction(async (tx) => {
+        const snap = await tx.get(orderRef);
+
+        if (!snap.exists) {
+            throw new Error("Order document does not exist.");
+        }
+
+        // Overwrite with the new sequence provided by the frontend
+        tx.set(orderRef, { items: newOrder }, { merge: true });
+    });
+}
+
 type WhereFilter = {
     field: string | FirebaseFirestore.FieldPath;
     operator: FirebaseFirestore.WhereFilterOp;

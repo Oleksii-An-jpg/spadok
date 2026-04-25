@@ -12,9 +12,20 @@ import {
     Text,
     Box,
     VStack,
-    Dialog, Portal, Button, CloseButton
+    Dialog, Portal, Button, CloseButton, ButtonGroup
 } from "@chakra-ui/react";
-import {BiFirstPage, BiHide, BiLastPage, BiLeftArrowAlt, BiRightArrowAlt, BiShow, BiTrash} from "react-icons/bi";
+import { toaster } from "@/components/ui/toaster"
+import {
+    BiFirstPage,
+    BiHide,
+    BiLastPage,
+    BiLeftArrowAlt,
+    BiRightArrowAlt,
+    BiShow,
+    BiTrash,
+    BiCaretDown,
+    BiCaretUp
+} from "react-icons/bi";
 import Link from "next/link";
 import Row from "./row";
 import {
@@ -74,7 +85,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
         router.refresh();
     }, []);
     function handleDragEnd(event: DragEndEvent) {
-        const { active, over } = event
+        const { active, over } = event;
         if (active && over && active.id !== over.id) {
             const oldIndex = order.indexOf(active.id)
             const newIndex = order.indexOf(over.id)
@@ -83,6 +94,49 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
         }
     }
 
+    const handleMove = useCallback(async (id: UniqueIdentifier, direction: 'up' | 'down') => {
+        const currentIndex = items.findIndex(item => item.id === id);
+        if (currentIndex === -1) return;
+
+        let targetIndex: number;
+
+        if (direction === 'up') {
+            // If at the top, move to the very end; otherwise, move up one
+            targetIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
+        } else {
+            // If at the bottom, move to the very start; otherwise, move down one
+            targetIndex = currentIndex === items.length - 1 ? 0 : currentIndex + 1;
+        }
+
+        const toasterID = "reordering";
+        if (!toaster.isVisible(toasterID)) {
+            toaster.loading({
+                id: toasterID,
+                title: "Працюємо...",
+                description: "Дочекайтесь завершення операції.",
+            })
+        }
+
+        // Boundary check
+        if (targetIndex < 0 || targetIndex >= items.length) return;
+
+        const newOrder = arrayMove(items, currentIndex, targetIndex).map(i => i.id);
+
+        await fetch(`/api/items/reorder`, {
+            method: 'PATCH',
+            body: JSON.stringify({ ids: newOrder }),
+        });
+
+        toaster.update(toasterID, {
+            title: "Мой як файно 🥳🥳🥳!!!",
+            description: "Операцію завершено.",
+            type: "success",
+            duration: 3000,
+        })
+
+        router.refresh();
+    }, [items, router]);
+
     const columns = useMemo<ColumnDef<Item>[]>(
         () => [
             {
@@ -90,11 +144,25 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                 header: 'Назва',
                 cell: info => {
                     const item = info.row.original;
-                    return <ChakraLink asChild variant="underline">
-                        <Link prefetch={false} href={`/admin/items/${item.id}`}>
-                            {item.name}
-                        </Link>
-                    </ChakraLink>
+                    return <HStack>
+                        <ButtonGroup orientation="vertical" size="2xs" variant="ghost">
+                            <IconButton onClick={() => {
+                                handleMove(info.row.original.id, 'up')
+                            }}>
+                                <BiCaretUp />
+                            </IconButton>
+                            <IconButton onClick={() => {
+                                handleMove(info.row.original.id, 'down')
+                            }}>
+                                <BiCaretDown />
+                            </IconButton>
+                        </ButtonGroup>
+                        <ChakraLink asChild variant="underline">
+                            <Link prefetch={false} href={`/admin/items/${item.id}`}>
+                                {item.name}
+                            </Link>
+                        </ChakraLink>
+                    </HStack>
                 },
             },
             {
