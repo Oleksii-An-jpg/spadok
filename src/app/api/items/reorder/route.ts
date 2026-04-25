@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import {reorderItems} from "@/api/items";
 
-export async function PATCH(request: NextRequest, response: NextResponse) {
+export async function PATCH(request: NextRequest) {
     try {
         const { ids } = await request.json();
 
@@ -14,6 +14,6 @@ export async function PATCH(request: NextRequest, response: NextResponse) {
         return NextResponse.json({ success: true, ids });
     } catch (error) {
         console.error("Reorder failed:", error);
-        return new Response("Internal Server Error", { status: 500 });
+        return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
