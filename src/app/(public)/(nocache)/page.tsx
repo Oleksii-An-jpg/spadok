@@ -143,7 +143,7 @@ const MEMBERS = [
         instagram: "https://www.instagram.com/katyahanzhala",
     },
     {
-        photo: "/photos/Майко Ірина.png",
+        photo: "/photos/iryna_maiko.png",
         name: "Майко Ірина",
         role: "Event-менеджерка",
         description: "Жартівниця, дослідниця, організаторка цікавих штук. Любить якісну командну роботу, моменти дитячої творчості та запал в очах навпроти.",
