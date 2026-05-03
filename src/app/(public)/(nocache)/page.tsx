@@ -66,6 +66,13 @@ const MEMBERS = [
         instagram: "https://www.instagram.com/o_garnaya/",
     },
     {
+        photo: "/photos/iryna_maiko.png",
+        name: "Ірина Майко",
+        role: "Проєктна менеджерка",
+        description: "Жартівниця, дослідниця, організаторка цікавих штук. Любить якісну командну роботу, моменти дитячої творчості та запал в очах навпроти.",
+        instagram: "https://www.instagram.com/jemappelleirein",
+    },
+    {
         photo: "/photos/oksana.png",
         name: "Оксана Тригуб",
         role: "Координаторка напрямку пошуку речей",
@@ -122,18 +129,18 @@ const MEMBERS = [
         instagram: "https://www.instagram.com/olastardust/",
     },
     {
+        photo: "/photos/Ткаченко Ольга.png",
+        name: "Ольга Ткаченко",
+        role: "Редакторка",
+        description: "Випускова редакторка у видавництві за професією, культурологиня за освітою, одіссейка за способом життя. Любить читати, малювати, брати участь у подіях, пов'язаних з мистецтвом, сучасною і традиційною культурою. А ще ділитися враженнями про них з близькими за духом людьми.",
+        instagram: "https://www.instagram.com/olya.oliunia",
+    },
+    {
         photo: "/photos/Ольга Хархальова.png",
         name: "Ольга Хархальова",
         role: "Веб-дизайнерка",
         description: "Дослідниця візуальних мов, керамістка, старша серед трьох сестер.",
         instagram: "https://www.instagram.com/olhakharkhalova/",
-    },
-    {
-        photo: "/photos/illia.png",
-        name: "Ілля Почкун",
-        role: "Автор візуального стилю",
-        description: "Співзасновник креативної агенції Taktika, музикант, художник, друг всіх тварин і володар дитячого розряду з айкідо.",
-        instagram: "https://instagram.com/pochkun",
     },
     {
         photo: "/photos/Катерина Ганжала.png",
@@ -143,13 +150,6 @@ const MEMBERS = [
         instagram: "https://www.instagram.com/katyahanzhala",
     },
     {
-        photo: "/photos/iryna_maiko.png",
-        name: "Майко Ірина",
-        role: "Event-менеджерка",
-        description: "Жартівниця, дослідниця, організаторка цікавих штук. Любить якісну командну роботу, моменти дитячої творчості та запал в очах навпроти.",
-        instagram: "https://www.instagram.com/jemappelleirein",
-    },
-    {
         photo: "/photos/Галина Лінкс.png",
         name: "Галина Лінкс",
         role: "Event-менеджерка",
@@ -157,11 +157,11 @@ const MEMBERS = [
         instagram: "https://www.instagram.com/feeling_of_height",
     },
     {
-        photo: "/photos/Ткаченко Ольга.png",
-        name: "Ткаченко Ольга",
-        role: "Редакторка",
-        description: "Випускова редакторка у видавництві за професією, культурологиня за освітою, одіссейка за способом життя. Любить читати, малювати, брати участь у подіях, пов'язаних з мистецтвом, сучасною і традиційною культурою. А ще ділитися враженнями про них з близькими за духом людьми.",
-        instagram: "https://www.instagram.com/olya.oliunia",
+        photo: "/photos/illia.png",
+        name: "Ілля Почкун",
+        role: "Автор візуального стилю",
+        description: "Співзасновник креативної агенції Taktika, музикант, художник, друг всіх тварин і володар дитячого розряду з айкідо.",
+        instagram: "https://instagram.com/pochkun",
     }
 ]
 
