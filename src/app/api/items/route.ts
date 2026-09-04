@@ -1,10 +1,10 @@
 // app/api/items/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import {admin} from "@/lib/admin";
-import {ItemConverter, setOrderAndPosition} from "@/api/items";
+import {ItemConverter, removeFromOrder, setOrderAndPosition} from "@/api/items";
 import {getRegions} from "@/api/regions";
 import {Item} from "@/models/item";
-import {saveItemToAlgolia} from "@/lib/algolia";
+import {deleteItemFromAlgolia, saveItemToAlgolia} from "@/lib/algolia";
 import {deleteImageFromBucket, ImageDimensions, uploadImageToBucket} from "@/lib/upload";
 import { guard } from "@/lib/session";
 
@@ -169,6 +169,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     await collection.doc(id).delete();
+
+    // The order document and the search index both key off the item id, so a
+    // leftover entry in either would keep showing up in — and be counted by —
+    // the paginated admin list.
+    await Promise.all([
+        removeFromOrder(id),
+        deleteItemFromAlgolia(id),
+    ]);
 
     if (body.images?.length) {
         await Promise.all(body.images.map(async image => {

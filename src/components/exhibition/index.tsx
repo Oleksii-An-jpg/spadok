@@ -72,7 +72,7 @@ function itemToFormData(item: Omit<ItemUIModel, 'regions'> & {
 
 type ExhibitionProps = {
     item?: Item;
-    items: Item[];
+    items?: Item[];
     authors: Author[]
     regions: Region[]
     materials: Material[]
@@ -432,7 +432,7 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                     <Button disabled={!isValid} loading={isSubmitting} type="submit">Зберегти</Button>
                 </VStack>
 
-                {item && <ItemsPicker submitText="Зберегти пов'язані речі" items={items} onSubmit={async (items) => {
+                {item && <ItemsPicker submitText="Зберегти пов'язані речі" items={items ?? []} onSubmit={async (items) => {
                     await fetch('/api/items/relation', {
                         method: 'PATCH',
                         body: JSON.stringify({

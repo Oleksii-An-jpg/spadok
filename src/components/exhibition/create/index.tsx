@@ -18,7 +18,7 @@ type CreateProps = {
     techniques: Technique[]
     categories: Category[]
     cuts: Cut[]
-    items: Item[]
+    items?: Item[]
 }
 
 const Create: FC<CreateProps> = (props) => {
