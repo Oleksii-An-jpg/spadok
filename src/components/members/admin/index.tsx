@@ -3,11 +3,9 @@ import {FC, useCallback, useEffect, useMemo, useState} from "react";
 import {
     Box,
     Button,
-    ButtonGroup,
     CloseButton,
     Dialog,
     Group,
-    HStack,
     IconButton,
     Link as ChakraLink,
     Portal,
@@ -16,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import {BiCaretDown, BiCaretUp, BiTrash} from "react-icons/bi";
+import {BiTrash} from "react-icons/bi";
 import {
     closestCenter,
     DndContext,
@@ -129,15 +127,6 @@ const Members: FC<MembersProps> = ({ members }) => {
         void reorder(arrayMove(rows, from, to));
     }, [rows, reorder]);
 
-    const handleMove = useCallback((id: string, delta: number) => {
-        const from = rows.findIndex(member => member.id === id);
-        const to = from + delta;
-
-        if (from === -1 || to < 0 || to >= rows.length) return;
-
-        void reorder(arrayMove(rows, from, to));
-    }, [rows, reorder]);
-
     const ids = useMemo(() => rows.map(member => member.id), [rows]);
 
     return <DndContext
@@ -159,20 +148,10 @@ const Members: FC<MembersProps> = ({ members }) => {
             </Table.Header>
             <Table.Body>
                 <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-                    {rows.map((member, index) => (
+                    {rows.map(member => (
                         <SortableRow id={member.id} disabled={!canEdit || pending} key={member.id}>
                             {canEdit && <Table.Cell>
-                                <HStack gap="0">
-                                    <DragHandle disabled={pending} />
-                                    <ButtonGroup orientation="vertical" size="2xs" variant="ghost">
-                                        <IconButton aria-label="Вище" disabled={pending || index === 0} onClick={() => handleMove(member.id, -1)}>
-                                            <BiCaretUp />
-                                        </IconButton>
-                                        <IconButton aria-label="Нижче" disabled={pending || index === rows.length - 1} onClick={() => handleMove(member.id, 1)}>
-                                            <BiCaretDown />
-                                        </IconButton>
-                                    </ButtonGroup>
-                                </HStack>
+                                <DragHandle disabled={pending} />
                             </Table.Cell>}
                             <Table.Cell>
                                 {member.photo ? <Box overflow="hidden" w="12" h="12" display="flex" alignItems="center" justifyContent="center">

@@ -166,9 +166,7 @@ type Move = {
     /** The item being moved. */
     activeId: UniqueIdentifier;
     /** Drop target — the moved item takes this item's place. */
-    overId?: UniqueIdentifier;
-    /** Relative move, used by the up/down buttons; ignored when `overId` is set. */
-    delta?: number;
+    overId: UniqueIdentifier;
 };
 
 /**
@@ -178,7 +176,7 @@ type Move = {
  * document, so two editors reordering at the same time cannot clobber each
  * other the way sending a full client-side sequence would.
  */
-export async function moveItem({ activeId, overId, delta = 0 }: Move) {
+export async function moveItem({ activeId, overId }: Move) {
     const orderRef = getOrderRef();
 
     return await admin.runTransaction(async (tx) => {
@@ -195,13 +193,11 @@ export async function moveItem({ activeId, overId, delta = 0 }: Move) {
             throw new Error(`Item ${activeId} is not part of the order.`);
         }
 
-        const target = overId !== undefined ? items.indexOf(overId) : from + delta;
+        const to = items.indexOf(overId);
 
-        if (target === -1) {
+        if (to === -1) {
             throw new Error(`Item ${overId} is not part of the order.`);
         }
-
-        const to = Math.min(Math.max(target, 0), items.length - 1);
 
         if (to === from) return items;
 

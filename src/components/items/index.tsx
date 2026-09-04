@@ -12,7 +12,7 @@ import {
     Text,
     Box,
     VStack,
-    Dialog, Portal, Button, CloseButton, ButtonGroup
+    Dialog, Portal, Button, CloseButton
 } from "@chakra-ui/react";
 import { toaster } from "@/components/ui/toaster"
 import {
@@ -23,8 +23,6 @@ import {
     BiRightArrowAlt,
     BiShow,
     BiTrash,
-    BiCaretDown,
-    BiCaretUp
 } from "react-icons/bi";
 import Link from "next/link";
 import {DragHandle, SortableRow} from "@/components/sortable";
@@ -67,8 +65,7 @@ type ItemsProps = {
 /** Body of a PATCH to /api/items/reorder. */
 type Move = {
     activeId: UniqueIdentifier
-    overId?: UniqueIdentifier
-    delta?: number
+    overId: UniqueIdentifier
 }
 
 const REORDER_TOAST = "reordering";
@@ -164,22 +161,6 @@ const Items: FC<ItemsProps> = ({ items, page, pageSize, total, pageCount, query 
         void reorder({ activeId: active.id, overId: over.id });
     }, [rows, reorder]);
 
-    const handleMove = useCallback((id: UniqueIdentifier, delta: number) => {
-        const from = rows.findIndex(item => item.id === id);
-
-        if (from === -1) return;
-
-        const to = from + delta;
-
-        // A move off either end of the page hands the item to the neighbouring
-        // page, so there is nothing to show optimistically — the refresh will.
-        if (to >= 0 && to < rows.length) {
-            setRows(arrayMove(rows, from, to));
-        }
-
-        void reorder({ activeId: id, delta });
-    }, [rows, reorder]);
-
     const handleDelete = useCallback(async (item: Item) => {
         await fetch(`/api/items`, {
             method: 'DELETE',
@@ -201,38 +182,12 @@ const Items: FC<ItemsProps> = ({ items, page, pageSize, total, pageCount, query 
         router.refresh();
     }, [router]);
 
-    // Where the first row of this page sits in the whole list, so the up/down
-    // buttons know when they are at an actual end of it.
-    const offset = page * pageSize;
-
     const columns = useMemo<ColumnDef<Item>[]>(
         () => [
             ...(sortable ? [{
                 id: 'order',
                 header: 'Порядок',
-                cell: info => {
-                    const index = offset + info.row.index;
-
-                    return <HStack gap="0">
-                        <DragHandle disabled={pending} />
-                        <ButtonGroup orientation="vertical" size="2xs" variant="ghost">
-                            <IconButton
-                                aria-label="Вище"
-                                disabled={pending || index === 0}
-                                onClick={() => handleMove(info.row.original.id, -1)}
-                            >
-                                <BiCaretUp />
-                            </IconButton>
-                            <IconButton
-                                aria-label="Нижче"
-                                disabled={pending || index === total - 1}
-                                onClick={() => handleMove(info.row.original.id, 1)}
-                            >
-                                <BiCaretDown />
-                            </IconButton>
-                        </ButtonGroup>
-                    </HStack>
-                },
+                cell: () => <DragHandle disabled={pending} />,
             } satisfies ColumnDef<Item>] : []),
             {
                 accessorKey: 'name',
@@ -312,7 +267,7 @@ const Items: FC<ItemsProps> = ({ items, page, pageSize, total, pageCount, query 
                 }
             } satisfies ColumnDef<Item>] : []),
         ],
-        [sortable, canEdit, pending, offset, total, handleMove, handleDelete, toggleVisible]
+        [sortable, canEdit, pending, handleDelete, toggleVisible]
     )
 
     const onPaginationChange: OnChangeFn<PaginationState> = useCallback(updater => {
