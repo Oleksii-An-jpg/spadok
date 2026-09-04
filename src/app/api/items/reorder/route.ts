@@ -1,7 +1,11 @@
 import {NextRequest, NextResponse} from "next/server";
 import {reorderItems} from "@/api/items";
+import { guard } from "@/lib/session";
 
 export async function PATCH(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     try {
         const { ids } = await request.json();
 

@@ -3,12 +3,17 @@ import {FC} from "react";
 import {Button, Dialog, Portal, CloseButton} from "@chakra-ui/react";
 import {Cut as CutModel} from "@/models/cut";
 import Cut from "@/components/cut";
+import {useCanEdit} from "@/components/role";
 
 type CreateProps = {
     cut?: CutModel
 }
 
 const Create: FC<CreateProps> = (props) => {
+    const canEdit = useCanEdit();
+
+    if (!canEdit) return null;
+
     return <Dialog.Root size="cover" scrollBehavior="inside">
         <Dialog.Trigger asChild>
             <Button>

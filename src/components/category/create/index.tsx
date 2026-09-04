@@ -3,12 +3,17 @@ import {FC} from "react";
 import {Button, Dialog, Portal, CloseButton} from "@chakra-ui/react";
 import Category from "@/components/category";
 import {Category as CategoryModel} from "@/models/category";
+import {useCanEdit} from "@/components/role";
 
 type CreateProps = {
     category?: CategoryModel
 }
 
 const Create: FC<CreateProps> = (props) => {
+    const canEdit = useCanEdit();
+
+    if (!canEdit) return null;
+
     return <Dialog.Root size="cover" scrollBehavior="inside">
         <Dialog.Trigger asChild>
             <Button>

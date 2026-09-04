@@ -3,8 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import { algoliaClient, configureAlgoliaIndex, denormalizeItemForAlgolia } from '@/lib/algolia';
 import {Item} from "@/models/item";
+import { guard } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
+    const denied = await guard('admin');
+    if (denied) return denied;
+
     try {
         console.log('Configuring Algolia index...');
         await configureAlgoliaIndex();

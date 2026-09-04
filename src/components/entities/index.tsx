@@ -27,6 +27,7 @@ import {
 } from "@tanstack/react-table";
 import Filter from "@/components/filter";
 import Row from "@/components/items/row";
+import {useCanEdit} from "@/components/role";
 
 type BaseItem = {
     id: string;
@@ -43,6 +44,7 @@ type EntitiesProps<T> = {
 function Entities<T extends BaseItem>({items, initialState, columns = []}: EntitiesProps<T>) {
     const pathname = usePathname();
     const router = useRouter();
+    const canEdit = useCanEdit();
     const handleDelete = useCallback(async (item: T) => {
         await fetch(`/api/${pathname.replace('/admin', '')}`, {
             method: 'DELETE',
@@ -75,7 +77,7 @@ function Entities<T extends BaseItem>({items, initialState, columns = []}: Entit
                 },
             },
             ...columns,
-            {
+            ...(canEdit ? [{
                 accessorKey: 'id',
                 header: 'Дії',
                 enableSorting: false,
@@ -116,9 +118,9 @@ function Entities<T extends BaseItem>({items, initialState, columns = []}: Entit
                         </Dialog.Root>
                     </Group>
                 }
-            },
+            }] as ColumnDef<T>[] : []),
         ],
-        []
+        [canEdit, columns, pathname]
     )
 
     const [pagination, setPagination] = useState<PaginationState>({

@@ -3,12 +3,17 @@ import {FC} from "react";
 import {Button, Dialog, Portal, CloseButton} from "@chakra-ui/react";
 import {Region as RegionModel} from "@/models/region";
 import Region from "@/components/region";
+import {useCanEdit} from "@/components/role";
 
 type CreateProps = {
     region?: RegionModel
 }
 
 const Create: FC<CreateProps> = (props) => {
+    const canEdit = useCanEdit();
+
+    if (!canEdit) return null;
+
     return <Dialog.Root size="cover" scrollBehavior="inside">
         <Dialog.Trigger asChild>
             <Button>

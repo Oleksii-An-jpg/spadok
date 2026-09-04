@@ -4,8 +4,12 @@ import {RegionConverter} from "@/api/regions";
 import {Region} from "@/models/region";
 import {deleteImageFromBucket, uploadImageToBucket} from "@/lib/upload";
 import {Category} from "@/models/category";
+import { guard } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const formData = await request.formData();
 
     const highlight = formData.get('highlight') as File
@@ -39,6 +43,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const body: Region = await request.json();
     if (!body.id) {
         return NextResponse.json({ success: false, message: 'ID is required' }, { status: 400 });

@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import {admin} from "@/lib/admin";
 import {CutsConverter} from "@/api/cuts";
 import {Cut} from "@/models/cut";
+import { guard } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const data = await request.json();
 
     const collection = admin.collection('cuts').withConverter(new CutsConverter());
@@ -20,6 +24,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const body: Cut = await request.json();
     if (!body.id) {
         return NextResponse.json({ success: false, message: 'ID is required' }, { status: 400 });

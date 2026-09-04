@@ -1,8 +1,12 @@
 // app/api/admin/sync-algolia/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import {syncCategories} from "@/scripts/sync-categories";
+import { guard } from "@/lib/session";
 
 export async function GET(_: NextRequest) {
+    const denied = await guard('admin');
+    if (denied) return denied;
+
     try {
         await syncCategories();
 

@@ -2,8 +2,13 @@
 import {FC} from "react";
 import {Button, Dialog, Portal, CloseButton} from "@chakra-ui/react";
 import Member from "@/components/member";
+import {useCanEdit} from "@/components/role";
 
 const Create: FC = () => {
+    const canEdit = useCanEdit();
+
+    if (!canEdit) return null;
+
     return <Dialog.Root size="cover" scrollBehavior="inside">
         <Dialog.Trigger asChild>
             <Button>
