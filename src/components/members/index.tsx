@@ -12,14 +12,8 @@ import {
 import {BiMinus, BiPlus} from "react-icons/bi";
 import Avatar from "@/components/avatar";
 import Link from "next/link";
-
-type Member = {
-    name: string;
-    role: string;
-    description: string;
-    photo: string;
-    instagram: string;
-}
+import {Member} from "@/models/member";
+import {getImageUrl} from "@/lib/images";
 
 type TeamMemberProps = {
     members: Member[]
@@ -35,8 +29,8 @@ const AccordionItemIcon = () => {
 
 const Members: FC<TeamMemberProps> = ({ members }) => {
     return <Accordion.Root multiple size="lg">
-        {members.map((member, index) => (
-            <Accordion.Item css={{ borderBottomWidth: 2 }} key={index} value={member.name}>
+        {members.map((member) => (
+            <Accordion.Item css={{ borderBottomWidth: 2 }} key={member.id} value={member.name}>
                 <Accordion.ItemTrigger className="cursor-pointer">
                     <HStack justify="space-between" w="full">
                         <Text fontSize="lg" fontWeight="extralight" lg={{ fontSize: '2xl' }}>{member.name}</Text>
@@ -47,16 +41,18 @@ const Members: FC<TeamMemberProps> = ({ members }) => {
                 <Accordion.ItemContent>
                     <Accordion.ItemBody>
                         <HStack align="start" gap={8}>
-                            <Avatar src={member.photo} decorated alt={member.name} />
+                            {member.photo && <Avatar src={getImageUrl(member.photo)} decorated alt={member.name} />}
                             <VStack justify="space-between" align="stretch">
                                 <Text fontSize="medium" mb={4} xl={{ mb: 10 }}>
                                     {member.description}
                                 </Text>
-                                <ChakraLink asChild variant="underline" className="text-xs">
-                                    <Link prefetch={false} href={member.instagram} target="_blank">
-                                        INSTAGRAM
-                                    </Link>
-                                </ChakraLink>
+                                {member.instagram && (
+                                    <ChakraLink asChild variant="underline" className="text-xs">
+                                        <Link prefetch={false} href={member.instagram} target="_blank">
+                                            INSTAGRAM
+                                        </Link>
+                                    </ChakraLink>
+                                )}
                             </VStack>
                         </HStack>
                     </Accordion.ItemBody>

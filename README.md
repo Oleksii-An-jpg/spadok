@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Team members
+
+The team shown on the homepage is managed in the admin section at `/admin/members`
+(Firestore collection `members`, photos uploaded to the `spadok-images` bucket).
+
+The list used to be hard-coded on the homepage. To move it into Firestore, call
+`GET /api/admin/seed-members` once after deploying — it imports the previous
+lineup (matching by name, so repeated calls do not create duplicates) and keeps
+the original photos served from `public/photos`. Until it runs, the team section
+on the homepage stays empty.
