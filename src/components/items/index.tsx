@@ -1,6 +1,6 @@
 'use client';
 
-import {FC, useCallback, useMemo, useState} from "react";
+import {FC, useCallback, useEffect, useMemo, useState} from "react";
 import {Item} from "@/models/item";
 import {
     Group,
@@ -27,43 +27,160 @@ import {
     BiCaretUp
 } from "react-icons/bi";
 import Link from "next/link";
-import Row from "./row";
+import {DragHandle, SortableRow} from "@/components/sortable";
 import {
-    DndContext, closestCenter, type DragEndEvent,
-    type UniqueIdentifier, useSensor, PointerSensor
+    DndContext, closestCenter, type DragEndEvent, type UniqueIdentifier,
+    KeyboardSensor, PointerSensor, useSensor, useSensors
 } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import {
     arrayMove,
     SortableContext,
+    sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 
 import {
     ColumnDef,
+    OnChangeFn,
     PaginationState,
     flexRender,
     getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table'
-import Filter from "@/components/filter";
-import {useForm} from "react-hook-form";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
+import {useCanEdit} from "@/components/role";
+
+export const DEFAULT_PAGE_SIZE = 10;
+export const PAGE_SIZES = [10, 20, 30, 40, 50];
 
 type ItemsProps = {
+    /** Only the current page — the rest of the list never reaches the browser. */
     items: Item[]
-    order: UniqueIdentifier[]
+    /** Zero-based. */
+    page: number
+    pageSize: number
+    total: number
+    pageCount: number
+    query?: string
 }
 
-const Items: FC<ItemsProps> = ({ items, order }) => {
+/** Body of a PATCH to /api/items/reorder. */
+type Move = {
+    activeId: UniqueIdentifier
+    overId?: UniqueIdentifier
+    delta?: number
+}
+
+const REORDER_TOAST = "reordering";
+
+const Items: FC<ItemsProps> = ({ items, page, pageSize, total, pageCount, query }) => {
     const router = useRouter();
-    const sensor = useSensor(PointerSensor, {
-        activationConstraint: { distance: 10 },
-    });
-    const { handleSubmit, formState: { isSubmitting } } = useForm();
+    const pathname = usePathname();
+    const canEdit = useCanEdit();
+
+    // Positions are global, so reordering only makes sense while the full,
+    // unfiltered list is on screen.
+    const sortable = canEdit && !query;
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    // Mirrors the server page so a drag can land immediately instead of waiting
+    // for the round trip; the next render from the server takes over again.
+    const [rows, setRows] = useState(items);
+    const [pending, setPending] = useState(false);
+
+    useEffect(() => setRows(items), [items]);
+
+    const goTo = useCallback((next: { page?: number, pageSize?: number }) => {
+        const index = next.page ?? page;
+        const size = next.pageSize ?? pageSize;
+
+        const params = new URLSearchParams();
+        if (query) params.set('q', query);
+        if (index > 0) params.set('page', String(index + 1));
+        if (size !== DEFAULT_PAGE_SIZE) params.set('size', String(size));
+
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname);
+    }, [page, pageSize, query, pathname, router]);
+
+    const reorder = useCallback(async (move: Move) => {
+        if (!toaster.isVisible(REORDER_TOAST)) {
+            toaster.loading({
+                id: REORDER_TOAST,
+                title: "Працюємо...",
+                description: "Дочекайтесь завершення операції.",
+            })
+        }
+
+        setPending(true);
+
+        try {
+            const response = await fetch(`/api/items/reorder`, {
+                method: 'PATCH',
+                body: JSON.stringify(move),
+            });
+
+            if (!response.ok) throw new Error(await response.text());
+
+            toaster.update(REORDER_TOAST, {
+                title: "Мой як файно 🥳🥳🥳!!!",
+                description: "Операцію завершено.",
+                type: "success",
+                duration: 3000,
+            })
+
+            router.refresh();
+        } catch (error) {
+            console.error(error);
+
+            // Put the optimistic move back where the server still has it.
+            setRows(items);
+
+            toaster.update(REORDER_TOAST, {
+                title: "Не вдалося змінити порядок",
+                description: "Спробуйте ще раз.",
+                type: "error",
+                duration: 5000,
+            })
+        } finally {
+            setPending(false);
+        }
+    }, [items, router]);
+
+    const handleDragEnd = useCallback(({ active, over }: DragEndEvent) => {
+        if (!over || active.id === over.id) return;
+
+        const from = rows.findIndex(item => item.id === active.id);
+        const to = rows.findIndex(item => item.id === over.id);
+
+        if (from === -1 || to === -1) return;
+
+        setRows(arrayMove(rows, from, to));
+
+        void reorder({ activeId: active.id, overId: over.id });
+    }, [rows, reorder]);
+
+    const handleMove = useCallback((id: UniqueIdentifier, delta: number) => {
+        const from = rows.findIndex(item => item.id === id);
+
+        if (from === -1) return;
+
+        const to = from + delta;
+
+        // A move off either end of the page hands the item to the neighbouring
+        // page, so there is nothing to show optimistically — the refresh will.
+        if (to >= 0 && to < rows.length) {
+            setRows(arrayMove(rows, from, to));
+        }
+
+        void reorder({ activeId: id, delta });
+    }, [rows, reorder]);
+
     const handleDelete = useCallback(async (item: Item) => {
         await fetch(`/api/items`, {
             method: 'DELETE',
@@ -71,112 +188,73 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
         });
 
         router.refresh();
-    }, []);
+    }, [router]);
+
     const toggleVisible = useCallback(async (item: Item) => {
-        const { published } = item;
         await fetch(`/api/items`, {
             method: 'PATCH',
             body: JSON.stringify({
-                published: !published,
+                published: !item.published,
                 id: item.id,
             }),
         });
 
         router.refresh();
-    }, []);
-    function handleDragEnd(event: DragEndEvent) {
-        const { active, over } = event;
-        if (active && over && active.id !== over.id) {
-            const oldIndex = order.indexOf(active.id)
-            const newIndex = order.indexOf(over.id)
-            const update = arrayMove(items, oldIndex, newIndex) //this is just a splice util
-            console.log(update)
-        }
-    }
+    }, [router]);
 
-    const handleMove = useCallback(async (id: UniqueIdentifier, direction: 'up' | 'down') => {
-        const currentIndex = items.findIndex(item => item.id === id);
-        if (currentIndex === -1) return;
-
-        let targetIndex: number;
-
-        if (direction === 'up') {
-            // ONLY wrap if we are at the absolute top (index 0)
-            targetIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
-        } else {
-            // ONLY wrap if we are at the absolute bottom
-            targetIndex = currentIndex === items.length - 1 ? 0 : currentIndex + 1;
-        }
-
-        const toasterID = "reordering";
-        if (!toaster.isVisible(toasterID)) {
-            toaster.loading({
-                id: toasterID,
-                title: "Працюємо...",
-                description: "Дочекайтесь завершення операції.",
-            })
-        }
-
-        // Boundary check
-        if (targetIndex < 0 || targetIndex >= items.length) return;
-
-        const newItems = arrayMove(items, currentIndex, targetIndex);
-        const newOrder = newItems.map(i => i.id);
-
-        await fetch(`/api/items/reorder`, {
-            method: 'PATCH',
-            body: JSON.stringify({ ids: newOrder }),
-        });
-
-        toaster.update(toasterID, {
-            title: "Мой як файно 🥳🥳🥳!!!",
-            description: "Операцію завершено.",
-            type: "success",
-            duration: 3000,
-        })
-
-        router.refresh();
-    }, [items, router]);
+    // Where the first row of this page sits in the whole list, so the up/down
+    // buttons know when they are at an actual end of it.
+    const offset = page * pageSize;
 
     const columns = useMemo<ColumnDef<Item>[]>(
         () => [
+            ...(sortable ? [{
+                id: 'order',
+                header: 'Порядок',
+                cell: info => {
+                    const index = offset + info.row.index;
+
+                    return <HStack gap="0">
+                        <DragHandle disabled={pending} />
+                        <ButtonGroup orientation="vertical" size="2xs" variant="ghost">
+                            <IconButton
+                                aria-label="Вище"
+                                disabled={pending || index === 0}
+                                onClick={() => handleMove(info.row.original.id, -1)}
+                            >
+                                <BiCaretUp />
+                            </IconButton>
+                            <IconButton
+                                aria-label="Нижче"
+                                disabled={pending || index === total - 1}
+                                onClick={() => handleMove(info.row.original.id, 1)}
+                            >
+                                <BiCaretDown />
+                            </IconButton>
+                        </ButtonGroup>
+                    </HStack>
+                },
+            } satisfies ColumnDef<Item>] : []),
             {
                 accessorKey: 'name',
                 header: 'Назва',
                 cell: info => {
                     const item = info.row.original;
-                    return <HStack>
-                        <ButtonGroup orientation="vertical" size="2xs" variant="ghost">
-                            <IconButton onClick={() => {
-                                handleMove(info.row.original.id, 'up')
-                            }}>
-                                <BiCaretUp />
-                            </IconButton>
-                            <IconButton onClick={() => {
-                                handleMove(info.row.original.id, 'down')
-                            }}>
-                                <BiCaretDown />
-                            </IconButton>
-                        </ButtonGroup>
-                        <ChakraLink asChild variant="underline">
-                            <Link prefetch={false} href={`/admin/items/${item.id}`}>
-                                {item.name}
-                            </Link>
-                        </ChakraLink>
-                    </HStack>
+                    return <ChakraLink asChild variant="underline">
+                        <Link prefetch={false} href={`/admin/items/${item.id}`}>
+                            {item.name}
+                        </Link>
+                    </ChakraLink>
                 },
             },
             {
                 header: 'Інвентарний номер',
                 accessorKey: 'inventory',
-                enableSorting: false,
             },
             {
                 header: 'Регіони',
                 accessorFn: item => item.regions.map(region => region.name).join(', '),
-                cell: info => {
-                    return info.getValue()
-                },
+                cell: info => info.getValue(),
             },
             {
                 accessorFn: item => item.images[0],
@@ -187,25 +265,24 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                         <img src={`https://storage.googleapis.com/spadok-images/${image}`} alt="Item image" />
                     </Box> : null;
                 },
-                enableColumnFilter: false,
-                enableSorting: false,
             },
-            {
+            ...(canEdit ? [{
                 id: 'actions',
                 header: 'Дії',
-                enableSorting: false,
-                enableColumnFilter: false,
                 cell: info => {
                     const item = info.row.original;
                     return <Group>
-                        <IconButton disabled={isSubmitting} size="sm" variant="outline" onClick={handleSubmit(() => {
-                            return toggleVisible(info.row.original);
-                        })}>
+                        <IconButton
+                            aria-label={item.published ? 'Приховати' : 'Показати'}
+                            size="sm"
+                            variant="outline"
+                            onClick={() => toggleVisible(item)}
+                        >
                             {item.published ? <BiHide /> : <BiShow />}
                         </IconButton>
                         <Dialog.Root role="alertdialog">
                             <Dialog.Trigger asChild>
-                                <IconButton size="sm" colorPalette="red" variant="outline">
+                                <IconButton aria-label="Видалити" size="sm" colorPalette="red" variant="outline">
                                     <BiTrash />
                                 </IconButton>
                             </Dialog.Trigger>
@@ -223,9 +300,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                                             <Dialog.ActionTrigger asChild>
                                                 <Button variant="outline">Скасувати</Button>
                                             </Dialog.ActionTrigger>
-                                            <Button onClick={handleSubmit(() => {
-                                                return handleDelete(info.row.original);
-                                            })} disabled={isSubmitting} colorPalette="red">Видалити</Button>
+                                            <Button onClick={() => handleDelete(item)} colorPalette="red">Видалити</Button>
                                         </Dialog.Footer>
                                         <Dialog.CloseTrigger asChild>
                                             <CloseButton size="sm" />
@@ -236,94 +311,75 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                         </Dialog.Root>
                     </Group>
                 }
-            },
+            } satisfies ColumnDef<Item>] : []),
         ],
-        [isSubmitting]
+        [sortable, canEdit, pending, offset, total, handleMove, handleDelete, toggleVisible]
     )
 
-    const [pagination, setPagination] = useState<PaginationState>({
-        pageIndex: 0,
-        pageSize: 10,
-    });
+    const onPaginationChange: OnChangeFn<PaginationState> = useCallback(updater => {
+        const current: PaginationState = { pageIndex: page, pageSize };
+        const next = typeof updater === 'function' ? updater(current) : updater;
+
+        goTo({
+            // A different page size renumbers everything, so start over.
+            page: next.pageSize === pageSize ? next.pageIndex : 0,
+            pageSize: next.pageSize,
+        });
+    }, [page, pageSize, goTo]);
 
     const table = useReactTable({
         columns,
-        data: items,
-        debugTable: true,
+        data: rows,
         getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        onPaginationChange: setPagination,
-        //no need to pass pageCount or rowCount with client-side pagination as it is calculated automatically
+        // `data` is already the page the server sent, so page count comes from
+        // the total row count rather than from the rows in hand.
+        manualPagination: true,
+        rowCount: total,
+        onPaginationChange,
         state: {
-            pagination,
+            pagination: { pageIndex: page, pageSize },
         },
-        // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
     })
+
+    const ids = useMemo(() => rows.map(item => item.id), [rows]);
 
     return <DndContext
         collisionDetection={closestCenter}
         modifiers={[restrictToVerticalAxis]}
         onDragEnd={handleDragEnd}
-        sensors={[sensor]}
+        sensors={sensors}
     >
+        {canEdit && query && <Text mb={2} color="fg.muted">
+            Порядок предметів можна змінювати лише у повному списку — очистіть пошук.
+        </Text>}
         <Table.Root size="sm">
             <Table.Header>
                 {table.getHeaderGroups().map(headerGroup => (
                     <Table.Row key={headerGroup.id}>
-                        {headerGroup.headers.map(header => {
-                            return (
-                                <Table.ColumnHeader verticalAlign="top" key={header.id} colSpan={header.colSpan}>
-                                    <VStack align="stretch">
-                                        <div
-                                            {...{
-                                                className: header.column.getCanSort()
-                                                    ? 'cursor-pointer select-none'
-                                                    : '',
-                                                onClick: header.column.getToggleSortingHandler(),
-                                            }}
-                                        >
-                                            {flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                            {{
-                                                asc: ' 🔼',
-                                                desc: ' 🔽',
-                                            }[header.column.getIsSorted() as string] ?? null}
-                                        </div>
-                                        {header.column.getCanFilter() ? (
-                                            <Filter column={header.column} />
-                                        ) : null}
-                                    </VStack>
-                                </Table.ColumnHeader>
-                            )
-                        })}
+                        {headerGroup.headers.map(header => (
+                            <Table.ColumnHeader verticalAlign="top" key={header.id} colSpan={header.colSpan}>
+                                {flexRender(header.column.columnDef.header, header.getContext())}
+                            </Table.ColumnHeader>
+                        ))}
                     </Table.Row>
                 ))}
             </Table.Header>
             <Table.Body>
-                <SortableContext
-                    items={order}
-                    strategy={verticalListSortingStrategy}
-                >
-                    {table.getRowModel().rows.map(row => {
-                        return (
-                            <Row row={row.id} key={row.id}>
-                                {row.getVisibleCells().map(cell => {
-                                    return (
-                                        <Table.Cell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </Table.Cell>
-                                    )
-                                })}
-                            </Row>
-                        )
-                    })}
+                <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+                    {table.getRowModel().rows.map(row => (
+                        <SortableRow id={row.original.id} disabled={!sortable || pending} key={row.id}>
+                            {row.getVisibleCells().map(cell => (
+                                <Table.Cell key={cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                </Table.Cell>
+                            ))}
+                        </SortableRow>
+                    ))}
+                    {!rows.length && <Table.Row>
+                        <Table.Cell colSpan={table.getAllFlatColumns().length}>
+                            <Text color="fg.muted">Нічого не знайдено.</Text>
+                        </Table.Cell>
+                    </Table.Row>}
                 </SortableContext>
             </Table.Body>
             <Table.Footer>
@@ -333,6 +389,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                             <HStack justify="space-between">
                                 <Group>
                                     <IconButton
+                                        aria-label="Перша сторінка"
                                         size="xs"
                                         onClick={() => table.firstPage()}
                                         disabled={!table.getCanPreviousPage()}
@@ -340,6 +397,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                                         <BiFirstPage />
                                     </IconButton>
                                     <IconButton
+                                        aria-label="Попередня сторінка"
                                         size="xs"
                                         onClick={() => table.previousPage()}
                                         disabled={!table.getCanPreviousPage()}
@@ -347,6 +405,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                                         <BiLeftArrowAlt />
                                     </IconButton>
                                     <IconButton
+                                        aria-label="Наступна сторінка"
                                         size="xs"
                                         onClick={() => table.nextPage()}
                                         disabled={!table.getCanNextPage()}
@@ -354,6 +413,7 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                                         <BiRightArrowAlt />
                                     </IconButton>
                                     <IconButton
+                                        aria-label="Остання сторінка"
                                         size="xs"
                                         onClick={() => table.lastPage()}
                                         disabled={!table.getCanNextPage()}
@@ -363,20 +423,19 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                                     <HStack className="whitespace-nowrap">
                                         <Text>Сторінка</Text>
                                         <Text as="b">
-                                            {table.getState().pagination.pageIndex + 1} із{' '}
-                                            {table.getPageCount().toLocaleString()}
+                                            {page + 1} із {pageCount.toLocaleString()}
                                         </Text>
                                     </HStack>
                                 </Group>
                                 <Box>
                                     <NativeSelect.Root size="sm">
-                                        <NativeSelect.Field value={table.getState().pagination.pageSize}
+                                        <NativeSelect.Field value={pageSize}
                                                             onChange={e => {
                                                                 table.setPageSize(Number(e.target.value))
                                                             }}>
-                                            {[10, 20, 30, 40, 50].map(pageSize => (
-                                                <option key={pageSize} value={pageSize}>
-                                                    Показати {pageSize}
+                                            {PAGE_SIZES.map(size => (
+                                                <option key={size} value={size}>
+                                                    Показати {size}
                                                 </option>
                                             ))}
                                         </NativeSelect.Field>
@@ -385,8 +444,8 @@ const Items: FC<ItemsProps> = ({ items, order }) => {
                                 </Box>
                             </HStack>
                             <Text>
-                                Показано {table.getRowModel().rows.length.toLocaleString()} із{' '}
-                                {table.getRowCount().toLocaleString()} записів
+                                Показано {rows.length.toLocaleString()} із{' '}
+                                {total.toLocaleString()} записів
                             </Text>
                         </VStack>
                     </Table.Cell>

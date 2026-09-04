@@ -26,7 +26,6 @@ import {
     useReactTable
 } from "@tanstack/react-table";
 import Filter from "@/components/filter";
-import Row from "@/components/items/row";
 import {useCanEdit} from "@/components/role";
 
 type BaseItem = {
@@ -185,7 +184,7 @@ function Entities<T extends BaseItem>({items, initialState, columns = []}: Entit
         <Table.Body>
             {table.getRowModel().rows.map(row => {
                 return (
-                    <Row row={row.id} key={row.id}>
+                    <Table.Row key={row.id}>
                         {row.getVisibleCells().map(cell => {
                             return (
                                 <Table.Cell key={cell.id}>
@@ -196,7 +195,7 @@ function Entities<T extends BaseItem>({items, initialState, columns = []}: Entit
                                 </Table.Cell>
                             )
                         })}
-                    </Row>
+                    </Table.Row>
                 )
             })}
         </Table.Body>
