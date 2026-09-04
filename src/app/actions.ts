@@ -1,24 +1,33 @@
 'use server';
 import { cookies } from 'next/headers'
 import { adminAuth } from "@/lib/admin";
-import {redirect} from "next/navigation";
+import { Role, roleFromClaims } from "@/lib/roles";
+import { SESSION_COOKIE, SESSION_MAX_AGE_MS } from "@/lib/session-cookie";
 
-export async function createSession(token: string) {
+/**
+ * Exchanges a freshly minted Firebase ID token for an httpOnly session cookie
+ * and reports back the role it carries, so the caller can route accordingly.
+ */
+export async function createSession(token: string): Promise<{ role: Role }> {
     const cookieStore = await cookies()
-    const expiresIn = 60 * 60 * 24 * 14 * 1000; // 14 days in ms
-    const sessionCookie = await adminAuth.createSessionCookie(token, { expiresIn });
+    const sessionCookie = await adminAuth.createSessionCookie(token, { expiresIn: SESSION_MAX_AGE_MS });
+
     cookieStore.set({
-        name: 'session',
+        name: SESSION_COOKIE,
         value: sessionCookie,
         httpOnly: true,
         path: '/',
-        secure: true,
-        expires: Date.now() + expiresIn
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        expires: Date.now() + SESSION_MAX_AGE_MS
     });
 
     const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
 
-    if (decoded.admin) {
-        redirect('/admin')
-    }
+    return { role: roleFromClaims(decoded) };
+}
+
+export async function destroySession() {
+    const cookieStore = await cookies();
+    cookieStore.delete(SESSION_COOKIE);
 }

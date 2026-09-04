@@ -3,8 +3,12 @@ import {admin} from "@/lib/admin";
 import {getNextMemberOrder, MembersConverter} from "@/api/members";
 import {Member} from "@/models/member";
 import {deleteImageFromBucket, uploadImageToBucket} from "@/lib/upload";
+import { guard } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const formData = await request.formData();
 
     const photo = formData.get('photo');
@@ -38,6 +42,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const body: Member = await request.json();
     if (!body.id) {
         return NextResponse.json({ success: false, message: 'ID is required' }, { status: 400 });

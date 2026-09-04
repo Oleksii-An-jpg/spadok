@@ -20,6 +20,7 @@ import {arrayMove} from "@dnd-kit/sortable";
 import {Member} from "@/models/member";
 import {getImageUrl} from "@/lib/images";
 import {toaster} from "@/components/ui/toaster";
+import {useCanEdit} from "@/components/role";
 
 type MembersProps = {
     members: Member[]
@@ -27,6 +28,7 @@ type MembersProps = {
 
 const Members: FC<MembersProps> = ({ members }) => {
     const router = useRouter();
+    const canEdit = useCanEdit();
     const [pending, setPending] = useState(false);
 
     const handleDelete = useCallback(async (member: Member) => {
@@ -77,18 +79,18 @@ const Members: FC<MembersProps> = ({ members }) => {
     return <Table.Root size="sm" variant="outline">
         <Table.Header>
             <Table.Row>
-                <Table.ColumnHeader w="1">Порядок</Table.ColumnHeader>
+                {canEdit && <Table.ColumnHeader w="1">Порядок</Table.ColumnHeader>}
                 <Table.ColumnHeader w="1">Світлина</Table.ColumnHeader>
                 <Table.ColumnHeader>Ім’я</Table.ColumnHeader>
                 <Table.ColumnHeader>Роль</Table.ColumnHeader>
                 <Table.ColumnHeader>Instagram</Table.ColumnHeader>
-                <Table.ColumnHeader w="1">Дії</Table.ColumnHeader>
+                {canEdit && <Table.ColumnHeader w="1">Дії</Table.ColumnHeader>}
             </Table.Row>
         </Table.Header>
         <Table.Body>
             {members.map((member, index) => (
                 <Table.Row key={member.id}>
-                    <Table.Cell>
+                    {canEdit && <Table.Cell>
                         <ButtonGroup orientation="vertical" size="2xs" variant="ghost">
                             <IconButton aria-label="Вище" disabled={pending || index === 0} onClick={() => handleMove(member.id, 'up')}>
                                 <BiCaretUp />
@@ -97,7 +99,7 @@ const Members: FC<MembersProps> = ({ members }) => {
                                 <BiCaretDown />
                             </IconButton>
                         </ButtonGroup>
-                    </Table.Cell>
+                    </Table.Cell>}
                     <Table.Cell>
                         {member.photo ? <Box overflow="hidden" w="12" h="12" display="flex" alignItems="center" justifyContent="center">
                             <img src={getImageUrl(member.photo)} alt={member.name} />
@@ -116,7 +118,7 @@ const Members: FC<MembersProps> = ({ members }) => {
                             {member.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, '@').replace(/\/$/, '')}
                         </ChakraLink> : null}
                     </Table.Cell>
-                    <Table.Cell>
+                    {canEdit && <Table.Cell>
                         <Group>
                             <Dialog.Root role="alertdialog">
                                 <Dialog.Trigger asChild>
@@ -148,7 +150,7 @@ const Members: FC<MembersProps> = ({ members }) => {
                                 </Portal>
                             </Dialog.Root>
                         </Group>
-                    </Table.Cell>
+                    </Table.Cell>}
                 </Table.Row>
             ))}
         </Table.Body>

@@ -9,6 +9,7 @@ import {Technique} from "@/models/technique";
 import {Category} from "@/models/category";
 import {Cut} from "@/models/cut";
 import {Item} from "@/models/item";
+import {useCanEdit} from "@/components/role";
 
 type CreateProps = {
     authors: Author[]
@@ -21,6 +22,10 @@ type CreateProps = {
 }
 
 const Create: FC<CreateProps> = (props) => {
+    const canEdit = useCanEdit();
+
+    if (!canEdit) return null;
+
     return <Dialog.Root size="cover" scrollBehavior="inside">
         <Dialog.Trigger asChild>
             <Button>

@@ -1,12 +1,14 @@
 'use client';
 import {FC, useMemo} from "react";
 import {Button, VStack} from "@chakra-ui/react";
-import {BiCategory, BiGlobe, BiHome, BiKnife, BiListUl, BiPaintRoll, BiCut, BiUser, BiGroup} from "react-icons/bi";
+import {BiCategory, BiGlobe, BiHome, BiKnife, BiListUl, BiPaintRoll, BiCut, BiUser, BiGroup, BiShield} from "react-icons/bi";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
+import {useCanManageAccounts} from "@/components/role";
 
 const Sidebar: FC = () => {
     const pathname = usePathname();
+    const canManageAccounts = useCanManageAccounts();
     const links = useMemo(() => [
         {name: 'Кошти', icon: BiHome, href: '/admin/founds'},
         {name: 'Предмети', icon: BiListUl, href: '/admin/items'},
@@ -17,10 +19,12 @@ const Sidebar: FC = () => {
         {name: 'Автори', icon: BiUser, href: '/admin/authors'},
         {name: 'Крої', icon: BiCut, href: '/admin/cuts'},
         {name: 'Команда', icon: BiGroup, href: '/admin/members'},
+        // roles management is the one section a plain editor may not open
+        ...(canManageAccounts ? [{name: 'Права', icon: BiShield, href: '/admin/accounts'}] : []),
     ].map(link => ({
         ...link,
         active: pathname === link.href,
-    })), [pathname]);
+    })), [pathname, canManageAccounts]);
     return <VStack align="justify" gap={2}>
         {links.map(link => (
             <Button colorPalette="blue" variant="subtle" disabled={link.active} key={link.name} asChild justifyContent="flex-start">

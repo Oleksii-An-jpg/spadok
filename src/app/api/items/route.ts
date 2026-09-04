@@ -6,6 +6,7 @@ import {getRegions} from "@/api/regions";
 import {Item} from "@/models/item";
 import {saveItemToAlgolia} from "@/lib/algolia";
 import {deleteImageFromBucket, ImageDimensions, uploadImageToBucket} from "@/lib/upload";
+import { guard } from "@/lib/session";
 
 function removeUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
     return Object.fromEntries(
@@ -54,6 +55,9 @@ async function processImages(
 }
 
 export async function POST(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const formData = await request.formData();
     const regions = await getRegions()
 
@@ -147,6 +151,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const body: Item = await request.json();
     const id = body.id ? String(body.id as string) : null;
     const regions = await getRegions();
@@ -173,6 +180,9 @@ export async function DELETE(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+    const denied = await guard('editor');
+    if (denied) return denied;
+
     const body: Item = await request.json();
     const id = body.id ? String(body.id as string) : null;
     const regions = await getRegions();
