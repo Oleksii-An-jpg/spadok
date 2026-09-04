@@ -1,11 +1,47 @@
 import {createSystem, defaultConfig, defineConfig} from "@chakra-ui/react";
+import {accordionAnatomy} from "@chakra-ui/react/anatomy";
 
 const config = defineConfig({
     preflight: {
         scope: ".chakra-reset",
     },
     theme: {
+        slotRecipes: {
+            accordion: {
+                slots: accordionAnatomy.keys(),
+                base: {
+                    itemTrigger: {
+                        // Clicking a trigger left a focus box around "Категорії" /
+                        // "Регіони" and around every name in the team block.
+                        _focusVisible: {
+                            outline: 'none',
+                        },
+                    },
+                },
+            },
+        },
         recipes: {
+            link: {
+                variants: {
+                    variant: {
+                        // One rule for the whole site: text links carry an
+                        // underline all the time, anything shaped like a button or
+                        // a card never carries one, hover included.
+                        underline: {
+                            textDecoration: 'underline',
+                            _hover: {
+                                textDecoration: 'underline',
+                            },
+                        },
+                        plain: {
+                            textDecoration: 'none',
+                            _hover: {
+                                textDecoration: 'none',
+                            },
+                        },
+                    },
+                },
+            },
             button: {
                 base: {
                     borderRadius: 0,
@@ -87,7 +123,10 @@ const config = defineConfig({
         tokens: {
             colors: {
                 salmon: {
-                    500: { value: "#FF7B7BFF" },
+                    // Same value as --color-salmon in globals.css: Chakra used to
+                    // carry an older pink, so buttons and arrows drifted away from
+                    // everything Tailwind painted.
+                    500: { value: "#FF7587" },
                 },
                 azure: {
                     500: { value: "#2F6DADFF" },

@@ -17,6 +17,7 @@ import {getTechniques} from "@/api/techniques";
 import {getMaterials} from "@/api/materials";
 import {getCuts} from "@/api/cuts";
 import {getRegions} from "@/api/regions";
+import {getAuthors} from "@/api/authors";
 import ChakraMarkdownComponents from "@/components/markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
@@ -76,7 +77,7 @@ export async function generateMetadata(
 
 export default async function Page({params}: Props) {
     const {id} = await params;
-    const [item, categories, {items}, relation, techniques, materials, cuts, regions] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id), getTechniques(), getMaterials(), getCuts(), getRegions()]);
+    const [item, categories, {items}, relation, techniques, materials, cuts, regions, authors] = await Promise.all([getItem(id), getCategories(), getItems(), getRelation(id), getTechniques(), getMaterials(), getCuts(), getRegions(), getAuthors()]);
 
     if (!item) {
         return notFound();
@@ -115,7 +116,7 @@ export default async function Page({params}: Props) {
                 </Breadcrumb.Item>
             </Breadcrumb.List>
         </Breadcrumb.Root>
-        <Display categories={categories} regions={regions} item={{
+        <Display categories={categories} regions={regions} author={authors.find(({ id }) => id === item.author)} item={{
             ...item,
             techniques: item.techniques?.map(technique => techniques.find(({ id }) => id === technique)?.name).filter(isDefined),
             materials: item.materials?.map(material => materials.find(({ id }) => id === material)?.name).filter(isDefined),
@@ -126,7 +127,7 @@ export default async function Page({params}: Props) {
                 <Container>
                     <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} gap={2.5}>
                         <GridItem>
-                            <Heading lineHeight="normal" fontSize={{ base: '2xl', xl: '5xl' }} fontWeight="light">Цікавинки</Heading>
+                            <Heading lineHeight="normal" fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">Цікавинки</Heading>
                         </GridItem>
                         <GridItem>
                             <Markdown components={ChakraMarkdownComponents} rehypePlugins={[rehypeRaw, rehypeHighlight]}>{item.facts}</Markdown>
@@ -147,7 +148,7 @@ export default async function Page({params}: Props) {
 
         {random?.length && (
             <VStack align="stretch" gap={8}>
-                <Heading fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">
+                <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
                     Вам може сподобатися:
                 </Heading>
                 <Box columnCount={{ base: 2, md: 3, lg: 4, xl: 5 }} gap={2}>
@@ -155,7 +156,7 @@ export default async function Page({params}: Props) {
                 </Box>
                 <Box alignSelf="center">
                     <BrandButton variant="brand-primary" asChild>
-                        <ChakraLink asChild variant="underline">
+                        <ChakraLink asChild variant="plain">
                             <Link prefetch={false} href={`/catalog`}>
                                 Каталог
                             </Link>

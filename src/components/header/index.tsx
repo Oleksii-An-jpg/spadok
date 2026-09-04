@@ -27,9 +27,8 @@ const Header: FC<HTMLAttributes<HTMLHeadingElement>> = ({
                 </Link>
                 <HStack>
                     <IconButton size={{ base: 'sm', md: 'xl' }} asChild variant="solid" colorPalette="yellow" bg="khaki">
-                        <ChakraLink asChild>
+                        <ChakraLink asChild variant="plain">
                             <Link href="https://instagram.com/spilnyi.spadok"
-                                  className="underline"
                                   target="_blank">
                                 <BiLogoInstagram className="w-6! h-6! xl:w-9! xl:h-9!" />
                             </Link>

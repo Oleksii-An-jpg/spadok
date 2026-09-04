@@ -49,7 +49,12 @@ type FilterProps = {
     table: Table<ItemModel>
 }
 
-function buildFilterQuery(filters: ColumnFiltersState) {
+/** Everything else in the query string is a column filter. */
+const PAGE_PARAM = 'page';
+
+const PAGE_SIZE = 16;
+
+function buildQuery(filters: ColumnFiltersState, pageIndex: number) {
     const params = new URLSearchParams();
 
     filters.forEach(filter => {
@@ -59,6 +64,12 @@ function buildFilterQuery(filters: ColumnFiltersState) {
         }
     });
 
+    // Carried in the URL so coming back from an item lands on the page the
+    // visitor left, rather than back at the first one.
+    if (pageIndex > 0) {
+        params.set(PAGE_PARAM, String(pageIndex + 1));
+    }
+
     return params.toString();
 }
 
@@ -67,7 +78,7 @@ function parseFilters(searchParams: URLSearchParams) {
     const used = new Set<string>();
 
     for (const key of searchParams.keys()) {
-        if (used.has(key)) continue;
+        if (key === PAGE_PARAM || used.has(key)) continue;
         used.add(key);
 
         filters.push({
@@ -77,6 +88,11 @@ function parseFilters(searchParams: URLSearchParams) {
     }
 
     return filters;
+}
+
+function parsePage(value: string | null) {
+    const page = Number(value);
+    return Number.isFinite(page) && page > 1 ? Math.floor(page) - 1 : 0;
 }
 
 const ListboxItemCheckmark = () => {
@@ -98,6 +114,44 @@ const AccordionItemIcon: FC = () => {
     return <Icon size="lg">
         {expanded ? <BiMinus /> : <BiPlus />}
     </Icon>
+}
+
+/**
+ * The pager, rendered both above and below the grid — people were missing the
+ * top one, and the cards are too uneven in height for it to sit anywhere fixed.
+ */
+const Pager: FC<{ table: Table<ItemModel> }> = ({ table }) => {
+    const { pageIndex, pageSize } = table.getState().pagination;
+
+    return <Pagination.Root count={table.getFilteredRowModel().rows.length} page={pageIndex + 1}
+                            onPageChange={(e) => table.setPageIndex(e.page - 1)} pageSize={pageSize}
+                            defaultPage={pageIndex + 1}>
+        <ButtonGroup variant="ghost" size={{ base: '2xs', xl: 'xs' }}>
+            <Pagination.PrevTrigger asChild>
+                <IconButton variant="solid"
+                            colorPalette="salmon">
+                    <BiLeftArrowAlt className="w-6! h-6!" color="black" />
+                </IconButton>
+            </Pagination.PrevTrigger>
+
+            <Text fontSize={{ base: '2xs', xl: 'md' }}>Сторінка</Text>
+
+            <Pagination.Items
+                render={(page) => (
+                    <IconButton colorPalette={{ _selected: 'pink' }}>
+                        {page.value}
+                    </IconButton>
+                )}
+            />
+
+            <Pagination.NextTrigger asChild>
+                <IconButton variant="solid"
+                            colorPalette="salmon">
+                    <BiRightArrowAlt className="w-6! h-6!" color="black" />
+                </IconButton>
+            </Pagination.NextTrigger>
+        </ButtonGroup>
+    </Pagination.Root>
 }
 
 const Filter: FC<FilterProps> = ({ column, table }) => {
@@ -167,8 +221,8 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
     const searchParams = useSearchParams();
     const initialFilters = parseFilters(searchParams);
     const [pagination, setPagination] = useState<PaginationState>({
-        pageIndex: 0,
-        pageSize: 16,
+        pageIndex: parsePage(searchParams.get(PAGE_PARAM)),
+        pageSize: PAGE_SIZE,
     });
     const categories = useMemo(() => rawCategories.filter(category => category.canFilter), [rawCategories])
     const regions = useMemo(() => rawRegions.filter(category => category.canFilter), [rawRegions])
@@ -290,9 +344,21 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
         getFacetedRowModel: getFacetedRowModel(), //if you need a list of values for a column (other faceted row models depend on this one)
         getFacetedUniqueValues: getFacetedUniqueValues(), //if you need a list of unique values
     });
+    const pageCount = table.getPageCount();
+
+    // A page number out of the URL can outrun the list once filters narrow it.
     useEffect(() => {
-        window.history.replaceState({}, '', `/catalog?${buildFilterQuery(columnFilters)}`)
-    }, [columnFilters]);
+        const last = Math.max(pageCount - 1, 0);
+
+        if (pagination.pageIndex > last) {
+            setPagination(current => ({ ...current, pageIndex: last }));
+        }
+    }, [pageCount, pagination.pageIndex]);
+
+    useEffect(() => {
+        const query = buildQuery(columnFilters, pagination.pageIndex);
+        window.history.replaceState({}, '', query ? `/catalog?${query}` : '/catalog')
+    }, [columnFilters, pagination.pageIndex]);
     return <>
         <GridItem>
             <VStack align="stretch">
@@ -319,52 +385,7 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
                     <Heading fontSize={{ base: 'xl', xl: '4xl' }} fontWeight="light">
                         Врятовані речі
                     </Heading>
-                    <Pagination.Root count={table.getFilteredRowModel().rows.length} page={table.getState().pagination.pageIndex + 1}
-                                     onPageChange={(e) => table.setPageIndex(e.page - 1)} pageSize={table.getState().pagination.pageSize} defaultPage={table.getState().pagination.pageIndex + 1}>
-                        <ButtonGroup variant="ghost" size={{ base: '2xs', xl: 'xs' }}>
-                            <Pagination.PrevTrigger asChild>
-                                <IconButton variant="solid"
-                                            colorPalette="salmon">
-                                    <BiLeftArrowAlt className="w-6! h-6!" color="black" />
-                                </IconButton>
-                            </Pagination.PrevTrigger>
-
-                            <Text fontSize={{ base: '2xs', xl: 'md' }}>Сторінка</Text>
-
-                            {/*<Pagination.Context>*/}
-                            {/*    {({ pages }) =>*/}
-                            {/*        pages.map((page, index) =>*/}
-                            {/*            page.type === "page" ? page.value <= 3 || index === pages.length - 1 ? <Pagination.Item key={index} {...page}>*/}
-                            {/*                <IconButton colorPalette={{ _selected: 'pink' }}>*/}
-                            {/*                    {page.value}*/}
-                            {/*                </IconButton>*/}
-                            {/*            </Pagination.Item> : null : (*/}
-                            {/*                <Pagination.Ellipsis key={index} index={index}>*/}
-                            {/*                    <IconButton>*/}
-                            {/*                        <BiDotsHorizontal />*/}
-                            {/*                    </IconButton>*/}
-                            {/*                </Pagination.Ellipsis>*/}
-                            {/*            ),*/}
-                            {/*        )*/}
-                            {/*    }*/}
-                            {/*</Pagination.Context>*/}
-
-                            <Pagination.Items
-                                render={(page) => (
-                                    <IconButton colorPalette={{ _selected: 'pink' }}>
-                                        {page.value}
-                                    </IconButton>
-                                )}
-                            />
-
-                            <Pagination.NextTrigger asChild>
-                                <IconButton variant="solid"
-                                            colorPalette="salmon">
-                                    <BiRightArrowAlt className="w-6! h-6!" color="black" />
-                                </IconButton>
-                            </Pagination.NextTrigger>
-                        </ButtonGroup>
-                    </Pagination.Root>
+                    <Pager table={table} />
                 </Stack>
                 <Box columnCount={{ base: 2, md: 3, lg: 4 }} gap={2}>
                     {table.getRowModel().rows.map(row => {
@@ -376,6 +397,9 @@ const List: FC<ListProps> = ({ items, categories: rawCategories, regions: rawReg
                             })}
                         </Fragment>
                     })}
+                </Box>
+                <Box alignSelf={{ base: 'flex-start', xl: 'center' }}>
+                    <Pager table={table} />
                 </Box>
             </VStack>
         </GridItem>

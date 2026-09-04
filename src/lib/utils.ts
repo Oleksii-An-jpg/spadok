@@ -308,15 +308,21 @@ export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo
     const dateType = inferDateType(duration);
     const century = getCenturyFromYear(startYear);
 
-    if (dateType === DateType.YEARS || dateType === DateType.DECADES) {
-        if (dateType === DateType.DECADES) {
-            return {
-                dateType,
-                century,
-                decade: Math.floor((startYear % 100) / 10)
-            }
-        } else {
-            return { dateType };
+    if (dateType === DateType.DECADES) {
+        return {
+            dateType,
+            century,
+            decade: Math.floor((startYear % 100) / 10)
+        }
+    }
+
+    if (dateType === DateType.YEARS) {
+        // `decade` doubles as the offset inside the century for single years —
+        // that is what getDateTupleFromExtractedInfo reads back.
+        return {
+            dateType,
+            century,
+            decade: startYear % 100
         }
     }
 
@@ -361,6 +367,30 @@ export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo
         part,
         fraction
     };
+};
+
+/**
+ * The date as it reads on the public pages, e.g. "Перша половина XX ст." or
+ * "50-ті рр. XX ст.". Decades and years carry their value in `decade`, so they
+ * need their own wording rather than the part/fraction one.
+ */
+export const getDateLabel = (info: ExtractedDateInfo): string => {
+    const { dateType, century, part, fraction, decade } = info;
+
+    if (!century) {
+        return '';
+    }
+
+    if (dateType === DateType.DECADES && decade !== undefined) {
+        // Padded so the first decade reads "00-ті", the way the picker labels it.
+        return `${String(decade * 10).padStart(2, '0')}-ті рр. ${century} ст.`;
+    }
+
+    if (dateType === DateType.YEARS && decade !== undefined) {
+        return `${(getCenturyNumber(century) - 1) * 100 + decade} р.`;
+    }
+
+    return [part, fraction, `${century} ст.`].filter(Boolean).join(' ');
 };
 
 // Utility for sorting by name

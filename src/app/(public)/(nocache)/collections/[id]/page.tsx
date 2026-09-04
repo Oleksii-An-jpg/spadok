@@ -144,7 +144,7 @@ export default async function Page({params}: Props) {
                     </Grid>
                     <Box className="self-center">
                         <BrandButton asChild variant="brand-primary">
-                            <ChakraLink asChild>
+                            <ChakraLink asChild variant="plain">
                                 <Link href="/collections">Колекції</Link>
                             </ChakraLink>
                         </BrandButton>
