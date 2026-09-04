@@ -1,5 +1,5 @@
 'use client';
-import {FC, useEffect, useRef, useState} from "react";
+import {FC, useEffect, useMemo, useRef, useState} from "react";
 import {Item, ItemUIModel, Matureness} from "@/models/item";
 import { toaster } from "@/components/ui/toaster"
 import {
@@ -34,7 +34,9 @@ import ItemsPicker from "@/components/picker";
 import ExhibitionDate from "@/components/exhibition/date";
 import Gallery from "@/components/exhibition/gallery";
 import {Relation} from "@/models/relation";
-import {BiHappy} from "react-icons/bi";
+import {BiHappy, BiLinkExternal} from "react-icons/bi";
+import Link from "next/link";
+import {sortAlphabetically} from "@/lib/utils";
 
 function itemToFormData(item: Omit<ItemUIModel, 'regions'> & {
     regions: string[];
@@ -87,6 +89,21 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
     const { register, watch, reset, formState: { errors, isValid, isSubmitting }, setValue, control, handleSubmit } = useForm<ItemUIModel>({
         defaultValues: rest
     });
+
+    const sorted = useMemo(() => [...categories].sort(sortAlphabetically), [categories]);
+    // Підбірки are assigned from the category page, not from here, so keeping
+    // them out leaves a short enough list to scan by eye. An item that already
+    // sits in one keeps it selectable so opening the form cannot silently drop it.
+    const mainCategories = useMemo(
+        () => sorted.filter(category => !category.isCollection || category.id === item?.mainCategory),
+        [sorted, item?.mainCategory]
+    );
+    // Everything stays selectable here, but split into two labelled groups so a
+    // підбірка is never mistaken for a missing category.
+    const subCategories = useMemo(() => [
+        ...sorted.filter(category => !category.isCollection).map(category => ({ ...category, group: 'Категорії' })),
+        ...sorted.filter(category => category.isCollection).map(category => ({ ...category, group: 'Підбірки' })),
+    ], [sorted]);
 
     const sex = useController({
         control,
@@ -171,6 +188,19 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
 
                     reset(data)
                 })} gap={4}>
+                    {item && <Field.Root orientation="horizontal">
+                        <Field.Label>
+                            Сторінка на сайті
+                        </Field.Label>
+                        <ChakraLink asChild variant="underline" colorPalette="blue" fontSize="xs">
+                            <Link href={`/items/${item.id}`} target="_blank" rel="noreferrer">
+                                /items/{item.id} <BiLinkExternal />
+                            </Link>
+                        </ChakraLink>
+                        <Field.HelperText>
+                            {item.published ? 'Опубліковано.' : 'Ще не опубліковано — сторінка відкривається, але речі немає в каталозі.'}
+                        </Field.HelperText>
+                    </Field.Root>}
                     <Field.Root orientation="horizontal" required>
                         <Field.Label>
                             Назва
@@ -345,13 +375,8 @@ const Exhibition: FC<ExhibitionProps> = ({ item, items, relation, authors, regio
                     <Combo items={materials} name="materials" control={control} label="Матеріали" placeholder="Оберіть матеріали" />
                     <Combo items={techniques} label="Техніки виконання" name="techniques" control={control} placeholder="Оберіть техніки" />
                     <Combo items={cuts} name="cuts" control={control} label="Крій" placeholder="Оберіть крій" />
-                    <Picker items={categories} name="mainCategory" control={control} label="Основна категорія" placeholder="Оберіть категорію" />
-                    <Combo items={categories.map(category => ({
-                        ...category,
-                        ...(category.isCollection && {
-                            hint: '(підбірка)'
-                        })
-                    }))} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
+                    <Picker items={mainCategories} name="mainCategory" control={control} label="Основна категорія" placeholder="Оберіть категорію" />
+                    <Combo items={subCategories} name="subCategories" control={control} label="Додаткові категорії" placeholder="Оберіть категорії" />
                     <ExhibitionDate control={control} />
                     <Field.Root orientation="horizontal" required>
                         <Field.Label>

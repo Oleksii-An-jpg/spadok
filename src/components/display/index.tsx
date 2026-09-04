@@ -8,16 +8,37 @@ import Carousel from "@/components/display/carousel";
 import Attributes from "@/components/attributes";
 import {Category} from "@/models/category";
 import {Region} from "@/models/region";
+import {Author} from "@/models/author";
+import {Sex} from "@/models/item";
+import {getDateLabel} from "@/lib/utils";
 import isDefined from "@/utils/isDefined";
 
 type DisplayProps = {
     item: Item
     categories: Category[];
     regions: Region[];
+    author?: Author;
 }
 
-const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
+const Display: FC<DisplayProps> = ({ item, categories, regions, author }) => {
     const hasRegions = [...item.region, ...(item.subRegions || [])].map(region => regions.find(({ id }) => id === region)).some(item => item?.canFilter);
+    // Falls back to the country, which is always known, when the item has no
+    // administrative address behind it.
+    const place = [item.address?.state, item.address?.region, item.address?.city]
+        .filter(Boolean)
+        .join(', ') || item.address?.country;
+    const ethnographic = item.regions.map(({ name }) => name).join(', ');
+    const authorName = author && [author.firstName, author.middleName, author.lastName]
+        .map(part => part?.trim())
+        .filter(Boolean)
+        .join(' ');
+    // Groups an item does not have are dropped rather than left as an empty
+    // slot, which used to leave a dangling "; ;" behind.
+    const madeOf = [item.materials, item.techniques, item.cuts]
+        .map(group => group?.join(', '))
+        .filter(Boolean)
+        .join('; ');
+    const date = getDateLabel(item.date);
     return <VStack align="stretch" gap={{ base: 4, xl: 16 }}>
         <Grid gridTemplateColumns={{ base: "auto", xl: "390px auto" }} columnGap={2.5} rowGap={8}>
             <Carousel images={item.images} alt={item.name} />
@@ -28,17 +49,18 @@ const Display: FC<DisplayProps> = ({ item, categories, regions }) => {
                 </VStack>
                 <VStack align="stretch" fontSize={{ base: 'xs', xl: 'md' }} gap={3}>
                     <Box>
-                        <Text>{[item.address?.state, item.address?.region, item.address?.city]
-                            .filter(Boolean)
-                            .join(', ')} {item.region?.length && `(${item.regions.map(({ name }) => name).join(', ')})`}.</Text>
-                        <Text>{[item.date.part, item.date.fraction, item.date.century && `${item.date.century} ст.`].filter(Boolean).join(' ')}</Text>
+                        {(place || ethnographic) && <Text>
+                            {[place, ethnographic && `(${ethnographic})`].filter(Boolean).join(' ')}.
+                        </Text>}
+                        {date && <Text>{date}</Text>}
+                        {authorName && <Text>
+                            {author?.sex === Sex.FEMALE ? 'Авторка' : 'Автор'}: {authorName}.
+                        </Text>}
                     </Box>
                     <VStack align="stretch" gap={4}>
-                        <Text className="first-letter:uppercase">
-                            {(item.materials?.length || item.techniques?.length || item.cuts?.length) > 0 &&
-                                [item.materials?.join(', '), item.techniques?.join(', '), item.cuts?.join(', ')].join('; ')
-                            }
-                        </Text>
+                        {madeOf && <Text className="first-letter:uppercase">
+                            {madeOf}.
+                        </Text>}
                         {item.size ? <Text>
                             {item.size}.
                         </Text> : null}

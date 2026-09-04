@@ -20,6 +20,7 @@ import {
     BiHide,
     BiLastPage,
     BiLeftArrowAlt,
+    BiLinkExternal,
     BiRightArrowAlt,
     BiShow,
     BiTrash,
@@ -226,6 +227,19 @@ const Items: FC<ItemsProps> = ({ items, page, pageSize, total, pageCount, query 
                 cell: info => {
                     const item = info.row.original;
                     return <Group>
+                        <IconButton
+                            aria-label="Відкрити на сайті"
+                            title="Відкрити на сайті"
+                            size="sm"
+                            variant="outline"
+                            asChild
+                        >
+                            <ChakraLink asChild variant="plain">
+                                <Link href={`/items/${item.id}`} target="_blank" rel="noreferrer">
+                                    <BiLinkExternal />
+                                </Link>
+                            </ChakraLink>
+                        </IconButton>
                         <IconButton
                             aria-label={item.published ? 'Приховати' : 'Показати'}
                             size="sm"

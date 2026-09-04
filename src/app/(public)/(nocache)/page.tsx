@@ -118,7 +118,7 @@ export default async function Home() {
                       </Grid>
                       <VStack>
                           <BrandButton asChild size="xl" variant="brand-primary">
-                              <ChakraLink asChild>
+                              <ChakraLink asChild variant="plain">
                                   <Link prefetch={false} href="/catalog">Каталог</Link>
                               </ChakraLink>
                           </BrandButton>
