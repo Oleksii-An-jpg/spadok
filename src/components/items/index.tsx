@@ -50,9 +50,8 @@ import {
 } from '@tanstack/react-table'
 import {usePathname, useRouter} from "next/navigation";
 import {useCanEdit} from "@/components/role";
+import {DEFAULT_PAGE_SIZE, PAGE_SIZES} from "@/lib/pagination";
 
-export const DEFAULT_PAGE_SIZE = 10;
-export const PAGE_SIZES = [10, 20, 30, 40, 50];
 
 type ItemsProps = {
     /** Only the current page — the rest of the list never reaches the browser. */

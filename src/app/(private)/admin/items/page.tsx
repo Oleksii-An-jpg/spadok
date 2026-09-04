@@ -1,7 +1,8 @@
 'use server';
 
 import {getItemsPage} from "@/api/items";
-import Items, {DEFAULT_PAGE_SIZE, PAGE_SIZES} from "@/components/items";
+import Items from "@/components/items";
+import {DEFAULT_PAGE_SIZE, PAGE_SIZES} from "@/lib/pagination";
 import {Card, Heading, VStack} from "@chakra-ui/react";
 import Create from "@/components/exhibition/create";
 import {getRegions} from "@/api/regions";
