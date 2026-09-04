@@ -1,7 +1,7 @@
 'use client';
 import {FC, useMemo} from "react";
 import {Button, VStack} from "@chakra-ui/react";
-import {BiCategory, BiGlobe, BiHome, BiKnife, BiListUl, BiPaintRoll, BiCut, BiUser} from "react-icons/bi";
+import {BiCategory, BiGlobe, BiHome, BiKnife, BiListUl, BiPaintRoll, BiCut, BiUser, BiGroup} from "react-icons/bi";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 
@@ -16,6 +16,7 @@ const Sidebar: FC = () => {
         {name: 'Матеріали', icon: BiPaintRoll, href: '/admin/materials'},
         {name: 'Автори', icon: BiUser, href: '/admin/authors'},
         {name: 'Крої', icon: BiCut, href: '/admin/cuts'},
+        {name: 'Команда', icon: BiGroup, href: '/admin/members'},
     ].map(link => ({
         ...link,
         active: pathname === link.href,
