@@ -7,34 +7,41 @@ import {
     Card,
     Center,
     Group,
-    HStack,
     Heading,
     Link as ChakraLink,
     Spinner,
-    Tabs,
     Text,
     VStack,
 } from '@chakra-ui/react';
 import {GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
 import Link from "next/link";
+import {useState} from "react";
 import {BiLogoGoogle} from "react-icons/bi";
-import {useBoolean} from "usehooks-ts";
 import {auth} from "@/lib/client";
 import {endSession} from "@/lib/auth-client";
 import {hasAtLeast, ROLE_LABELS} from "@/lib/roles";
-import EmailAuth from "./_ui/email";
-import PhoneAuth from "./_ui/phone";
 import {useAuthState} from "./_ui/use-auth-state";
 
 export default function Auth() {
-    const { value: isSignUp, toggle } = useBoolean(false);
     const { checked, user, role } = useAuthState();
+    const [pending, setPending] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     async function handleGoogleLogin() {
+        setPending(true);
+        setError(null);
+
         try {
             await signInWithPopup(auth, new GoogleAuthProvider());
-        } catch (err) {
-            console.error("Google login error:", err);
+        } catch (e) {
+            const code = (e as { code?: string }).code;
+
+            // Closing the popup is a deliberate action, not something to report.
+            if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
+                setError((e as Error).message || 'Не вдалося увійти через Ґуґл');
+            }
+        } finally {
+            setPending(false);
         }
     }
 
@@ -49,7 +56,7 @@ export default function Auth() {
 
         return <VStack gap={4} align="stretch">
             <VStack gap={1}>
-                <Heading>{user.displayName ?? user.email ?? user.phoneNumber}</Heading>
+                <Heading>{user.displayName ?? user.email}</Heading>
                 {role && <Badge colorPalette={authorised ? 'green' : 'orange'}>{ROLE_LABELS[role]}</Badge>}
             </VStack>
 
@@ -85,37 +92,21 @@ export default function Auth() {
         </Card.Header>
 
         <Card.Body>
-            <Tabs.Root defaultValue="email" fitted>
-                <Tabs.List>
-                    <Tabs.Trigger value="email">Пошта</Tabs.Trigger>
-                    <Tabs.Trigger value="phone">Телефон</Tabs.Trigger>
-                </Tabs.List>
+            <VStack gap={4} align="stretch">
+                <Text fontSize="sm" color="gray.500">
+                    Вхід до адмінки здійснюється через обліковий запис Ґуґл.
+                </Text>
 
-                <Tabs.Content value="email" pt={4}>
-                    <EmailAuth isSignUp={isSignUp} />
-                </Tabs.Content>
+                {error && <Alert.Root status="error">
+                    <Alert.Indicator />
+                    <Alert.Description>{error}</Alert.Description>
+                </Alert.Root>}
 
-                <Tabs.Content value="phone" pt={4}>
-                    <PhoneAuth />
-                </Tabs.Content>
-            </Tabs.Root>
-        </Card.Body>
-
-        <Card.Footer>
-            <HStack w="full" wrap="wrap" justify="space-between">
-                <Button variant="outline" onClick={handleGoogleLogin}>
+                <Button colorPalette="blue" width="full" loading={pending} onClick={handleGoogleLogin}>
                     <BiLogoGoogle />
                     Зайти через Ґуґл
                 </Button>
-                <HStack>
-                    <Text fontSize="sm">
-                        {isSignUp ? 'Вже маєте обліковий запис?' : 'Немає облікового запису?'}
-                    </Text>
-                    <Button size="xs" variant="outline" onClick={toggle}>
-                        {isSignUp ? 'Увійти' : 'Зареєструватися'}
-                    </Button>
-                </HStack>
-            </HStack>
-        </Card.Footer>
+            </VStack>
+        </Card.Body>
     </Card.Root>
 }
