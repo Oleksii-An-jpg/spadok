@@ -138,15 +138,15 @@ export default async function Page({params}: Props) {
                 </Container>
             </Box>
         </Bleed> : null}
-        {related?.length && (
+        {related?.length ? (
             <Related items={related} />
-        )}
+        ) : null}
 
         <Bleed inline="30px">
             <Banner />
         </Bleed>
 
-        {random?.length && (
+        {random?.length ? (
             <VStack align="stretch" gap={8}>
                 <Heading fontSize={{ base: 'xl', xl: '3xl' }} fontWeight="light">
                     Вам може сподобатися:
@@ -164,6 +164,6 @@ export default async function Page({params}: Props) {
                     </BrandButton>
                 </Box>
             </VStack>
-        )}
+        ) : null}
     </VStack>
 }

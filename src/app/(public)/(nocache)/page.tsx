@@ -16,6 +16,19 @@ import Collection from "@/components/collection";
 import Banner from "@/components/banner";
 import {Filter} from "firebase-admin/firestore";
 
+// A sum sized to its column, so a seven-digit total still fits on a laptop
+// screen; the kopecks and the currency sign are set smaller than the hryvnias.
+function Amount({ value }: { value: number | string }) {
+    const price = getDisplayPrice(value);
+    const match = price.match(/^(.*?)(\.\d+)?(₴)$/);
+    return <h2 className="whitespace-nowrap leading-none text-[min(6rem,17cqw)]">
+        {match ? <>
+            {match[1]}
+            <span className="text-[0.5em]">{match[2]}{match[3]}</span>
+        </> : price}
+    </h2>;
+}
+
 export default async function Home() {
     const [categories, founds, members] = await Promise.all([getCategories({
         filters: [Filter.and(Filter.where('isCollection', '==', true), Filter.where('isHomepage', '==', true))]
@@ -67,15 +80,13 @@ export default async function Home() {
               </Section>
               <Section className="py-24 xl:py-48" variant="quaternary">
                   {founds && (
-                      <div className="flex flex-wrap xl:flex-nowrap gap-x-2.5 gap-y-6 xl:gap-x-40">
-                          <div className="basis-2/4">
+                      <div className="flex gap-x-2.5 xl:gap-x-20">
+                          <div className="flex-1 min-w-0 @container">
                               <h3 className="text-xl xl:text-4xl mb-3 xl:mb-6 font-light whitespace-nowrap">
                                   Зібрано <br /> коштів
                               </h3>
                               {founds.raised ? (
-                                  <h2 className="text-2xl xl:text-8xl">
-                                      {getDisplayPrice(founds.raised)}
-                                  </h2>
+                                  <Amount value={founds.raised} />
                               ) : (
                                   <p className="text-xs xl:text-base">
                                       Перші внески ми отримаємо на рахунок 05.03, на цей момент вони
@@ -83,13 +94,11 @@ export default async function Home() {
                                   </p>
                               )}
                           </div>
-                          <div className="xl:basis-2/4">
+                          <div className="flex-1 min-w-0 @container">
                               <h3 className="text-xl xl:text-4xl mb-3 xl:mb-6 font-light whitespace-nowrap">
                                   Витрачено <br /> коштів
                               </h3>
-                              <h2 className="text-2xl xl:text-8xl">
-                                  {getDisplayPrice(founds.spent)}
-                              </h2>
+                              <Amount value={founds.spent} />
                           </div>
                       </div>
                   )}
