@@ -28,6 +28,14 @@ const Display: FC<DisplayProps> = ({ item, categories, regions, author }) => {
         .filter(Boolean)
         .join(', ') || item.address?.country;
     const ethnographic = item.regions.map(({ name }) => name).join(', ');
+    // "Place. Ethnographic region." — a sentence each, so either one reads fine
+    // on its own when the other is unknown. A trailing dot (e.g. "обл.") is
+    // dropped first so it does not double up.
+    const origin = [place, ethnographic]
+        .map(part => part?.trim().replace(/\.$/, ''))
+        .filter(Boolean)
+        .map(part => `${part}.`)
+        .join(' ');
     const authorName = author && [author.firstName, author.middleName, author.lastName]
         .map(part => part?.trim())
         .filter(Boolean)
@@ -49,9 +57,7 @@ const Display: FC<DisplayProps> = ({ item, categories, regions, author }) => {
                 </VStack>
                 <VStack align="stretch" fontSize={{ base: 'xs', xl: 'md' }} gap={3}>
                     <Box>
-                        {(place || ethnographic) && <Text>
-                            {[place, ethnographic && `(${ethnographic})`].filter(Boolean).join(' ')}.
-                        </Text>}
+                        {origin && <Text>{origin}</Text>}
                         {date && <Text>{date}</Text>}
                         {authorName && <Text>
                             {author?.sex === Sex.FEMALE ? 'Авторка' : 'Автор'}: {authorName}.
