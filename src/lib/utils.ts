@@ -2,7 +2,7 @@ export enum DateType {
     CENTURIES = 'Століття',
     PARTS = 'Частини (типу, друга половина XIX ст.)',
     DECADES = 'Декади (20рр., 40рр. і так далі)',
-    YEARS = 'Роки'
+    YEARS = 'Точний рік'
 }
 
 export enum Century {
@@ -245,7 +245,13 @@ export interface ExtractedDateInfo {
     part?: Part;
     fraction?: Fraction;
     decade?: number; // 0-9 for decades within a century
+    year?: number; // the exact year, for DateType.YEARS
 }
+
+// The century the way the decade picker counts it: 1900–1999 is "XX", so
+// "00-ті рр. XX ст." is 1900–1909.
+const getCenturyOfDecade = (year: number): Century => getCenturyFromYear(Math.floor(year / 100) * 100 + 1);
+
 
 export const getDateTupleFromExtractedInfo = (info: ExtractedDateInfo): [Date, Date] | undefined => {
     const { dateType, century, part, fraction } = info;
@@ -260,6 +266,9 @@ export const getDateTupleFromExtractedInfo = (info: ExtractedDateInfo): [Date, D
         const centuryNumber = getCenturyNumber(century);
         const startYear = (centuryNumber - 1) * 100 + info.decade * 10;
         return [toUTCDate(new Date(startYear, 0, 1)), toUTCDate(new Date(startYear + 9, 11, 31))];
+    }
+    if (dateType === DateType.YEARS && info.year) {
+        return [toUTCDate(new Date(info.year, 0, 1)), toUTCDate(new Date(info.year, 11, 31))];
     }
     if (dateType === DateType.YEARS && century && info.decade !== undefined) {
         const centuryNumber = getCenturyNumber(century);
@@ -306,25 +315,24 @@ export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo
     const duration = endYear - startYear + 1;
 
     const dateType = inferDateType(duration);
-    const century = getCenturyFromYear(startYear);
 
     if (dateType === DateType.DECADES) {
         return {
             dateType,
-            century,
+            century: getCenturyOfDecade(startYear),
             decade: Math.floor((startYear % 100) / 10)
         }
     }
 
     if (dateType === DateType.YEARS) {
-        // `decade` doubles as the offset inside the century for single years —
-        // that is what getDateTupleFromExtractedInfo reads back.
         return {
             dateType,
-            century,
-            decade: startYear % 100
+            century: getCenturyFromYear(startYear),
+            year: startYear
         }
     }
+
+    const century = getCenturyFromYear(startYear);
 
     if (dateType === DateType.CENTURIES) {
         return { dateType, century };
@@ -375,7 +383,11 @@ export const extractCenturyPartAndFraction = (dates?: Date[]): ExtractedDateInfo
  * need their own wording rather than the part/fraction one.
  */
 export const getDateLabel = (info: ExtractedDateInfo): string => {
-    const { dateType, century, part, fraction, decade } = info;
+    const { dateType, century, part, fraction, decade, year } = info;
+
+    if (dateType === DateType.YEARS && year) {
+        return `${year} р.`;
+    }
 
     if (!century) {
         return '';

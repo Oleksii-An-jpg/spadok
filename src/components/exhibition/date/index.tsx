@@ -7,6 +7,7 @@ import CenturyPicker from "@/components/exhibition/date/century";
 import PartPicker from "@/components/exhibition/date/part";
 import FractionPicker from "@/components/exhibition/date/fraction";
 import DecadePicker from "@/components/exhibition/date/decade";
+import YearInput from "@/components/exhibition/date/year";
 
 type DateProps = {
     control: Control<ItemUIModel>;
@@ -99,6 +100,8 @@ const Date: FC<DateProps> = ({ control }) => {
                         <DecadePicker control={control} />
                         <CenturyPicker control={control} />
                     </>
+                case DateType.YEARS:
+                    return <YearInput control={control} />
             }
         })()}
     </>

@@ -29,7 +29,7 @@ const Founds: FC<FoundsProps> = ({ values }) => {
                             Зібрано
                         </Field.Label>
                         <InputGroup endAddon="UAH">
-                            <Input {...register('raised')} type="number" min={0} step={0.01} />
+                            <Input {...register('raised', { valueAsNumber: true })} type="number" min={0} step={0.01} />
                         </InputGroup>
                         <Field.HelperText />
                         <Field.ErrorText />
@@ -40,7 +40,7 @@ const Founds: FC<FoundsProps> = ({ values }) => {
                             Витрачено
                         </Field.Label>
                         <InputGroup endAddon="UAH">
-                            <Input {...register('spent')} type="number" min={0} step={0.01} />
+                            <Input {...register('spent', { valueAsNumber: true })} type="number" min={0} step={0.01} />
                         </InputGroup>
                         <Field.HelperText />
                         <Field.ErrorText />
